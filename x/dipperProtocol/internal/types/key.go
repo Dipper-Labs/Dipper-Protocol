@@ -17,5 +17,5 @@ const (
 //this is the token pool
 type tUser = string
 type tSymbol = string
-type tBill = float64
-type tPrice = float64
+type tBill = int64
+type tPrice = int64

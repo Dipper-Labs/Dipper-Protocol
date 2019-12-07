@@ -139,12 +139,12 @@ func (msg MsgDeleteName) GetSigners() []sdk.AccAddress {
 
 //MsgBankRepay define someone repay money to bank
 type MsgBankBorrow struct {
-	Amount float64 `json:"amount"`
+	Amount int64 `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankBorrow(amount float64, symbol string, owner sdk.AccAddress) MsgBankBorrow {
+func NewMsgBankBorrow(amount int64, symbol string, owner sdk.AccAddress) MsgBankBorrow {
 	return MsgBankBorrow{
 		Amount: amount,
 		Symbol: symbol,
@@ -181,12 +181,12 @@ func (msg MsgBankBorrow) GetSigners() []sdk.AccAddress {
 
 //MsgBankRepay define someone repay money to bank
 type MsgBankRepay struct {
-	Amount float64 `json:"amount"`
+	Amount int64 `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankRepay(amount float64, symbol string, owner sdk.AccAddress) MsgBankRepay {
+func NewMsgBankRepay(amount int64, symbol string, owner sdk.AccAddress) MsgBankRepay {
 	return MsgBankRepay{
 		Amount: amount,
 		Symbol: symbol,
@@ -223,12 +223,12 @@ func (msg MsgBankRepay) GetSigners() []sdk.AccAddress {
 
 //MsgBankBorrow define someone deposit money to bank
 type MsgBankDeposit struct {
-	Amount float64 `json:"amount"`
+	Amount int64 `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankDeposit(amount float64, symbol string, owner sdk.AccAddress) MsgBankDeposit {
+func NewMsgBankDeposit(amount int64, symbol string, owner sdk.AccAddress) MsgBankDeposit {
 	return MsgBankDeposit{
 		Amount: amount,
 		Symbol: symbol,
@@ -265,12 +265,12 @@ func (msg MsgBankDeposit) GetSigners() []sdk.AccAddress {
 
 //MsgBankWithdraw define someone withdraw money from bank
 type MsgBankWithdraw struct {
-	Amount float64 `json:"amount"`
+	Amount int64 `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankWithdraw(amount float64, symbol string, owner sdk.AccAddress) MsgBankWithdraw {
+func NewMsgBankWithdraw(amount int64, symbol string, owner sdk.AccAddress) MsgBankWithdraw {
 	return MsgBankWithdraw{
 		Amount: amount,
 		Symbol: symbol,
@@ -309,11 +309,11 @@ func (msg MsgBankWithdraw) GetSigners() []sdk.AccAddress {
 type MsgSetOraclePrice struct {
 	Name string `json:"amount"`
 	Symbol string `json:"symbol"`
-	Price float64 `json:"price"`
+	Price int64 `json:"price"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgSetOraclePrice(name string, symbol string, amount float64, owner sdk.AccAddress) MsgSetOraclePrice {
+func NewMsgSetOraclePrice(name string, symbol string, amount int64, owner sdk.AccAddress) MsgSetOraclePrice {
 	return MsgSetOraclePrice{
 		Name: name,
 		Symbol: symbol,
