@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 )
 
 // RouterKey is the module name router key
@@ -113,7 +114,7 @@ func NewMsgDeleteName(name string, owner sdk.AccAddress) MsgDeleteName {
 // Route should return the name of the module
 func (msg MsgDeleteName) Route() string { return RouterKey }
 
-// Type should return the action
+// Type should return the action[
 func (msg MsgDeleteName) Type() string { return "delete_name" }
 
 // ValidateBasic runs stateless checks on the message
@@ -144,9 +145,10 @@ type MsgBankBorrow struct {
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankBorrow(amount int64, symbol string, owner sdk.AccAddress) MsgBankBorrow {
+func NewMsgBankBorrow(amount string, symbol string, owner sdk.AccAddress) MsgBankBorrow {
+	amountInt, _ := strconv.ParseInt(amount, 10, 64)
 	return MsgBankBorrow{
-		Amount: amount,
+		Amount: amountInt,
 		Symbol: symbol,
 		Owner:  owner,
 	}

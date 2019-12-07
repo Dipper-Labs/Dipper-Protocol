@@ -108,94 +108,98 @@ func GetCmdDeleteName(cdc *codec.Codec) *cobra.Command {
 }
 
 
-//// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
-//func GetCmdBankBorrow(cdc *codec.Codec) *cobra.Command {
-//	return &cobra.Command{
-//		Use:   "delete-name [name]",
-//		Short: "delete the name that you own along with it's associated fields",
-//		Args:  cobra.ExactArgs(1),
-//		RunE: func(cmd *cobra.Command, args []string) error {
-//			cliCtx := context.NewCLIContext().WithCodec(cdc)
-//
-//			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-//
-//			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
-//			err := msg.ValidateBasic()
-//			if err != nil {
-//				return err
-//			}
-//
-//			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-//			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-//		},
-//	}
-//}
-//
-//// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
-//func GetCmdBankRepay(cdc *codec.Codec) *cobra.Command {
-//	return &cobra.Command{
-//		Use:   "bank-borrow [name]",
-//		Short: "delete the name that you own along with it's associated fields",
-//		Args:  cobra.ExactArgs(1),
-//		RunE: func(cmd *cobra.Command, args []string) error {
-//			cliCtx := context.NewCLIContext().WithCodec(cdc)
-//
-//			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-//
-//			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
-//			err := msg.ValidateBasic()
-//			if err != nil {
-//				return err
-//			}
-//
-//			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-//			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-//		},
-//	}
-//}
-//
-//// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
-//func GetCmdBankDeposit(cdc *codec.Codec) *cobra.Command {
-//	return &cobra.Command{
-//		Use:   "delete-name [name]",
-//		Short: "delete the name that you own along with it's associated fields",
-//		Args:  cobra.ExactArgs(1),
-//		RunE: func(cmd *cobra.Command, args []string) error {
-//			cliCtx := context.NewCLIContext().WithCodec(cdc)
-//
-//			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-//
-//			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
-//			err := msg.ValidateBasic()
-//			if err != nil {
-//				return err
-//			}
-//
-//			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-//			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-//		},
-//	}
-//}
-//
-//// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
-//func GetCmdBankWithdraw(cdc *codec.Codec) *cobra.Command {
-//	return &cobra.Command{
-//		Use:   "delete-name [name]",
-//		Short: "delete the name that you own along with it's associated fields",
-//		Args:  cobra.ExactArgs(1),
-//		RunE: func(cmd *cobra.Command, args []string) error {
-//			cliCtx := context.NewCLIContext().WithCodec(cdc)
-//
-//			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-//
-//			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
-//			err := msg.ValidateBasic()
-//			if err != nil {
-//				return err
-//			}
-//
-//			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-//			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-//		},
-//	}
-//}
+// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
+func GetCmdBankBorrow(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "bank-borrow [amount] [symbol]",
+		Short: "delete the name that you own along with it's associated fields",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			//coins, err := sdk.ParseCoins(args[0])
+			//if err != nil {
+			//	return err
+			//}
+
+			msg := types.NewMsgBankBorrow(args[0], args[1], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
+func GetCmdBankRepay(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "bank-borrow [name]",
+		Short: "delete the name that you own along with it's associated fields",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
+func GetCmdBankDeposit(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete-name [name]",
+		Short: "delete the name that you own along with it's associated fields",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdDeleteName is the CLI command for sending a DeleteName transaction
+func GetCmdBankWithdraw(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete-name [name]",
+		Short: "delete the name that you own along with it's associated fields",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
