@@ -107,23 +107,23 @@ func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 
 //Dipper Bank
 
-func (k Keeper) GetBillBank(ctx sdk.Context) types.BillBank {
+func (k Keeper) GetBillBank(ctx sdk.Context) *types.BillBank {
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsObjectPresent(ctx, types.DipperBank){
-		return *types.NewBillBank()
+		return types.NewBillBank()
 	}
 	bz := store.Get([]byte(types.DipperBank))
 	var billBank = types.NewBillBank()
 	k.cdc.MustUnmarshalBinaryBare(bz, &billBank)
-	return *billBank
+	return billBank
 }
 
-func (k Keeper) SetBillBank(ctx sdk.Context, bb types.BillBank) {
+func (k Keeper) SetBillBank(ctx sdk.Context, bb *types.BillBank) {
 	//if len(oracle.TokensPrice) == 0 {
 	//	return
 	//}
 	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(bb))
+	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(*bb))
 }
 
 //NetValueOf
