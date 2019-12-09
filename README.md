@@ -6,6 +6,8 @@ this is basic finance protocol
 dpd init dpd-official --chain-id dpd-chain
 
 # Add both accounts, with coins to the genesis file
+dpcli keys add alice\
+dpcli keys add bob\
 dpd add-genesis-account $(dpcli keys show alice -a) 10000000000000000stake,10000000000000000dpc\
 dpd add-genesis-account $(dpcli keys show bob -a) 1000000000000stake,10000000000000000dpc
 
