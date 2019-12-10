@@ -9,8 +9,8 @@ NOTE: If you have run the tutorial before, you can start from scratch with a dpd
 # Add both accounts, with coins to the genesis file
 dpcli keys add alice\
 dpcli keys add bob\
-dpd add-genesis-account $(dpcli keys show alice -a) 10000000000000000stake,10000000000000000dpc,10000000000000000ETH,10000000000000000DAI\
-dpd add-genesis-account $(dpcli keys show bob -a) 10000000000000000stake,10000000000000000dpc,10000000000000000ETH,10000000000000000DAI
+dpd add-genesis-account $(dpcli keys show alice -a) 10000000000000000stake,10000000000000000dpc,10000000000000000eth,10000000000000000dai\
+dpd add-genesis-account $(dpcli keys show bob -a) 10000000000000000stake,10000000000000000dpc,10000000000000000eth,10000000000000000dai
 
 # create validator
 dpd gentx 
