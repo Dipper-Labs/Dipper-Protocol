@@ -226,7 +226,7 @@ func GetCmdBankWithdraw(cdc *codec.Codec) *cobra.Command {
 // GetCmdSetOraclePrice is the CLI command for sending a SetOraclePrice transaction
 func GetCmdSetOraclePrice(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "bank-withdraw [name] [symbol] [amount]",
+		Use:   "set-oracleprice [name] [symbol] [amount]",
 		Short: "set the oracle price",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
