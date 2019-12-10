@@ -4,7 +4,7 @@ this is basic finance protocol
 
 # Initialize configuration files and genesis file
 dpd init dpd-official --chain-id dpd-chain\
-NOTE: If you have run the tutorial before, you can start from scratch with a nsd unsafe-reset-all or by deleting both of the home folders rm -rf ~/.ns*
+NOTE: If you have run the tutorial before, you can start from scratch with a dpd unsafe-reset-all or by deleting both of the home folders rm -rf ~/.dp*
 
 # Add both accounts, with coins to the genesis file
 dpcli keys add alice\
