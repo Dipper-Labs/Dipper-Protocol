@@ -34,9 +34,9 @@ dpd start --log_level "*:debug" --trace\
 curl http://127.0.0.1:26657/status
 
 # You can withdraw/deposit/borrow/repay coin which bank supports.
-dpcli tx dipperProtocol set-oracleprice dipperBank ETH 150000000 --from bob\
-dpcli tx dipperProtocol bank-withdraw 12000000eth ETH --from bob\
-dpcli tx dipperProtocol bank-withdraw 150000000dai DAI --from alice\
-dpcli tx dipperProtocol bank-deposit 1000000eth ETH --from bob\
-dpcli tx dipperProtocol bank-borrow 120000000dai DAI --from bob\
-dpcli tx dipperProtocol bank-repay 120000000dai DAI --from bob
+dpcli tx dipperProtocol set-oracleprice dipperBank eth 150000000 --from bob\
+dpcli tx dipperProtocol bank-withdraw 12000000eth eth --from bob\
+dpcli tx dipperProtocol bank-withdraw 150000000dai dai --from alice\
+dpcli tx dipperProtocol bank-deposit 1000000eth eth --from bob\
+dpcli tx dipperProtocol bank-borrow 120000000dai dai --from bob\
+dpcli tx dipperProtocol bank-repay 120000000dai dai --from bob
