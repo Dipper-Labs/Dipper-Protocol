@@ -67,7 +67,7 @@ type BillBank struct {
 
 	Pools map[tSymbol]TokenPool `json:"AccountDepositBills"`
 
-	Oracler *Oracle `json:"AccountDepositBills"`
+	Oracler Oracle `json:"AccountDepositBills"`
 
 	// BlockNumber simulate
 	BlockNumber uint64 `json:"AccountDepositBills"`
@@ -346,13 +346,13 @@ type Oracle struct {
 	TokensPrice map[tSymbol]tPrice `json:"tokensPrice"`
 }
 
-func NewOracle() *Oracle {
-	return &Oracle{map[tSymbol]tPrice{}}
+func NewOracle() Oracle {
+	return Oracle{map[tSymbol]tPrice{}}
 }
 
 // implement fmt.Stringer
 func (o Oracle) String() string {
-	return "Chainlink" //TODO add some orcale info.
+	return "DipperBank" //TODO add some orcale info.
 }
 
 func (o *Oracle) GetPrice(symbol string) int64 {

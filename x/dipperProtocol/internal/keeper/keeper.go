@@ -106,7 +106,6 @@ func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 }
 
 //Dipper Bank
-
 func (k Keeper) GetBillBank(ctx sdk.Context) *types.BillBank {
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsObjectPresent(ctx, types.DipperBank){
@@ -118,12 +117,12 @@ func (k Keeper) GetBillBank(ctx sdk.Context) *types.BillBank {
 	return billBank
 }
 
-func (k Keeper) SetBillBank(ctx sdk.Context, bb *types.BillBank) {
+func (k Keeper) SetBillBank(ctx sdk.Context, bb types.BillBank) {
 	//if len(oracle.TokensPrice) == 0 {
 	//	return
 	//}
 	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(*bb))
+	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(bb))
 }
 
 //NetValueOf
@@ -150,7 +149,7 @@ func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, bank)
+	k.SetBillBank(ctx, *bank)
 	return nil
 }
 
@@ -160,7 +159,7 @@ func (k Keeper)BankRepay(ctx sdk.Context, amount sdk.Coins, symbol string, user 
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, bank)
+	k.SetBillBank(ctx, *bank)
 	return nil
 }
 
@@ -180,7 +179,7 @@ func (k Keeper)BankDeposit(ctx sdk.Context, amount sdk.Coins, symbol string, use
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, bank)
+	k.SetBillBank(ctx, *bank)
 	return nil
 }
 
@@ -190,29 +189,20 @@ func (k Keeper)BankWithdraw(ctx sdk.Context, amount sdk.Coins, symbol string, us
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, bank)
+	k.SetBillBank(ctx, *bank)
 	return nil
 }
 
 //Orcale methods
 // Gets the entire Whois metadata struct for a name
 func (k Keeper) GetBankOracle(ctx sdk.Context, name string) types.Oracle {
-	store := ctx.KVStore(k.storeKey)
-	if !k.IsObjectPresent(ctx, name) {
-		return *types.NewOracle()
-	}
-	bz := store.Get([]byte(name))
-	var oracle types.Oracle
-	k.cdc.MustUnmarshalBinaryBare(bz, &oracle)
-	return oracle
+	return k.GetBillBank(ctx).Oracler
 }
 
 func (k Keeper) SetBankOracle(ctx sdk.Context, name string, oracle types.Oracle) {
-	//if len(oracle.TokensPrice) == 0 {
-	//	return
-	//}
-	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(name), k.cdc.MustMarshalBinaryBare(oracle))
+	bank := k.GetBillBank(ctx)
+	bank.Oracler = oracle
+	k.SetBillBank(ctx, *bank)
 }
 
 func (k Keeper) IsObjectPresent(ctx sdk.Context, name string) bool {
