@@ -228,7 +228,7 @@ func GetCmdSetOraclePrice(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "set-oracleprice [name] [symbol] [amount]",
 		Short: "set the oracle price",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
