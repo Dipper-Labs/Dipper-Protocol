@@ -3,6 +3,7 @@ package dipperProtocol
 import (
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/keeper"
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 )
 
 const (
@@ -26,6 +27,7 @@ var (
 	NewBankRepay = types.NewMsgBankRepay
 	NewBankDeposit = types.NewMsgBankDeposit
 	NewBankWithdraw = types.NewMsgBankWithdraw
+	DipperBankAddress = supply.NewModuleAddress(ModuleName)
 )
 
 type (
@@ -42,6 +44,7 @@ type (
 	MsgBankRepay = types.MsgBankRepay
 	MsgBankDeposit = types.MsgBankDeposit
 	MsgBankWithdraw = types.MsgBankWithdraw
+	MsgSetOraclePrice = types.MsgSetOraclePrice
 	BillBank = types.BillBank
 	TokenPool = types.TokenPool
 )

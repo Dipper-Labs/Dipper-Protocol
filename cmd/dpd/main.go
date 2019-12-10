@@ -63,7 +63,7 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app.NewdipperProtocolApp(logger, db)
+	return app.NewDipperProtocolApp(logger, db)
 }
 
 func exportAppStateAndTMValidators(
@@ -71,7 +71,7 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		nsApp := app.NewdipperProtocolApp(logger, db)
+		nsApp := app.NewDipperProtocolApp(logger, db)
 		err := nsApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
@@ -79,7 +79,7 @@ func exportAppStateAndTMValidators(
 		return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	nsApp := app.NewdipperProtocolApp(logger, db)
+	nsApp := app.NewDipperProtocolApp(logger, db)
 
 	return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

@@ -21,4 +21,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgBankRepay{}, "dipperProtocol/BankRepay", nil)
 	cdc.RegisterConcrete(MsgBankDeposit{}, "dipperProtocol/BankDeposit", nil)
 	cdc.RegisterConcrete(MsgBankWithdraw{}, "dipperProtocol/BankWithdraw", nil)
+
+	cdc.RegisterConcrete(MsgSetOraclePrice{}, "dipperProtocol/SetOraclePrice", nil)
 }

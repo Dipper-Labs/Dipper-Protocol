@@ -144,19 +144,24 @@ func (k Keeper)GetBorrowValueEstimate(ctx sdk.Context, amount int64, symbol stri
 	return k.GetBillBank(ctx).BorrowValueEstimate(amount, symbol)
 }
 
-func (k Keeper)BankBorrow(ctx sdk.Context, amount int64, symbol string, user sdk.AccAddress) {
+func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
 	bank := k.GetBillBank(ctx)
-	bank.Borrow(amount, symbol, user)
-	//if err != nil {
-	//	return
-	//}
+	err := bank.Borrow(amount, symbol, user)
+	if err != nil {
+		return err
+	}
 	k.SetBillBank(ctx, bank)
+	return nil
 }
 
-func (k Keeper)BankRepay(ctx sdk.Context, amount int64, symbol string, user sdk.AccAddress) {
+func (k Keeper)BankRepay(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
 	bank := k.GetBillBank(ctx)
-	bank.Repay(amount, symbol, user)
+	err := bank.Repay(amount, symbol, user)
+	if err != nil {
+		return err
+	}
 	k.SetBillBank(ctx, bank)
+	return nil
 }
 
 
@@ -169,16 +174,24 @@ func (k Keeper)GetSupplyValueOf(ctx sdk.Context, symbol string, user sdk.AccAddr
 	return k.GetBillBank(ctx).SupplyValueOf(symbol, user)
 }
 
-func (k Keeper)BankDeposit(ctx sdk.Context, amount int64, symbol string, user sdk.AccAddress) {
+func (k Keeper)BankDeposit(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error {
 	bank := k.GetBillBank(ctx)
-	bank.Deposit(amount, symbol, user)
+	err := bank.Deposit(amount, symbol, user)
+	if err != nil {
+		return err
+	}
 	k.SetBillBank(ctx, bank)
+	return nil
 }
 
-func (k Keeper)BankWithdraw(ctx sdk.Context, amount int64, symbol string, user sdk.AccAddress) {
+func (k Keeper)BankWithdraw(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
 	bank := k.GetBillBank(ctx)
-	bank.Withdraw(amount, symbol, user)
+	err := bank.Withdraw(amount, symbol, user)
+	if err != nil {
+		return err
+	}
 	k.SetBillBank(ctx, bank)
+	return nil
 }
 
 //Orcale methods

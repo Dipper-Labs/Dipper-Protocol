@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strconv"
 )
 
 // RouterKey is the module name router key
@@ -140,15 +139,14 @@ func (msg MsgDeleteName) GetSigners() []sdk.AccAddress {
 
 //MsgBankRepay define someone repay money to bank
 type MsgBankBorrow struct {
-	Amount int64 `json:"amount"`
+	Amount sdk.Coins `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankBorrow(amount string, symbol string, owner sdk.AccAddress) MsgBankBorrow {
-	amountInt, _ := strconv.ParseInt(amount, 10, 64)
+func NewMsgBankBorrow(amount sdk.Coins, symbol string, owner sdk.AccAddress) MsgBankBorrow {
 	return MsgBankBorrow{
-		Amount: amountInt,
+		Amount: amount,
 		Symbol: symbol,
 		Owner:  owner,
 	}
@@ -165,7 +163,7 @@ func (msg MsgBankBorrow) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if msg.Amount == 0 || len(msg.Symbol) == 0 {
+	if !msg.Amount.IsAllPositive() || len(msg.Symbol) == 0 {
 		return sdk.ErrUnknownRequest("Amount and/or Symbol cannot be empty")
 	}
 	return nil
@@ -183,12 +181,12 @@ func (msg MsgBankBorrow) GetSigners() []sdk.AccAddress {
 
 //MsgBankRepay define someone repay money to bank
 type MsgBankRepay struct {
-	Amount int64 `json:"amount"`
+	Amount sdk.Coins `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankRepay(amount int64, symbol string, owner sdk.AccAddress) MsgBankRepay {
+func NewMsgBankRepay(amount sdk.Coins, symbol string, owner sdk.AccAddress) MsgBankRepay {
 	return MsgBankRepay{
 		Amount: amount,
 		Symbol: symbol,
@@ -207,7 +205,7 @@ func (msg MsgBankRepay) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if msg.Amount == 0 || len(msg.Symbol) == 0 {
+	if !msg.Amount.IsAllPositive() || len(msg.Symbol) == 0 {
 		return sdk.ErrUnknownRequest("Amount and/or Symbol cannot be empty")
 	}
 	return nil
@@ -225,12 +223,12 @@ func (msg MsgBankRepay) GetSigners() []sdk.AccAddress {
 
 //MsgBankBorrow define someone deposit money to bank
 type MsgBankDeposit struct {
-	Amount int64 `json:"amount"`
+	Amount sdk.Coins `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankDeposit(amount int64, symbol string, owner sdk.AccAddress) MsgBankDeposit {
+func NewMsgBankDeposit(amount sdk.Coins, symbol string, owner sdk.AccAddress) MsgBankDeposit {
 	return MsgBankDeposit{
 		Amount: amount,
 		Symbol: symbol,
@@ -249,7 +247,7 @@ func (msg MsgBankDeposit) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if msg.Amount == 0 || len(msg.Symbol) == 0 {
+	if !msg.Amount.IsAllPositive() || len(msg.Symbol) == 0 {
 		return sdk.ErrUnknownRequest("Amount and/or Symbol cannot be empty")
 	}
 	return nil
@@ -267,12 +265,12 @@ func (msg MsgBankDeposit) GetSigners() []sdk.AccAddress {
 
 //MsgBankWithdraw define someone withdraw money from bank
 type MsgBankWithdraw struct {
-	Amount int64 `json:"amount"`
+	Amount sdk.Coins `json:"amount"`
 	Symbol string `json:"symbol"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgBankWithdraw(amount int64, symbol string, owner sdk.AccAddress) MsgBankWithdraw {
+func NewMsgBankWithdraw(amount sdk.Coins, symbol string, owner sdk.AccAddress) MsgBankWithdraw {
 	return MsgBankWithdraw{
 		Amount: amount,
 		Symbol: symbol,
@@ -291,7 +289,7 @@ func (msg MsgBankWithdraw) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if msg.Amount == 0 || len(msg.Symbol) == 0 {
+	if !msg.Amount.IsAllPositive() || len(msg.Symbol) == 0 {
 		return sdk.ErrUnknownRequest("Amount and/or Symbol cannot be empty")
 	}
 	return nil
@@ -311,11 +309,11 @@ func (msg MsgBankWithdraw) GetSigners() []sdk.AccAddress {
 type MsgSetOraclePrice struct {
 	Name string `json:"amount"`
 	Symbol string `json:"symbol"`
-	Price int64 `json:"price"`
+	Price string `json:"price"`
 	Owner sdk.AccAddress `json:"owner"`
 }
 
-func NewMsgSetOraclePrice(name string, symbol string, amount int64, owner sdk.AccAddress) MsgSetOraclePrice {
+func NewMsgSetOraclePrice(name string, symbol string, amount string, owner sdk.AccAddress) MsgSetOraclePrice {
 	return MsgSetOraclePrice{
 		Name: name,
 		Symbol: symbol,
@@ -335,7 +333,7 @@ func (msg MsgSetOraclePrice) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if msg.Price == 0 || len(msg.Name) == 0 || len(msg.Symbol) == 0{
+	if len(msg.Price) == 0 || len(msg.Name) == 0 || len(msg.Symbol) == 0{
 		return sdk.ErrUnknownRequest("Price and/or Name and/or Symbol cannot be empty")
 	}
 	return nil

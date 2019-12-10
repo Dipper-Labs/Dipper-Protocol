@@ -10,7 +10,7 @@ import (
 )
 
 // MinNamePrice is Initial Starting Price for a name that was never previously owned
-var MinNamePrice = sdk.Coins{sdk.NewInt64Coin("dippertoken", 1)}
+var MinNamePrice = sdk.Coins{sdk.NewInt64Coin("dpc", 1)}
 
 // Whois is a struct that contains all the metadata of a name
 type Whois struct {
@@ -190,20 +190,21 @@ func (b *BillBank) BorrowValueEstimate(amount int64, symbol string) int64 {
 	return amount * b.Oracler.GetPrice(symbol)
 }
 
-func (b *BillBank) Borrow(amount int64, symbol string, userAcc sdk.AccAddress) error {
+func (b *BillBank) Borrow(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
 	user := userAcc.String()
 	b.liquidate(symbol)
 	pool := b.getPool(symbol)
 
+	coin := amount.AmountOf(symbol).Int64()
 	// check cash of pool
-	if amount > pool.GetCash() {
+	if coin > pool.GetCash() {
 		return fmt.Errorf("not enough token for borrow. amount: %v, cash: %v", amount, pool.GetCash())
 	}
 
 	// calcuate bill
-	bill := amount
+	bill := coin
 	if pool.BorrowBill != 0 && pool.Borrow != 0 {
-		bill = amount * (pool.BorrowBill / pool.Borrow)
+		bill = coin * (pool.BorrowBill / pool.Borrow)
 	}
 
 	// update user account bill
@@ -219,32 +220,33 @@ func (b *BillBank) Borrow(amount int64, symbol string, userAcc sdk.AccAddress) e
 
 	// update borrow
 	pool.BorrowBill += bill
-	pool.Borrow += amount
+	pool.Borrow += coin
 	b.Pools[symbol] = pool
 
 	return nil
 }
 
-func (b *BillBank) Repay(amount int64, symbol string, userAcc sdk.AccAddress) error {
+func (b *BillBank) Repay(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
 	user := userAcc.String()
 	b.liquidate(symbol)
 	pool := b.getPool(symbol)
 
 	// check borrow
 	accountAmount := b.BorrowBalanceOf(symbol, userAcc)
-	if amount > accountAmount {
+	coin := amount.AmountOf(symbol).Int64()
+	if coin > accountAmount {
 		return fmt.Errorf("too much amount to repay. user: %v, need repay: %v", user, accountAmount)
 	}
 
 	// calculate bill
-	bill := amount * (pool.BorrowBill / pool.Borrow)
+	bill := coin * (pool.BorrowBill / pool.Borrow)
 
 	// update user account borrow
 	b.AccountBorrowBills[user][symbol] -= bill
 
 	// update borrow
 	pool.BorrowBill -= bill
-	pool.Borrow -= amount
+	pool.Borrow -= coin
 	b.Pools[symbol] = pool
 
 	return nil
@@ -277,15 +279,16 @@ func (b *BillBank) SupplyValueOf(symbol string, userAcc sdk.AccAddress) int64 {
 	return b.SupplyBalanceOf(symbol, userAcc) * b.Oracler.GetPrice(symbol)
 }
 
-func (b *BillBank) Deposit(amount int64, symbol string, userAcc sdk.AccAddress) error {
+func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
 	user := userAcc.String()
 	b.liquidate(symbol)
 	pool := b.getPool(symbol)
 
 	// calcuate bill
-	bill := amount
+	coin := amount.AmountOf(symbol).Int64()
+	bill := coin
 	if pool.SupplyBill != 0 && pool.Supply != 0 {
-		bill = amount * (pool.SupplyBill / pool.Supply)
+		bill = coin * (pool.SupplyBill / pool.Supply)
 	}
 
 	// update user account bill
@@ -301,36 +304,37 @@ func (b *BillBank) Deposit(amount int64, symbol string, userAcc sdk.AccAddress) 
 
 	// update pool
 	pool.SupplyBill += bill
-	pool.Supply += amount
+	pool.Supply += coin
 	b.Pools[symbol] = pool
 
 	return nil
 }
 
-func (b *BillBank) Withdraw(amount int64, symbol string, userAcc sdk.AccAddress) (err error) {
+func (b *BillBank) Withdraw(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) (err error) {
 	user := userAcc.String()
 	b.liquidate(symbol)
 	pool := b.getPool(symbol)
 
 	// check account balance
 	accountAmount := b.SupplyBalanceOf(symbol, userAcc)
-	if amount > accountAmount {
+	coin := amount.AmountOf(symbol).Int64()
+	if coin > accountAmount {
 		return fmt.Errorf("not enough amount for withdraw. user: %v, acutal amount: %v", userAcc.String(), accountAmount)
 	}
 	// check balance of supply
-	if amount > pool.GetCash() {
+	if coin > pool.GetCash() {
 		return fmt.Errorf("not enough token for withdraw. amount: %v, cash %v", amount, pool.GetCash())
 	}
 
 	// calcuate bill
-	bill := amount * (pool.SupplyBill / pool.Supply)
+	bill := coin * (pool.SupplyBill / pool.Supply)
 
 	// update user account bill
 	b.AccountDepositBills[user][symbol] -= bill
 
 	// update pool
 	pool.SupplyBill -= bill
-	pool.Supply -= amount
+	pool.Supply -= coin
 	b.Pools[symbol] = pool
 
 	return

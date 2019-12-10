@@ -2,8 +2,8 @@ package dipperProtocol
 
 import (
 	"fmt"
-
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -26,6 +26,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgBankDeposit(ctx, keeper, msg)
 		case MsgBankWithdraw:
 			return handleMsgBankWithdraw(ctx, keeper, msg)
+		case MsgSetOraclePrice:
+			return handleMsgSetOraclePrice(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized dipperProtocol Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -79,21 +81,47 @@ func handleMsgDeleteName(ctx sdk.Context, keeper Keeper, msg MsgDeleteName) sdk.
 
 
 func handleMsgBankBorrow(ctx sdk.Context, keeper Keeper, msg MsgBankBorrow) sdk.Result{
-	keeper.BankBorrow(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	err := keeper.BankBorrow(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	if err != nil {
+		return types.ErrNotEnoughTokenForBorrow(types.DefaultCodespace).Result()
+	}
+	keeper.CoinKeeper.SendCoins(ctx, DipperBankAddress, msg.Owner, msg.Amount)
 	return sdk.Result{}
 }
 
 func handleMsgBankRepay(ctx sdk.Context, keeper Keeper, msg MsgBankRepay) sdk.Result{
-	keeper.BankRepay(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	err := keeper.BankRepay(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	if err != nil {
+		return types.ErrTooMuchAmountToRepay(types.DefaultCodespace).Result()
+	}
+	keeper.CoinKeeper.SendCoins(ctx, msg.Owner, DipperBankAddress, msg.Amount)
 	return sdk.Result{}
 }
 
 func handleMsgBankDeposit(ctx sdk.Context, keeper Keeper, msg MsgBankDeposit) sdk.Result{
 	keeper.BankDeposit(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	keeper.CoinKeeper.SendCoins(ctx, msg.Owner, DipperBankAddress, msg.Amount)
 	return sdk.Result{}
 }
 
 func handleMsgBankWithdraw(ctx sdk.Context, keeper Keeper, msg MsgBankWithdraw) sdk.Result{
-	keeper.BankWithdraw(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	err := keeper.BankWithdraw(ctx, msg.Amount, msg.Symbol, msg.Owner)
+	if err != nil {
+		return types.ErrNotEnoughAmountCoinForWithdraw(types.DefaultCodespace).Result()
+	}
+	keeper.CoinKeeper.SendCoins(ctx, DipperBankAddress, msg.Owner, msg.Amount)
+	return sdk.Result{}
+}
+
+func handleMsgSetOraclePrice(ctx sdk.Context, keeper Keeper, msg MsgSetOraclePrice) sdk.Result{
+	//TODO add authority who can set oracle price.
+	//if msg.Owner.Equals(){
+	//
+	//}
+	price, err := strconv.ParseInt(msg.Price, 10, 64)
+	if err != nil {
+		return sdk.ErrUnknownRequest("invalid price").Result()
+	}
+	keeper.SetOraclePrice(ctx, msg.Name, msg.Symbol, price)
 	return sdk.Result{}
 }
