@@ -91,8 +91,8 @@ type dipperProtocolApp struct {
 	mm *module.Manager
 }
 
-// NewDipperProtocolApp is a constructor function for dipperProtocolApp
-func NewDipperProtocolApp(
+// NewdipperProtocolApp is a constructor function for dipperProtocolApp
+func NewdipperProtocolApp(
 	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
 ) *dipperProtocolApp {
 
