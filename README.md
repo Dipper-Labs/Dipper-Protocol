@@ -13,12 +13,12 @@ dpd add-genesis-account $(dpcli keys show alice -a) 10000000000000000stake,10000
 dpd add-genesis-account $(dpcli keys show bob -a) 10000000000000000stake,10000000000000000dpc,10000000000000000eth,10000000000000000dai
 
 # create validator
-dpd gentx \
-  --amount 1000000stake \
-  --commission-rate "0.10" \
-  --commission-max-rate "0.20" \
-  --commission-max-change-rate "0.10" \
-  --pubkey $(dpd tendermint show-validator) \
+dpd gentx 
+  --amount 1000000stake 
+  --commission-rate "0.10" 
+  --commission-max-rate "0.20" 
+  --commission-max-change-rate "0.10" 
+  --pubkey $(dpd tendermint show-validator) 
   --name alice
 
 # collect gentx
