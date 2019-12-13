@@ -122,6 +122,6 @@ func handleMsgSetOraclePrice(ctx sdk.Context, keeper Keeper, msg MsgSetOraclePri
 	if err != nil {
 		return sdk.ErrUnknownRequest("invalid price").Result()
 	}
-	keeper.SetOraclePrice(ctx, msg.Name, msg.Symbol, price)
+	keeper.SetOraclePrice(ctx, msg.Symbol, price)
 	return sdk.Result{}
 }

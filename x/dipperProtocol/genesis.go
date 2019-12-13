@@ -2,17 +2,18 @@ package dipperProtocol
 
 import (
 	"fmt"
-
+	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 type GenesisState struct {
 	WhoisRecords []Whois `json:"whois_records"`
+	BillBank BillBank `json:"bill_bank"`
 }
 
 func NewGenesisState(whoIsRecords []Whois) GenesisState {
-	return GenesisState{WhoisRecords: nil}
+	return GenesisState{WhoisRecords: nil, BillBank: types.BillBank{}}
 }
 
 func ValidateGenesis(data GenesisState) error {
@@ -33,6 +34,7 @@ func ValidateGenesis(data GenesisState) error {
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
 		WhoisRecords: []Whois{},
+		BillBank: types.BillBank{},
 	}
 }
 
@@ -40,6 +42,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.Valid
 	for _, record := range data.WhoisRecords {
 		keeper.SetWhois(ctx, record.Value, record)
 	}
+	keeper.SetBillBank(ctx, data.BillBank)
 	return []abci.ValidatorUpdate{}
 }
 
@@ -51,7 +54,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		name := string(iterator.Key())
 		whois := k.GetWhois(ctx, name)
 		records = append(records, whois)
-
 	}
-	return GenesisState{WhoisRecords: records}
+	billBank := types.NewBillBank()
+	return GenesisState{WhoisRecords: records, BillBank:billBank}
 }

@@ -33,13 +33,11 @@ Value: %s
 Price: %s`, w.Owner, w.Value, w.Price))
 }
 
-
-
 type TokenPool struct {
-	SupplyBill int64 `json:"supplyBill"`
+	SupplyBill int64 `json:"supply_bill"`
 	Supply     int64 `json:"supply"`
-	BorrowBill int64 `json:"BorrowBill"`
-	Borrow     int64 `json:"Borrow"`
+	BorrowBill int64 `json:"borrow_bill"`
+	Borrow     int64 `json:"borrow"`
 
 	// last liquidate blockNumber
 	liquidateIndex uint64
@@ -54,29 +52,29 @@ Borrow: %d`, tp.SupplyBill, tp.Supply, tp.BorrowBill, tp.Borrow))
 }
 
 // GetCash Cash = Supply - Borrow
-func (tp *TokenPool) GetCash() int64 {
+func (tp TokenPool) GetCash() int64 {
 	return tp.Supply - tp.Borrow
 }
 
 
 type BillBank struct {
 	// internal account for token bill(deposit)
-	AccountDepositBills map[tUser]map[tSymbol]tBill `json:"accountDepositBills"`
+	AccountDepositBills map[tUser]map[tSymbol]tBill `json:"account_deposit_bills"`
 	// internal account for token bill(borrow)
-	AccountBorrowBills map[tUser]map[tSymbol]tBill `json:"accountDepositBills"`
+	AccountBorrowBills map[tUser]map[tSymbol]tBill `json:"account_deposit_bills"`
 
-	Pools map[tSymbol]TokenPool `json:"AccountDepositBills"`
+	Pools map[tSymbol]TokenPool `json:"account_deposit_bills"`
 
-	Oracler Oracle `json:"AccountDepositBills"`
+	Oracler Oracle `json:"oracle"`
 
 	// BlockNumber simulate
-	BlockNumber uint64 `json:"AccountDepositBills"`
+	BlockNumber uint64 `json:"block_number"`
 	// borrowRate every block
-	borrowRate uint64 `json:"AccountDepositBills"`
+	borrowRate uint64 `json:"borrow_rate"`
 }
 
-func NewBillBank() *BillBank {
-	return &BillBank{
+func NewBillBank() BillBank {
+	return BillBank{
 		AccountDepositBills: map[tUser]map[tSymbol]tBill{},
 		AccountBorrowBills:  map[tUser]map[tSymbol]tBill{},
 		Pools: map[tSymbol]TokenPool{
@@ -85,7 +83,7 @@ func NewBillBank() *BillBank {
 		},
 		Oracler:     NewOracle(),
 		BlockNumber: 1,
-		borrowRate:  100000,
+		borrowRate:  1,
 	}
 }
 
@@ -115,7 +113,7 @@ func (b *BillBank) calculateGrowth(symbol string) int64 {
 		//		n: block number
 		//		b = b * (1+r)^n
 		borrow = int64(float64(borrow) * math.Pow(
-			float64(1000000+b.borrowRate),
+			1+float64(b.borrowRate)/100,
 			float64(b.BlockNumber-pool.liquidateIndex),
 		))
 		growth = borrow - pool.Borrow
@@ -123,7 +121,7 @@ func (b *BillBank) calculateGrowth(symbol string) int64 {
 	return growth
 }
 
-func (b *BillBank) getPool(symbol string) (pool TokenPool) {
+func (b BillBank) getPool(symbol string) (pool TokenPool) {
 	var ok bool
 	if pool, ok = b.Pools[symbol]; !ok {
 		log.Panicf("not support token: %v", symbol)
@@ -131,7 +129,7 @@ func (b *BillBank) getPool(symbol string) (pool TokenPool) {
 	return
 }
 
-func (b *BillBank) NetValueOf(userAcc sdk.AccAddress) int64 {
+func (b BillBank) NetValueOf(userAcc sdk.AccAddress) int64 {
 	user := userAcc.String()
 	var supplyValue int64 = 0
 	if acc, ok := b.AccountDepositBills[user]; ok {
@@ -157,7 +155,7 @@ func (b *BillBank) NetValueOf(userAcc sdk.AccAddress) int64 {
 
 
 //BillBank Borrow method
-func (b *BillBank) BorrowBalanceOf(symbol string, userAcc sdk.AccAddress) int64 {
+func (b BillBank) BorrowBalanceOf(symbol string, userAcc sdk.AccAddress) int64 {
 	user := userAcc.String()
 	pool := b.getPool(symbol)
 
@@ -176,10 +174,10 @@ func (b *BillBank) BorrowBalanceOf(symbol string, userAcc sdk.AccAddress) int64 
 	// calcuate amount
 	// current block liquidated, growth is zero
 	growth := b.calculateGrowth(symbol)
-	return bill * (pool.Borrow + growth) / pool.BorrowBill
+	return int64(float64(bill) * float64(pool.Borrow + growth) / float64(pool.BorrowBill))
 }
 
-func (b *BillBank) BorrowValueOf(symbol string, userAcc sdk.AccAddress) int64 {
+func (b BillBank) BorrowValueOf(symbol string, userAcc sdk.AccAddress) int64 {
 	return b.BorrowValueEstimate(
 		b.BorrowBalanceOf(symbol, userAcc),
 		symbol,
@@ -187,7 +185,7 @@ func (b *BillBank) BorrowValueOf(symbol string, userAcc sdk.AccAddress) int64 {
 }
 
 func (b *BillBank) BorrowValueEstimate(amount int64, symbol string) int64 {
-	return amount * b.Oracler.GetPrice(symbol)
+	return amount * b.Oracler.GetPrice(symbol)/1000000
 }
 
 func (b *BillBank) Borrow(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -239,7 +237,7 @@ func (b *BillBank) Repay(amount sdk.Coins, symbol string, userAcc sdk.AccAddress
 	}
 
 	// calculate bill
-	bill := coin * (pool.BorrowBill / pool.Borrow)
+	bill := int64(float64(coin) * (float64(pool.BorrowBill) / float64(pool.Borrow)))
 
 	// update user account borrow
 	b.AccountBorrowBills[user][symbol] -= bill
@@ -272,11 +270,11 @@ func (b *BillBank) SupplyBalanceOf(symbol string, userAcc sdk.AccAddress) int64 
 	// calcuate amount
 	// current block liquidated, growth is zero
 	growth := b.calculateGrowth(symbol)
-	return bill * ((pool.Supply + growth) / pool.SupplyBill)
+	return int64(float64(bill) * (float64(pool.Supply + growth) / float64(pool.SupplyBill)))
 }
 
 func (b *BillBank) SupplyValueOf(symbol string, userAcc sdk.AccAddress) int64 {
-	return b.SupplyBalanceOf(symbol, userAcc) * b.Oracler.GetPrice(symbol)
+	return b.SupplyBalanceOf(symbol, userAcc) * b.Oracler.GetPrice(symbol)/1000000
 }
 
 func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -288,7 +286,7 @@ func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddre
 	coin := amount.AmountOf(symbol).Int64()
 	bill := coin
 	if pool.SupplyBill != 0 && pool.Supply != 0 {
-		bill = coin * (pool.SupplyBill / pool.Supply)
+		bill = int64(float64(coin) * float64(pool.SupplyBill / pool.Supply))
 	}
 
 	// update user account bill
@@ -327,7 +325,7 @@ func (b *BillBank) Withdraw(amount sdk.Coins, symbol string, userAcc sdk.AccAddr
 	}
 
 	// calcuate bill
-	bill := coin * (pool.SupplyBill / pool.Supply)
+	bill := int64(float64(coin) * float64(pool.SupplyBill / pool.Supply))
 
 	// update user account bill
 	b.AccountDepositBills[user][symbol] -= bill
@@ -355,7 +353,7 @@ func (o Oracle) String() string {
 	return "DipperBank" //TODO add some orcale info.
 }
 
-func (o *Oracle) GetPrice(symbol string) int64 {
+func (o Oracle) GetPrice(symbol string) int64 {
 	if v, ok := o.TokensPrice[symbol]; ok {
 		return v
 	}

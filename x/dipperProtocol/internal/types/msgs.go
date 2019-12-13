@@ -307,7 +307,7 @@ func (msg MsgBankWithdraw) GetSigners() []sdk.AccAddress {
 
 //MsgBankBorrow define someone who has been chose to set oracle price.
 type MsgSetOraclePrice struct {
-	Name string `json:"amount"`
+	//Name string `json:"name"`
 	Symbol string `json:"symbol"`
 	Price string `json:"price"`
 	Owner sdk.AccAddress `json:"owner"`
@@ -315,7 +315,7 @@ type MsgSetOraclePrice struct {
 
 func NewMsgSetOraclePrice(name string, symbol string, amount string, owner sdk.AccAddress) MsgSetOraclePrice {
 	return MsgSetOraclePrice{
-		Name: name,
+		//Name: name,
 		Symbol: symbol,
 		Price: amount,
 		Owner:  owner,
@@ -333,7 +333,7 @@ func (msg MsgSetOraclePrice) ValidateBasic() sdk.Error {
 	if msg.Owner.Empty() {
 		return sdk.ErrInvalidAddress(msg.Owner.String())
 	}
-	if len(msg.Price) == 0 || len(msg.Name) == 0 || len(msg.Symbol) == 0{
+	if len(msg.Price) == 0 || len(msg.Symbol) == 0{
 		return sdk.ErrUnknownRequest("Price and/or Name and/or Symbol cannot be empty")
 	}
 	return nil

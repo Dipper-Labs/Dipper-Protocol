@@ -102,7 +102,7 @@ func queryNames(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, 
 
 
 func queryOraclePrice(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	price := keeper.GetOraclePrice(ctx, path[0], path[1])
+	price := keeper.GetOraclePrice(ctx, path[0])
 	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResResolve{Value: fmt.Sprintf("%d", price)})
 	if err != nil {
 		panic("could not marshal result to JSON")

@@ -104,17 +104,17 @@ func GetCmdNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
 // GetCmdNames queries a list of all names
 func GetCmdOraclePrice(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "oracleprice [addr] [symbol]",
+		Use:   "oracleprice [symbol]",
 		Short: "Get oracle price",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			addr := args[0]
-			symbol := args[1]
+			//addr := args[0]
+			symbol := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oracleprice/%s/%s", queryRoute, addr, symbol), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oracleprice/%s", queryRoute, symbol), nil)
 			if err != nil {
-				fmt.Printf("could not get oracle price - %s 0f %s \n", symbol, addr)
+				fmt.Printf("could not get oracle price - %s \n", symbol)
 				return nil
 			}
 

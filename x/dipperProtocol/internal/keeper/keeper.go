@@ -106,7 +106,7 @@ func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 }
 
 //Dipper Bank
-func (k Keeper) GetBillBank(ctx sdk.Context) *types.BillBank {
+func (k Keeper) GetBillBank(ctx sdk.Context) types.BillBank {
 	store := ctx.KVStore(k.storeKey)
 	if !k.IsObjectPresent(ctx, types.DipperBank){
 		return types.NewBillBank()
@@ -140,7 +140,8 @@ func (k Keeper)GetBorrowValueOf(ctx sdk.Context, symbol string, user sdk.AccAddr
 }
 
 func (k Keeper)GetBorrowValueEstimate(ctx sdk.Context, amount int64, symbol string) int64{
-	return k.GetBillBank(ctx).BorrowValueEstimate(amount, symbol)
+	bank := k.GetBillBank(ctx)
+	return bank.BorrowValueEstimate(amount, symbol)
 }
 
 func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
@@ -149,7 +150,7 @@ func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, *bank)
+	k.SetBillBank(ctx, bank)
 	return nil
 }
 
@@ -159,18 +160,20 @@ func (k Keeper)BankRepay(ctx sdk.Context, amount sdk.Coins, symbol string, user 
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, *bank)
+	k.SetBillBank(ctx, bank)
 	return nil
 }
 
 
 //Supply methods
 func (k Keeper)GetSupplyBalanceOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
-	return k.GetBillBank(ctx).SupplyBalanceOf(symbol, user)
+	bank := k.GetBillBank(ctx)
+	return bank.SupplyBalanceOf(symbol, user)
 }
 
 func (k Keeper)GetSupplyValueOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
-	return k.GetBillBank(ctx).SupplyValueOf(symbol, user)
+	bank := k.GetBillBank(ctx)
+	return bank.SupplyValueOf(symbol, user)
 }
 
 func (k Keeper)BankDeposit(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error {
@@ -179,7 +182,7 @@ func (k Keeper)BankDeposit(ctx sdk.Context, amount sdk.Coins, symbol string, use
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, *bank)
+	k.SetBillBank(ctx, bank)
 	return nil
 }
 
@@ -189,34 +192,34 @@ func (k Keeper)BankWithdraw(ctx sdk.Context, amount sdk.Coins, symbol string, us
 	if err != nil {
 		return err
 	}
-	k.SetBillBank(ctx, *bank)
+	k.SetBillBank(ctx, bank)
 	return nil
 }
 
 //Orcale methods
 // Gets the entire Whois metadata struct for a name
-func (k Keeper) GetBankOracle(ctx sdk.Context, name string) types.Oracle {
+func (k Keeper) GetBankOracle(ctx sdk.Context) types.Oracle {
 	return k.GetBillBank(ctx).Oracler
 }
 
-func (k Keeper) SetBankOracle(ctx sdk.Context, name string, oracle types.Oracle) {
+func (k Keeper) SetBankOracle(ctx sdk.Context, oracle types.Oracle) {
 	bank := k.GetBillBank(ctx)
 	bank.Oracler = oracle
-	k.SetBillBank(ctx, *bank)
+	k.SetBillBank(ctx, bank)
+}
+
+func (k Keeper)GetOraclePrice(ctx sdk.Context,symbol string) int64 {
+	oracle := k.GetBankOracle(ctx)
+	return oracle.GetPrice(symbol)
+}
+
+func (k Keeper)SetOraclePrice(ctx sdk.Context, symbol string, price int64) {
+	oracle := k.GetBankOracle(ctx)
+	oracle.SetPrice(symbol, price)
+	k.SetBankOracle(ctx, oracle)
 }
 
 func (k Keeper) IsObjectPresent(ctx sdk.Context, name string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has([]byte(name))
-}
-
-func (k Keeper)GetOraclePrice(ctx sdk.Context, name string, symbol string) int64 {
-	oracle := k.GetBankOracle(ctx, name)
-	return oracle.GetPrice(symbol)
-}
-
-func (k Keeper)SetOraclePrice(ctx sdk.Context, name string, symbol string, price int64) {
-	oracle := k.GetBankOracle(ctx, name)
-	oracle.SetPrice(symbol, price)
-	k.SetBankOracle(ctx, name, oracle)
 }
