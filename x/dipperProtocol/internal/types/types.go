@@ -464,7 +464,7 @@ type AccountBills struct {
 }
 
 func NewAccountBills() AccountBills {
-	return AccountBills{map[DUser]map[DSymbol]DBill{"init":{"init2":999}}}
+	return AccountBills{map[DUser]map[DSymbol]DBill{}}
 }
 
 func (ab AccountBills) Bytes() []byte{
@@ -499,7 +499,7 @@ type Oracle struct {
 }
 
 func NewOracle() Oracle {
-	return Oracle{map[DSymbol]DPrice{"init":999}}
+	return Oracle{map[DSymbol]DPrice{}}
 }
 
 // implement fmt.Stringer
