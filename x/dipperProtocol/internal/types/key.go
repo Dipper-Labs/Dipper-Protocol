@@ -15,7 +15,7 @@ const (
 
 //Dipper-Bank
 //this is the token pool
-type tUser = string
-type tSymbol = string
-type tBill = int64
-type tPrice = int64
+type DUser = string
+type DSymbol = string
+type DBill = int64
+type DPrice = int64

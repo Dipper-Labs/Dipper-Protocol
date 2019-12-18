@@ -122,6 +122,8 @@ func (k Keeper) SetBillBank(ctx sdk.Context, bb types.BillBank) {
 	//	return
 	//}
 	store := ctx.KVStore(k.storeKey)
+	//oracle, _ := bb.GetOracle()
+	//fmt.Println("in the end the oracle is", oracle) //for test set price
 	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(bb))
 }
 
@@ -199,12 +201,18 @@ func (k Keeper)BankWithdraw(ctx sdk.Context, amount sdk.Coins, symbol string, us
 //Orcale methods
 // Gets the entire Whois metadata struct for a name
 func (k Keeper) GetBankOracle(ctx sdk.Context) types.Oracle {
-	return k.GetBillBank(ctx).Oracler
+	oracle, err := k.GetBillBank(ctx).GetOracle()
+	if err != nil {
+		return types.NewOracle()
+	}
+	return oracle
 }
 
 func (k Keeper) SetBankOracle(ctx sdk.Context, oracle types.Oracle) {
 	bank := k.GetBillBank(ctx)
-	bank.Oracler = oracle
+	bank.Oracle = oracle.Bytes()
+	//realbank, _ := bank.GetOracle()
+	//fmt.Println("original oracle is", oracle,  "original oracle byte is", oracle.Bytes() ,"real store is", realbank) //for test set price
 	k.SetBillBank(ctx, bank)
 }
 
@@ -216,6 +224,7 @@ func (k Keeper)GetOraclePrice(ctx sdk.Context,symbol string) int64 {
 func (k Keeper)SetOraclePrice(ctx sdk.Context, symbol string, price int64) {
 	oracle := k.GetBankOracle(ctx)
 	oracle.SetPrice(symbol, price)
+	//fmt.Println("oracle's price", oracle) //for test set price
 	k.SetBankOracle(ctx, oracle)
 }
 

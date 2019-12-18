@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -56,16 +57,15 @@ func (tp TokenPool) GetCash() int64 {
 	return tp.Supply - tp.Borrow
 }
 
-
 type BillBank struct {
 	// internal account for token bill(deposit)
-	AccountDepositBills map[tUser]map[tSymbol]tBill `json:"account_deposit_bills"`
+	AccountDepositBills []byte `json:"account_deposit_bills"`
 	// internal account for token bill(borrow)
-	AccountBorrowBills map[tUser]map[tSymbol]tBill `json:"account_deposit_bills"`
+	AccountBorrowBills []byte `json:"account_deposit_bills"`
 
-	Pools map[tSymbol]TokenPool `json:"account_deposit_bills"`
+	Pools []byte `json:"account_deposit_bills"`
 
-	Oracler Oracle `json:"oracle"`
+	Oracle []byte `json:"oracle"`
 
 	// BlockNumber simulate
 	BlockNumber uint64 `json:"block_number"`
@@ -73,15 +73,14 @@ type BillBank struct {
 	borrowRate uint64 `json:"borrow_rate"`
 }
 
+
+
 func NewBillBank() BillBank {
 	return BillBank{
-		AccountDepositBills: map[tUser]map[tSymbol]tBill{},
-		AccountBorrowBills:  map[tUser]map[tSymbol]tBill{},
-		Pools: map[tSymbol]TokenPool{
-			"ETH": TokenPool{},
-			"DAI": TokenPool{},
-		},
-		Oracler:     NewOracle(),
+		AccountDepositBills: NewAccountBills().Bytes(),
+		AccountBorrowBills:  NewAccountBills().Bytes(),
+		Pools: 		NewPools().Bytes(),
+		Oracle:     NewOracle().Bytes(),
 		BlockNumber: 1,
 		borrowRate:  1,
 	}
@@ -97,7 +96,11 @@ func (b *BillBank) liquidate(symbol string) {
 
 	// update pool
 	pool.liquidateIndex = b.BlockNumber
-	b.Pools[symbol] = pool
+	pools, err := b.GetPools()
+	if err != nil {
+		return
+	}
+	pools.SubPools[symbol] = pool
 }
 
 func (b *BillBank) calculateGrowth(symbol string) int64 {
@@ -123,7 +126,11 @@ func (b *BillBank) calculateGrowth(symbol string) int64 {
 
 func (b BillBank) getPool(symbol string) (pool TokenPool) {
 	var ok bool
-	if pool, ok = b.Pools[symbol]; !ok {
+	pools, err := b.GetPools()
+	if err != nil {
+		return TokenPool{}
+	}
+	if pool, ok = pools.SubPools[symbol]; !ok {
 		log.Panicf("not support token: %v", symbol)
 	}
 	return
@@ -132,7 +139,11 @@ func (b BillBank) getPool(symbol string) (pool TokenPool) {
 func (b BillBank) NetValueOf(userAcc sdk.AccAddress) int64 {
 	user := userAcc.String()
 	var supplyValue int64 = 0
-	if acc, ok := b.AccountDepositBills[user]; ok {
+	depositBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return 0
+	}
+	if acc, ok := depositBills.Bills[user]; ok {
 		for sym, bill := range acc {
 			if bill != 0 {
 				supplyValue += b.SupplyValueOf(sym, userAcc)
@@ -141,7 +152,11 @@ func (b BillBank) NetValueOf(userAcc sdk.AccAddress) int64 {
 	}
 
 	var borrowValue int64 = 0
-	if acc, ok := b.AccountBorrowBills[user]; ok {
+	borrowBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return 0
+	}
+	if acc, ok := borrowBills.Bills[user]; ok {
 		for sym, bill := range acc {
 			if bill != 0 {
 				borrowValue += b.BorrowValueOf(sym, userAcc)
@@ -159,12 +174,17 @@ func (b BillBank) BorrowBalanceOf(symbol string, userAcc sdk.AccAddress) int64 {
 	user := userAcc.String()
 	pool := b.getPool(symbol)
 
+
+	borrowBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return 0
+	}
 	// check bill
-	if _, ok := b.AccountBorrowBills[user]; !ok {
+	if _, ok := borrowBills.Bills[user]; !ok {
 		return 0
 	}
 	var bill int64 = 0
-	if b, ok := b.AccountBorrowBills[user][symbol]; ok {
+	if b, ok := borrowBills.Bills[user][symbol]; ok {
 		bill = b
 	}
 	if bill == 0 {
@@ -185,7 +205,11 @@ func (b BillBank) BorrowValueOf(symbol string, userAcc sdk.AccAddress) int64 {
 }
 
 func (b *BillBank) BorrowValueEstimate(amount int64, symbol string) int64 {
-	return amount * b.Oracler.GetPrice(symbol)/1000000
+	oracle, err := b.GetOracle()
+	if err != nil {
+		return 0
+	}
+	return amount * oracle.GetPrice(symbol)/1000000
 }
 
 func (b *BillBank) Borrow(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -205,21 +229,34 @@ func (b *BillBank) Borrow(amount sdk.Coins, symbol string, userAcc sdk.AccAddres
 		bill = coin * (pool.BorrowBill / pool.Borrow)
 	}
 
+
+	borrowBills, err := b.GetAccountBorrowBills()
+	if err != nil {
+		return fmt.Errorf("there is no deposit bills")
+	}
 	// update user account bill
-	if accountBorrow, ok := b.AccountBorrowBills[user]; ok {
+	if accountBorrow, ok := borrowBills.Bills[user]; ok {
 		if _, ok := accountBorrow[symbol]; ok {
-			b.AccountBorrowBills[user][symbol] += bill
+			borrowBills.Bills[user][symbol] += bill
 		} else {
-			b.AccountBorrowBills[user][symbol] = bill
+			borrowBills.Bills[user][symbol] = bill
 		}
 	} else {
-		b.AccountBorrowBills[user] = map[tSymbol]tBill{symbol: bill}
+		borrowBills.Bills[user] = map[DSymbol]DBill{symbol: bill}
 	}
 
 	// update borrow
 	pool.BorrowBill += bill
 	pool.Borrow += coin
-	b.Pools[symbol] = pool
+
+	pools, err := b.GetPools()
+	if err != nil {
+		return fmt.Errorf("there is no pools")
+	}
+	pools.SubPools[symbol] = pool
+	//TODO set change to billbank
+	b.AccountBorrowBills = borrowBills.Bytes()
+	b.Pools = pools.Bytes()
 
 	return nil
 }
@@ -239,14 +276,28 @@ func (b *BillBank) Repay(amount sdk.Coins, symbol string, userAcc sdk.AccAddress
 	// calculate bill
 	bill := int64(float64(coin) * (float64(pool.BorrowBill) / float64(pool.Borrow)))
 
+	borrowBills, err := b.GetAccountBorrowBills()
+	if err != nil {
+		return fmt.Errorf("there is no borrow bills")
+	}
+
 	// update user account borrow
-	b.AccountBorrowBills[user][symbol] -= bill
+	borrowBills.Bills[user][symbol] -= bill
 
 	// update borrow
 	pool.BorrowBill -= bill
 	pool.Borrow -= coin
-	b.Pools[symbol] = pool
 
+	pools, err := b.GetPools()
+	if err != nil {
+		return fmt.Errorf("there is no pools")
+	}
+
+	pools.SubPools[symbol] = pool
+
+
+	b.AccountBorrowBills = borrowBills.Bytes()
+	b.Pools = pools.Bytes()
 	return nil
 }
 
@@ -255,12 +306,16 @@ func (b *BillBank) SupplyBalanceOf(symbol string, userAcc sdk.AccAddress) int64 
 	user := userAcc.String()
 	pool := b.getPool(symbol)
 
+	depositBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return 0
+	}
 	// check bill
-	if _, ok := b.AccountDepositBills[user]; !ok {
+	if _, ok := depositBills.Bills[user]; !ok {
 		return 0
 	}
 	var bill int64 = 0
-	if b, ok := b.AccountDepositBills[user][symbol]; ok {
+	if b, ok := depositBills.Bills[user][symbol]; ok {
 		bill = b
 	}
 	if bill == 0 {
@@ -274,7 +329,11 @@ func (b *BillBank) SupplyBalanceOf(symbol string, userAcc sdk.AccAddress) int64 
 }
 
 func (b *BillBank) SupplyValueOf(symbol string, userAcc sdk.AccAddress) int64 {
-	return b.SupplyBalanceOf(symbol, userAcc) * b.Oracler.GetPrice(symbol)/1000000
+	oracle, err := b.GetOracle()
+	if err != nil {
+		return 0
+	}
+	return b.SupplyBalanceOf(symbol, userAcc) * oracle.GetPrice(symbol)/1000000
 }
 
 func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -289,21 +348,34 @@ func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddre
 		bill = int64(float64(coin) * float64(pool.SupplyBill / pool.Supply))
 	}
 
-	// update user account bill
-	if accountBill, ok := b.AccountDepositBills[user]; ok {
-		if _, ok := accountBill[symbol]; ok {
-			b.AccountDepositBills[user][symbol] += bill
-		} else {
-			b.AccountDepositBills[user][symbol] = bill
-		}
-	} else {
-		b.AccountDepositBills[user] = map[tSymbol]tBill{symbol: bill}
+	depostiBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return fmt.Errorf("there is no bills")
 	}
 
+	// update user account bill
+	if accountBill, ok := depostiBills.Bills[user]; ok {
+		if _, ok := accountBill[symbol]; ok {
+			depostiBills.Bills[user][symbol] += bill
+		} else {
+			depostiBills.Bills[user][symbol] = bill
+		}
+	} else {
+		depostiBills.Bills[user] = map[DSymbol]DBill{symbol: bill}
+	}
+
+	pools, err := b.GetPools()
+	if err != nil {
+		return fmt.Errorf("there is no pools")
+	}
 	// update pool
 	pool.SupplyBill += bill
 	pool.Supply += coin
-	b.Pools[symbol] = pool
+	pools.SubPools[symbol] = pool
+
+
+	b.AccountDepositBills = depostiBills.Bytes()
+	b.Pools = pools.Bytes()
 
 	return nil
 }
@@ -328,30 +400,123 @@ func (b *BillBank) Withdraw(amount sdk.Coins, symbol string, userAcc sdk.AccAddr
 	bill := int64(float64(coin) * float64(pool.SupplyBill / pool.Supply))
 
 	// update user account bill
-	b.AccountDepositBills[user][symbol] -= bill
+	depositBills, err := b.GetAccountDepositBills()
+	if err != nil {
+		return fmt.Errorf("there is no deposit bills")
+	}
 
+	depositBills.Bills[user][symbol] -= bill
+
+	pools, err := b.GetPools()
+	if err != nil {
+		return fmt.Errorf("there is no pools")
+	}
 	// update pool
 	pool.SupplyBill -= bill
 	pool.Supply -= coin
-	b.Pools[symbol] = pool
+	pools.SubPools[symbol] = pool
+
+	b.AccountBorrowBills = depositBills.Bytes()
+	b.Pools = pools.Bytes()
 
 	return
 }
 
+func (b BillBank)GetAccountDepositBills() (AccountBills, error) {
+	o := AccountBills{}
+	err := json.Unmarshal(b.AccountDepositBills, &o)
+	if err != nil {
+		return NewAccountBills(), err
+	}
+	return o, nil
+}
+
+func (b BillBank)GetAccountBorrowBills() (AccountBills, error) {
+	o := AccountBills{}
+	err := json.Unmarshal(b.AccountBorrowBills, &o)
+	if err != nil {
+		return NewAccountBills(), err
+	}
+	return o, nil
+}
+
+func (b BillBank)GetPools() (Pools, error) {
+	o := Pools{}
+	err := json.Unmarshal(b.Pools, &o)
+	if err != nil {
+		return NewPools(), err
+	}
+	return o, nil
+}
+
+func (b BillBank)GetOracle() (Oracle, error) {
+	o := Oracle{}
+	err := json.Unmarshal(b.Oracle, &o)
+	if err != nil {
+		//fmt.Println("shit fuck", err.Error()) //for test set price
+		return NewOracle(), err
+	}
+	return o, nil
+}
+
+type AccountBills struct {
+	Bills map[DUser]map[DSymbol]DBill `json:"account_bills"`
+}
+
+func NewAccountBills() AccountBills {
+	return AccountBills{map[DUser]map[DSymbol]DBill{"init":{"init2":999}}}
+}
+
+func (ab AccountBills) Bytes() []byte{
+	initBytes, err := json.Marshal(ab)
+	if err != nil {
+		return []byte{}
+	}
+	return initBytes
+}
+
+type Pools struct {
+	SubPools map[DSymbol]TokenPool `json:"sub_pools"`
+}
+
+func NewPools() Pools {
+	return Pools{map[DSymbol]TokenPool{
+		"ETH": TokenPool{},
+		"DAI": TokenPool{},}}
+}
+
+func (p Pools) Bytes() []byte{
+	initBytes, err := json.Marshal(p)
+	if err != nil {
+		return []byte{}
+	}
+	return initBytes
+}
 
 //Oracle, maybe use chainlink later
 type Oracle struct {
-	TokensPrice map[tSymbol]tPrice `json:"tokensPrice"`
+	TokensPrice map[DSymbol]DPrice `json:"tokensPrice"`
 }
 
 func NewOracle() Oracle {
-	return Oracle{map[tSymbol]tPrice{}}
+	return Oracle{map[DSymbol]DPrice{"init":999}}
 }
 
 // implement fmt.Stringer
 func (o Oracle) String() string {
-	return "DipperBank" //TODO add some orcale info.
+	mjson,_ :=json.Marshal(o.TokensPrice)
+	mString :=string(mjson)
+	return mString
 }
+
+func (o Oracle) Bytes() []byte{
+	initBytes, err := json.Marshal(o)
+	if err != nil {
+		return []byte{}
+	}
+	return initBytes
+}
+
 
 func (o Oracle) GetPrice(symbol string) int64 {
 	if v, ok := o.TokensPrice[symbol]; ok {
