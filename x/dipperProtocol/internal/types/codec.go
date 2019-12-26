@@ -13,14 +13,9 @@ func init() {
 
 // RegisterCodec registers concrete types on the Amino codec
 func RegisterCodec(cdc *codec.Codec) {
-	cdc.RegisterConcrete(MsgSetName{}, "dipperProtocol/SetName", nil)
-	cdc.RegisterConcrete(MsgBuyName{}, "dipperProtocol/BuyName", nil)
-	cdc.RegisterConcrete(MsgDeleteName{}, "dipperProtocol/DeleteName", nil)
-
 	cdc.RegisterConcrete(MsgBankBorrow{}, "dipperProtocol/BankBorrow", nil)
 	cdc.RegisterConcrete(MsgBankRepay{}, "dipperProtocol/BankRepay", nil)
 	cdc.RegisterConcrete(MsgBankDeposit{}, "dipperProtocol/BankDeposit", nil)
 	cdc.RegisterConcrete(MsgBankWithdraw{}, "dipperProtocol/BankWithdraw", nil)
-
 	cdc.RegisterConcrete(MsgSetOraclePrice{}, "dipperProtocol/SetOraclePrice", nil)
 }

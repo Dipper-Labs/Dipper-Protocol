@@ -15,11 +15,6 @@ const (
 	CodeNotEnoughAmountCoinForWithdraw sdk.CodeType = 203
 )
 
-// ErrNameDoesNotExist is the error for name not existing
-func ErrNameDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNameDoesNotExist, "Name does not exist")
-}
-
 
 func ErrNotEnoughTokenForBorrow(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNotEnoughTokenForBorrow, "Not enough token for borrow")
