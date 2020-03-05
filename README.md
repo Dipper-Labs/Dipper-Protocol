@@ -15,6 +15,7 @@ dipcli keys add bob\
 dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000dpc,10000000000000000eth,10000000000000000dai\
 dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000000000000000dpc,10000000000000000eth,10000000000000000dai
 
+
 # create validator
 dipd gentx 
   --amount 1000000stake 
