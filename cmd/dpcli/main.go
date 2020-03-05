@@ -5,19 +5,21 @@ import (
 	"os"
 	"path"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/cosmos/cosmos-sdk/client/lcd"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/version"
-	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
-	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/Dipper-Protocol/client"
+	"github.com/Dipper-Protocol/client/keys"
+	"github.com/Dipper-Protocol/client/lcd"
+	"github.com/Dipper-Protocol/client/rpc"
+	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Protocol/version"
+	authcmd "github.com/Dipper-Protocol/x/auth/client/cli"
+	authrest "github.com/Dipper-Protocol/x/auth/client/rest"
+	bankcmd "github.com/Dipper-Protocol/x/bank/client/cli"
+	vmcli "github.com/Dipper-Protocol/x/vm/client/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
+
 )
 
 func main() {
@@ -45,6 +47,8 @@ func main() {
 
 	// Construct Root Command
 	rootCmd.AddCommand(
+		bankcmd.SendTxCmd(cdc),
+		vmcli.VMCmd(cdc),
 		rpc.StatusCommand(),
 		client.ConfigCmd(app2.DefaultCLIHome),
 		queryCmd(cdc),
@@ -58,7 +62,7 @@ func main() {
 		client.NewCompletionCmd(rootCmd, true),
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "NS", app2.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "DIP", app2.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/Dipper-Protocol/codec"
 )
 
 // ModuleCdc is the codec for the module

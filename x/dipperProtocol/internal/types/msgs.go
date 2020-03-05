@@ -1,11 +1,12 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/Dipper-Protocol/types"
 )
 
 // RouterKey is the module name router key
 const RouterKey = ModuleName // this was defined in your key.go file
+
 
 //MsgBankRepay define someone repay money to bank
 type MsgBankBorrow struct {

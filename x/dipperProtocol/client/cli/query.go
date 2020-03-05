@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/Dipper-Protocol/client"
+	"github.com/Dipper-Protocol/client/context"
+	"github.com/Dipper-Protocol/codec"
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
 	"github.com/spf13/cobra"
 )

@@ -5,7 +5,7 @@ import (
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/Dipper-Protocol/types"
 )
 
 // NewHandler returns a handler for "dipperProtocol" type messages.

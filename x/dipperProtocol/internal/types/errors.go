@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/Dipper-Protocol/types"
 )
 
 // DefaultCodespace is the Module Name

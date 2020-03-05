@@ -2,7 +2,8 @@ package app
 
 import (
 	"encoding/json"
-	"github.com/cosmos/cosmos-sdk/x/genaccounts"
+	"github.com/Dipper-Protocol/x/genaccounts"
+	"github.com/Dipper-Protocol/x/vm"
 	"os"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -11,19 +12,19 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	bam "github.com/Dipper-Protocol/baseapp"
+	"github.com/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Protocol/types/module"
+	"github.com/Dipper-Protocol/version"
+	"github.com/Dipper-Protocol/x/auth"
+	"github.com/Dipper-Protocol/x/bank"
+	distr "github.com/Dipper-Protocol/x/distribution"
+	"github.com/Dipper-Protocol/x/genutil"
+	"github.com/Dipper-Protocol/x/params"
+	"github.com/Dipper-Protocol/x/slashing"
+	"github.com/Dipper-Protocol/x/staking"
+	"github.com/Dipper-Protocol/x/supply"
 
 	"github.com/Dipper-Protocol/x/dipperProtocol"
 )
@@ -50,6 +51,7 @@ var (
 		supply.AppModuleBasic{},
 
 		dipperProtocol.AppModule{},
+		vm.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
@@ -86,6 +88,7 @@ type dipperProtocolApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       dipperProtocol.Keeper
+	vmKeeper	   vm.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -104,8 +107,18 @@ func NewDipperProtocolApp(
 
 	bApp.SetAppVersion(version.Version)
 
-	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, dipperProtocol.StoreKey)
+	keys := sdk.NewKVStoreKeys(
+		bam.MainStoreKey,
+		auth.StoreKey,
+		staking.StoreKey,
+		supply.StoreKey,
+		distr.StoreKey,
+		slashing.StoreKey,
+		params.StoreKey,
+		dipperProtocol.StoreKey,
+		vm.StoreKey,
+		vm.CodeKey,//TODO why is codekey
+		)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -125,6 +138,7 @@ func NewDipperProtocolApp(
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+	vmSubspace := app.paramsKeeper.Subspace(vm.DefaultParamspace)
 
 	// The AccountKeeper handles address -> account lookups
 	app.accountKeeper = auth.NewAccountKeeper(
@@ -196,6 +210,13 @@ func NewDipperProtocolApp(
 		app.cdc,
 	)
 
+	app.vmKeeper = vm.NewKeeper(
+		app.cdc,
+		keys[vm.StoreKey],
+		keys[vm.CodeKey],
+		vmSubspace,
+		app.accountKeeper)
+
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
@@ -206,10 +227,11 @@ func NewDipperProtocolApp(
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
+		vm.NewAppModule(app.vmKeeper),
 	)
 
 	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName)
+	app.mm.SetOrderEndBlockers(staking.ModuleName, vm.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -224,6 +246,7 @@ func NewDipperProtocolApp(
 		dipperProtocol.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,
+		vm.ModuleName,
 	)
 
 	// register all module routes and module queriers

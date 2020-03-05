@@ -7,7 +7,7 @@ import (
 	"math"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/Dipper-Protocol/types"
 )
 
 type TokenPool struct {

@@ -3,7 +3,7 @@ package dipperProtocol
 import (
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/keeper"
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
-	"github.com/cosmos/cosmos-sdk/x/supply"
+	"github.com/Dipper-Protocol/x/supply"
 )
 
 const (

@@ -6,14 +6,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/Dipper-Protocol/codec"
+	"github.com/Dipper-Protocol/types/module"
+	"github.com/Dipper-Protocol/x/bank"
 	"github.com/Dipper-Protocol/x/dipperProtocol/client/cli"
 	"github.com/Dipper-Protocol/x/dipperProtocol/client/rest"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/Dipper-Protocol/client/context"
+	sdk "github.com/Dipper-Protocol/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

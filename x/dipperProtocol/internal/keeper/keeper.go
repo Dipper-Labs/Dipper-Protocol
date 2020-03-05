@@ -2,9 +2,9 @@ package keeper
 
 import (
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Protocol/x/bank"
 )
 
 // Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine

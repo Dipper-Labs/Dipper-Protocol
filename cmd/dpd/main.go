@@ -3,23 +3,34 @@ package main
 import (
 	"encoding/json"
 	app2 "github.com/Dipper-Protocol/app"
+	"github.com/Dipper-Protocol/client"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/x/genaccounts"
-	genaccscli "github.com/cosmos/cosmos-sdk/x/genaccounts/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/Dipper-Protocol/server"
+	"github.com/Dipper-Protocol/x/genaccounts"
+	genaccscli "github.com/Dipper-Protocol/x/genaccounts/client/cli"
+	"github.com/Dipper-Protocol/x/staking"
 
 	"github.com/spf13/cobra"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	sdk "github.com/Dipper-Protocol/types"
+	genutilcli "github.com/Dipper-Protocol/x/genutil/client/cli"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
+
+const (
+	flagOverwrite    = "overwrite"
+	flagMinGasPrices = "minimum-gas-prices"
+)
+
+// dpd custom flags
+const flagInvCheckPeriod = "inv-check-period"
+
+var invCheckPeriod uint
 
 func main() {
 	cobra.EnableCommandSorting = false
@@ -50,12 +61,17 @@ func main() {
 		genutilcli.ValidateGenesisCmd(ctx, cdc, app2.ModuleBasics),
 		// AddGenesisAccountCmd allows users to add accounts to the genesis file
 		genaccscli.AddGenesisAccountCmd(ctx, cdc, app2.DefaultNodeHome, app2.DefaultCLIHome),
+		client.NewCompletionCmd(rootCmd, true),
+		replayCmd(),
+		client.LineBreak,
 	)
 
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
 	// prepare and add flags
 	executor := cli.PrepareBaseCmd(rootCmd, "DP", app2.DefaultNodeHome)
+	rootCmd.PersistentFlags().UintVar(&invCheckPeriod, flagInvCheckPeriod,
+		0, "Assert registered invariants every N blocks")
 	err := executor.Execute()
 	if err != nil {
 		panic(err)

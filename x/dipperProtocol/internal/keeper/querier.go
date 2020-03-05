@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/Dipper-Protocol/codec"
 	"github.com/Dipper-Protocol/x/dipperProtocol/internal/types"
 	"strconv"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/Dipper-Protocol/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
