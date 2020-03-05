@@ -43,3 +43,6 @@ dpcli tx dipperProtocol bank-withdraw 150000000dai dai --from alice\
 dpcli tx dipperProtocol bank-deposit 1000000eth eth --from bob\
 dpcli tx dipperProtocol bank-borrow 120000000dai dai --from bob\
 dpcli tx dipperProtocol bank-repay 120000000dai dai --from bob
+
+# we also support contract via EVM，welcome to test with us
+
