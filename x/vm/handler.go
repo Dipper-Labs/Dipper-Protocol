@@ -32,6 +32,7 @@ func handleMsgContract(ctx sdk.Context, msg MsgContract, k Keeper) sdk.Result {
 
 	gasLimit := ctx.GasMeter().Limit() - ctx.GasMeter().GasConsumed()
 	_, res, err2 := DoStateTransition(ctx, msg, k, gasLimit, false)
+	//TODO temporary, need to fix
 	if err2 != nil {
 		err, ok := err2.(sdk.Error)
 		if ok {

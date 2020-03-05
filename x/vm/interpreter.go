@@ -2,14 +2,13 @@ package vm
 
 import (
 	"fmt"
-	math2 "github.com/Dipper-Protocol/x/vm/common/math"
-	"github.com/Dipper-Protocol/x/vm/types"
 	"hash"
 	"os"
 	"sync/atomic"
 
+	"github.com/Dipper-Protocol/x/vm/common/math"
+	"github.com/Dipper-Protocol/x/vm/types"
 	sdk "github.com/Dipper-Protocol/types"
-	sdkerrors "github.com/Dipper-Protocol/types/errors"
 )
 
 type Config struct {
@@ -102,9 +101,9 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 	}
 
 	var (
-		op    OpCode           // current opcode
-		mem      = NewMemory() // bound memory
-		stack  = newstack()    // local stack
+		op    OpCode        // current opcode
+		mem   = NewMemory() // bound memory
+		stack = newstack()  // local stack
 		// For optimisation reason we're using uint64 as the program counter.
 		// It's theoretically possible to go above 2^64. The YP defines the PC
 		// to be uint256. Practically much less so feasible.
@@ -125,9 +124,9 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		defer func() {
 			if err != nil {
 				if !logged {
-					CaptureState(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
+					in.cfg.Tracer.CaptureState(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
 				} else {
-					CaptureFault(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
+					in.cfg.Tracer.CaptureFault(in.evm, pcCopy, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
 				}
 			}
 		}()
@@ -149,13 +148,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		operation := in.cfg.JumpTable[op]
 		operation.constantGas = in.cfg.OpConstGasConfig[op]
 		if !operation.valid {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrInternal, "invalid opcode 0x%x", int(op))
+			return nil, sdk.ErrInternal(fmt.Sprintf("invalid opcode 0x%x", int(op)))
 		}
 		// Validate stack
 		if sLen := stack.len(); sLen < operation.minStack {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrInternal, "stack underflow (%d <=> %d)", sLen, operation.minStack)
+			return nil, sdk.ErrInternal(fmt.Sprintf("stack underflow (%d <=> %d)", sLen, operation.minStack))
 		} else if sLen > operation.maxStack {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrInternal, "stack limit reached %d (%d)", sLen, operation.maxStack)
+			return nil, sdk.ErrInternal(fmt.Sprintf("stack limit reached %d (%d)", sLen, operation.maxStack))
 		}
 		// If the operation is valid, enforce and write restrictions
 		if in.readOnly {
@@ -165,13 +164,13 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			// account to the others means the state is modified and should also
 			// return with an error.
 			if operation.writes || (op == CALL && stack.Back(2).Sign() != 0) {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInternal, "errWriteProtection")
+				return nil, sdk.ErrInternal("errWriteProtection")
 			}
 		}
 		// Static portion of gas
 		cost = operation.constantGas // For tracing
 		if !contract.UseGas(operation.constantGas) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInternal, "ErrOutOfGas")
+			return nil, sdk.ErrInternal("ErrOutOfGas")
 		}
 
 		var memorySize uint64
@@ -182,12 +181,12 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		if operation.memorySize != nil {
 			memSize, overflow := operation.memorySize(stack)
 			if overflow {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInternal, "errGasUintOverflow")
+				return nil, sdk.ErrInternal("errGasUintOverflow")
 			}
 			// memory is expanded in words of 32 bytes. Gas
 			// is also calculated in words.
-			if memorySize, overflow = math2.SafeMul(toWordSize(memSize), 32); overflow {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInternal, "errGasUintOverflow")
+			if memorySize, overflow = math.SafeMul(toWordSize(memSize), 32); overflow {
+				return nil, sdk.ErrInternal("errGasUintOverflow")
 			}
 		}
 		// Dynamic portion of gas
@@ -198,7 +197,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 			dynamicCost, err = operation.dynamicGas(in.evm, contract, stack, mem, memorySize)
 			cost += dynamicCost // total cost, for debug tracing
 			if err != nil || !contract.UseGas(dynamicCost) {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInternal, "ErrOutOfGas")
+				return nil, sdk.ErrInternal("ErrOutOfGas")
 			}
 		}
 		if memorySize > 0 {
@@ -206,7 +205,7 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		}
 
 		if in.cfg.Debug {
-			CaptureState(in.evm, pc, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
+			in.cfg.Tracer.CaptureState(in.evm, pc, op, gasCopy, cost, mem, stack, contract, in.evm.depth, err)
 			logged = true
 		}
 

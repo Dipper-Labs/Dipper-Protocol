@@ -69,7 +69,7 @@ func setupTest() (vmKeeper Keeper, ctx sdk.Context) {
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey,
 		auth.StoreKey,
-		auth.RefundKey,
+		//auth.RefundKey,
 		staking.StoreKey,
 		supply.StoreKey,
 		mint.StoreKey,
@@ -84,7 +84,7 @@ func setupTest() (vmKeeper Keeper, ctx sdk.Context) {
 	)
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, staking.TStoreKey, params.TStoreKey)
 
-	paramsKeeper := params.NewKeeper(cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
+	paramsKeeper := params.NewKeeper(cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	authSubspace := paramsKeeper.Subspace(auth.DefaultParamspace)
 
 	vmSubspace := paramsKeeper.Subspace(DefaultParamspace)
@@ -128,7 +128,7 @@ func newEVM() *EVM {
 	keyParams := sdk.NewKVStoreKey(params.StoreKey)
 	tkeyParams := sdk.NewTransientStoreKey(params.TStoreKey)
 
-	paramsKeeper := params.NewKeeper(types.ModuleCdc, keyParams, tkeyParams)
+	paramsKeeper := params.NewKeeper(types.ModuleCdc, keyParams, tkeyParams, params.DefaultCodespace)
 	accountKeeper := auth.NewAccountKeeper(types.ModuleCdc, keyAcc, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 
 	keys := sdk.NewKVStoreKeys(auth.StoreKey, StoreKey, CodeKey)

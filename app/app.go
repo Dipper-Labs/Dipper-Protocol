@@ -158,7 +158,7 @@ func NewDIPApp(
 	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
-	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
+	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace)
 	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	vmSubspace := app.paramsKeeper.Subspace(vm.DefaultParamspace)
 
@@ -265,7 +265,7 @@ func NewDIPApp(
 
 	app.govKeeper = gov.NewKeeper(
 		app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace, app.supplyKeeper,
-		&stakingKeeper, gov.DefaultCodespace,govRouter,
+		&stakingKeeper, gov.DefaultCodespace, govRouter,
 	)
 
 

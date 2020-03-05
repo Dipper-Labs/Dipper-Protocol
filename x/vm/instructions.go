@@ -1,23 +1,23 @@
 package vm
 
 import (
-	"github.com/Dipper-Protocol/x/vm/common"
-	math2 "github.com/Dipper-Protocol/x/vm/common/math"
 	"math/big"
 
 	"golang.org/x/crypto/sha3"
 
+	"github.com/Dipper-Protocol/x/vm/common"
+	"github.com/Dipper-Protocol/x/vm/common/math"
 	sdk "github.com/Dipper-Protocol/types"
 )
 
 var (
 	bigZero = new(big.Int)
-	tt255   = math2.BigPow(2, 255)
+	tt255   = math.BigPow(2, 255)
 )
 
 func opAdd(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	x, y := stack.pop(), stack.peek()
-	math2.U256(y.Add(x, y))
+	math.U256(y.Add(x, y))
 
 	interpreter.intPool.put(x)
 	return nil, nil
@@ -25,7 +25,7 @@ func opAdd(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 
 func opSub(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	x, y := stack.pop(), stack.peek()
-	math2.U256(y.Sub(x, y))
+	math.U256(y.Sub(x, y))
 
 	interpreter.intPool.put(x)
 	return nil, nil
@@ -33,7 +33,7 @@ func opSub(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 
 func opMul(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	x, y := stack.pop(), stack.pop()
-	stack.push(math2.U256(x.Mul(x, y)))
+	stack.push(math.U256(x.Mul(x, y)))
 
 	interpreter.intPool.put(y)
 
@@ -43,7 +43,7 @@ func opMul(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 func opDiv(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	x, y := stack.pop(), stack.peek()
 	if y.Sign() != 0 {
-		math2.U256(y.Div(x, y))
+		math.U256(y.Div(x, y))
 	} else {
 		y.SetUint64(0)
 	}
@@ -54,7 +54,7 @@ func opDiv(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 }
 
 func opSdiv(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	x, y := math2.S256(stack.pop()), math2.S256(stack.pop())
+	x, y := math.S256(stack.pop()), math.S256(stack.pop())
 	res := interpreter.intPool.getZero()
 
 	if y.Sign() == 0 || x.Sign() == 0 {
@@ -66,7 +66,7 @@ func opSdiv(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		} else {
 			res.Div(x.Abs(x), y.Abs(y))
 		}
-		stack.push(math2.U256(res))
+		stack.push(math.U256(res))
 	}
 
 	interpreter.intPool.put(x, y)
@@ -79,7 +79,7 @@ func opMod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 	if y.Sign() == 0 {
 		stack.push(x.SetUint64(0))
 	} else {
-		stack.push(math2.U256(x.Mod(x, y)))
+		stack.push(math.U256(x.Mod(x, y)))
 	}
 
 	interpreter.intPool.put(y)
@@ -87,7 +87,7 @@ func opMod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 }
 
 func opSmod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	x, y := math2.S256(stack.pop()), math2.S256(stack.pop())
+	x, y := math.S256(stack.pop()), math.S256(stack.pop())
 	res := interpreter.intPool.getZero()
 
 	if y.Sign() == 0 {
@@ -99,7 +99,7 @@ func opSmod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		} else {
 			res.Mod(x.Abs(x), y.Abs(y))
 		}
-		stack.push(math2.S256(res))
+		stack.push(math.S256(res))
 	}
 	interpreter.intPool.put(x, y)
 	return nil, nil
@@ -119,7 +119,7 @@ func opExp(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 		// x ^ 1 == x
 		stack.push(base)
 	} else {
-		stack.push(math2.Exp(base, exponent))
+		stack.push(math.Exp(base, exponent))
 		interpreter.intPool.put(base)
 	}
 	interpreter.intPool.put(exponent)
@@ -139,7 +139,7 @@ func opSignExtend(pc *uint64, interpreter *EVMInterpreter, contract *Contract, m
 			num.And(num, mask)
 		}
 
-		stack.push(math2.U256(num))
+		stack.push(math.U256(num))
 	}
 
 	interpreter.intPool.put(back)
@@ -148,7 +148,7 @@ func opSignExtend(pc *uint64, interpreter *EVMInterpreter, contract *Contract, m
 
 func opNot(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	x := stack.peek()
-	math2.U256(x.Not(x))
+	math.U256(x.Not(x))
 	return nil, nil
 }
 
@@ -271,7 +271,7 @@ func opXor(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 func opByte(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	th, val := stack.pop(), stack.peek()
 	if th.Cmp(common.Big32) < 0 {
-		b := math2.Byte(val, 32, int(th.Int64()))
+		b := math.Byte(val, 32, int(th.Int64()))
 		val.SetUint64(uint64(b))
 	} else {
 		val.SetUint64(0)
@@ -286,7 +286,7 @@ func opAddmod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 	if z.Cmp(bigZero) > 0 {
 		x.Add(x, y)
 		x.Mod(x, z)
-		stack.push(math2.U256(x))
+		stack.push(math.U256(x))
 	} else {
 		stack.push(x.SetUint64(0))
 	}
@@ -300,7 +300,7 @@ func opMulmod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 	if z.Cmp(bigZero) > 0 {
 		x.Mul(x, y)
 		x.Mod(x, z)
-		stack.push(math2.U256(x))
+		stack.push(math.U256(x))
 	} else {
 		stack.push(x.SetUint64(0))
 	}
@@ -310,7 +310,7 @@ func opMulmod(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memor
 
 func opSHL(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	// Note, second operand is left in the stack; accumulate result into it, and no need to push it afterwards
-	shift, value := math2.U256(stack.pop()), math2.U256(stack.peek())
+	shift, value := math.U256(stack.pop()), math.U256(stack.peek())
 	defer interpreter.intPool.put(shift) // First operand back into the pool
 
 	if shift.Cmp(common.Big256) >= 0 {
@@ -318,14 +318,14 @@ func opSHL(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 		return nil, nil
 	}
 	n := uint(shift.Uint64())
-	math2.U256(value.Lsh(value, n))
+	math.U256(value.Lsh(value, n))
 
 	return nil, nil
 }
 
 func opSHR(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	// Note, second operand is left in the stack; accumulate result into it, and no need to push it afterwards
-	shift, value := math2.U256(stack.pop()), math2.U256(stack.peek())
+	shift, value := math.U256(stack.pop()), math.U256(stack.peek())
 	defer interpreter.intPool.put(shift) // First operand back into the pool
 
 	if shift.Cmp(common.Big256) >= 0 {
@@ -333,14 +333,14 @@ func opSHR(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 		return nil, nil
 	}
 	n := uint(shift.Uint64())
-	math2.U256(value.Rsh(value, n))
+	math.U256(value.Rsh(value, n))
 
 	return nil, nil
 }
 
 func opSAR(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	// Note, S256 returns (potentially) a new bigint, so we're popping, not peeking this one
-	shift, value := math2.U256(stack.pop()), math2.S256(stack.pop())
+	shift, value := math.U256(stack.pop()), math.S256(stack.pop())
 	defer interpreter.intPool.put(shift) // First operand back into the pool
 
 	if shift.Cmp(common.Big256) >= 0 {
@@ -349,12 +349,12 @@ func opSAR(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *
 		} else {
 			value.SetInt64(-1)
 		}
-		stack.push(math2.U256(value))
+		stack.push(math.U256(value))
 		return nil, nil
 	}
 	n := uint(shift.Uint64())
 	value.Rsh(value, n)
-	stack.push(math2.U256(value))
+	stack.push(math.U256(value))
 
 	return nil, nil
 }
@@ -370,7 +370,7 @@ func opSha3(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 		interpreter.hasher.Reset()
 	}
 	interpreter.hasher.Write(data)
-	Read(interpreter.hasherBuf[:])
+	interpreter.hasher.Read(interpreter.hasherBuf[:])
 
 	evm := interpreter.evm
 	if evm.vmConfig.EnablePreimageRecording {
@@ -529,12 +529,12 @@ func opCoinbase(pc *uint64, interpreter *EVMInterpreter, contract *Contract, mem
 }
 
 func opTimestamp(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	stack.push(math2.U256(interpreter.intPool.get().Set(interpreter.evm.Time)))
+	stack.push(math.U256(interpreter.intPool.get().Set(interpreter.evm.Time)))
 	return nil, nil
 }
 
 func opNumber(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	stack.push(math2.U256(interpreter.intPool.get().Set(interpreter.evm.BlockNumber)))
+	stack.push(math.U256(interpreter.intPool.get().Set(interpreter.evm.BlockNumber)))
 	return nil, nil
 }
 
@@ -543,7 +543,7 @@ func opDifficulty(pc *uint64, interpreter *EVMInterpreter, contract *Contract, m
 }
 
 func opGasLimit(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
-	stack.push(math2.U256(interpreter.intPool.get().SetUint64(interpreter.evm.GasLimit)))
+	stack.push(math.U256(interpreter.intPool.get().SetUint64(interpreter.evm.GasLimit)))
 	return nil, nil
 }
 
@@ -698,7 +698,7 @@ func opCall(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory 
 	// pop other call parameters
 	addr, value, inOffset, inSize, retOffset, retSize := stack.pop(), stack.pop(), stack.pop(), stack.pop(), stack.pop(), stack.pop()
 	toAddr := sdk.BigToAddress(addr)
-	value = math2.U256(value)
+	value = math.U256(value)
 	// get the arguments from memory
 	args := memory.GetPtr(inOffset.Int64(), inSize.Int64())
 
@@ -728,7 +728,7 @@ func opCallCode(pc *uint64, interpreter *EVMInterpreter, contract *Contract, mem
 	// pop other call parameters
 	addr, value, inOffset, inSize, retOffset, retSize := stack.pop(), stack.pop(), stack.pop(), stack.pop(), stack.pop(), stack.pop()
 	toAddr := sdk.BigToAddress(addr)
-	value = math2.U256(value)
+	value = math.U256(value)
 	// get the arguments from memory
 	args := memory.GetPtr(inOffset.Int64(), inSize.Int64())
 

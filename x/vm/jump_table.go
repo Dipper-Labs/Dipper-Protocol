@@ -1,5 +1,9 @@
 package vm
 
+import (
+	//sdk "github.com/Dipper-Protocol/types"
+)
+
 type (
 	executionFunc func(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error)
 	gasFunc       func(*EVM, *Contract, *Stack, *Memory, uint64) (uint64, error) // last parameter is the requested memory size as a uint64

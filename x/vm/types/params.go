@@ -56,9 +56,12 @@ func NewParams(maxCodeSize uint64, vmOpGasParams [256]uint64, vmCommonGasParams 
 
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{
-		params.NewParamSetPair(KeyMaxCodeSize, &p.MaxCodeSize, validateMaxCodeSize),
-		params.NewParamSetPair(KeyVMOpGasParams, &p.VMOpGasParams, validateVMOpGasParams),
-		params.NewParamSetPair(KeyVMCommonGasParams, &p.VMCommonGasParams, validateVMCommonGasParams),
+		//params.NewParamSetPair(KeyMaxCodeSize, &p.MaxCodeSize, validateMaxCodeSize),
+		//params.NewParamSetPair(KeyVMOpGasParams, &p.VMOpGasParams, validateVMOpGasParams),
+		//params.NewParamSetPair(KeyVMCommonGasParams, &p.VMCommonGasParams, validateVMCommonGasParams),
+		params.ParamSetPair{KeyMaxCodeSize,&p.MaxCodeSize},
+		params.ParamSetPair{KeyVMOpGasParams,&p.VMOpGasParams},
+		params.ParamSetPair{KeyVMCommonGasParams,&p.VMCommonGasParams},
 	}
 }
 

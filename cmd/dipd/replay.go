@@ -24,7 +24,7 @@ import (
 func replayCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "replay <root-dir>",
-		Short: "Replay dpd transactions",
+		Short: "Replay dipd transactions",
 		RunE: func(_ *cobra.Command, args []string) error {
 			return replayTxs(args[0])
 		},
@@ -76,7 +76,7 @@ func replayTxs(rootDir string) error {
 
 	// Application
 	fmt.Fprintln(os.Stderr, "Creating application")
-	myapp := app.NewDIPApp(ctx.Logger, appDB)
+	myapp := app.NewDIPApp(ctx.Logger, appDB, nil,true, uint(1))
 
 	// Genesis
 	var genDocPath = filepath.Join(configDir, "genesis.json")

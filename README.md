@@ -7,7 +7,7 @@ dipd init dipd-official --chain-id dipd-chain\
 NOTE: If you have run the tutorial before, you can start from scratch with a\
 dipd unsafe-reset-all\
 or by deleting both of the home folders\
-rm -rf ~/.dp*
+rm -rf ~/.dip*
 
 # Add both accounts, with coins to the genesis file
 dipcli keys add alice\

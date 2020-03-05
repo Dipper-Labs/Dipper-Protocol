@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -96,6 +97,17 @@ var _ yaml.Marshaler = ConsAddress{}
 // AccAddress a wrapper around bytes meant to represent an account address.
 // When marshaled to a string or JSON, it uses Bech32.
 type AccAddress []byte
+
+// BytesToAddress returns Address with value b.
+// If b is larger than len(h), b will be cropped from the left.
+func BytesToAddress(b []byte) AccAddress {
+	return AccAddress(b)
+}
+
+// BigToAddress returns Address with byte values of b.
+// If b is larger than len(h), b will be cropped from the left.
+func BigToAddress(b *big.Int) AccAddress { return BytesToAddress(b.Bytes()) }
+
 
 // AccAddressFromHex creates an AccAddress from a hex string.
 func AccAddressFromHex(address string) (addr AccAddress, err error) {
