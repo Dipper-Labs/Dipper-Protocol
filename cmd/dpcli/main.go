@@ -1,7 +1,9 @@
 package main
 
 import (
-	app2 "github.com/Dipper-Protocol/app"
+	"github.com/Dipper-Protocol/app"
+	"github.com/Dipper-Protocol/x/auth"
+	"github.com/Dipper-Protocol/x/bank"
 	"os"
 	"path"
 
@@ -25,7 +27,7 @@ import (
 func main() {
 	cobra.EnableCommandSorting = false
 
-	cdc := app2.MakeCodec()
+	cdc := app.MakeCodec()
 
 	// Read in the configuration file for the sdk
 	config := sdk.GetConfig()
@@ -35,7 +37,7 @@ func main() {
 	config.Seal()
 
 	rootCmd := &cobra.Command{
-		Use:   "dpcli",
+		Use:   "dipcli",
 		Short: "dipperProtocol Client",
 	}
 
@@ -50,7 +52,7 @@ func main() {
 		bankcmd.SendTxCmd(cdc),
 		vmcli.VMCmd(cdc),
 		rpc.StatusCommand(),
-		client.ConfigCmd(app2.DefaultCLIHome),
+		client.ConfigCmd(app.DefaultCLIHome),
 		queryCmd(cdc),
 		txCmd(cdc),
 		client.LineBreak,
@@ -62,7 +64,7 @@ func main() {
 		client.NewCompletionCmd(rootCmd, true),
 	)
 
-	executor := cli.PrepareMainCmd(rootCmd, "DIP", app2.DefaultCLIHome)
+	executor := cli.PrepareMainCmd(rootCmd, "DIP", app.DefaultCLIHome)
 	err := executor.Execute()
 	if err != nil {
 		panic(err)
@@ -72,7 +74,7 @@ func main() {
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
 	authrest.RegisterTxRoutes(rs.CliCtx, rs.Mux)
-	app2.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
+	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }
 
 func queryCmd(cdc *amino.Codec) *cobra.Command {
@@ -93,7 +95,7 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 	)
 
 	// add modules' query commands
-	app2.ModuleBasics.AddQueryCommands(queryCmd, cdc)
+	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
 
 	return queryCmd
 }
@@ -111,12 +113,23 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 		authcmd.GetMultiSignCommand(cdc),
 		client.LineBreak,
 		authcmd.GetBroadcastCommand(cdc),
-		authcmd.GetEncodeCommand(cdc),
+		//authcmd.GetEncodeCommand(cdc),
 		client.LineBreak,
 	)
 
 	// add modules' tx commands
-	app2.ModuleBasics.AddTxCommands(txCmd, cdc)
+	app.ModuleBasics.AddTxCommands(txCmd, cdc)
+
+	// remove auth and bank commands as they're mounted under the root tx command
+	var cmdsToRemove []*cobra.Command
+
+	for _, cmd := range txCmd.Commands() {
+		if cmd.Use == auth.ModuleName || cmd.Use == bank.ModuleName {
+			cmdsToRemove = append(cmdsToRemove, cmd)
+		}
+	}
+
+	txCmd.RemoveCommand(cmdsToRemove...)
 
 	return txCmd
 }

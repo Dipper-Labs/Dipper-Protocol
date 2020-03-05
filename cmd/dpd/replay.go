@@ -76,7 +76,7 @@ func replayTxs(rootDir string) error {
 
 	// Application
 	fmt.Fprintln(os.Stderr, "Creating application")
-	myapp := app.NewDipperProtocolApp(ctx.Logger, appDB)
+	myapp := app.NewDIPApp(ctx.Logger, appDB)
 
 	// Genesis
 	var genDocPath = filepath.Join(configDir, "genesis.json")

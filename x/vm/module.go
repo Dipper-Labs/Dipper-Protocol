@@ -51,6 +51,7 @@ func (a AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Rout
 
 func (a AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	return nil
+	//return cli2.VMCmd(cdc) //TODO
 }
 
 func (a AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {

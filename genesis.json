@@ -1,6 +1,6 @@
 {
   "genesis_time": "2019-12-10T02:02:38.026345614Z",
-  "chain_id": "dpd-chain",
+  "chain_id": "dipd-chain",
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
@@ -60,7 +60,7 @@
                 "type": "cosmos-sdk/MsgCreateValidator",
                 "value": {
                   "description": {
-                    "moniker": "dpd-official",
+                    "moniker": "dipd-official",
                     "identity": "",
                     "website": "",
                     "details": ""
@@ -172,7 +172,7 @@
         ]
       }
     ],
-    "dipperProtocol": {
+    "dipperBank": {
       "whois_records": []
     },
     "params": null,

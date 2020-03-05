@@ -1,8 +1,12 @@
 package app
 
 import (
+	"io"
 	"encoding/json"
+	"github.com/Dipper-Protocol/x/crisis"
 	"github.com/Dipper-Protocol/x/genaccounts"
+	"github.com/Dipper-Protocol/x/gov"
+	"github.com/Dipper-Protocol/x/mint"
 	"github.com/Dipper-Protocol/x/vm"
 	"os"
 
@@ -26,17 +30,19 @@ import (
 	"github.com/Dipper-Protocol/x/staking"
 	"github.com/Dipper-Protocol/x/supply"
 
-	"github.com/Dipper-Protocol/x/dipperProtocol"
+	"github.com/Dipper-Protocol/x/dipperBank"
+
+	paramsclient "github.com/Dipper-Protocol/x/params/client"
 )
 
-const appName = "dipperProtocol"
+const appName = "dip"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.dpcli")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.dipcli")
 
 	// DefaultNodeHome sets the folder where the application data and configuration will be stored
-	DefaultNodeHome = os.ExpandEnv("$HOME/.dpd")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.dipd")
 
 	// NewBasicManager is in charge of setting up basic module elements
 	ModuleBasics = module.NewBasicManager(
@@ -45,20 +51,25 @@ var (
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
+		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
+		gov.NewAppModuleBasic(paramsclient.ProposalHandler, distr.ProposalHandler),
 		params.AppModuleBasic{},
+		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		dipperProtocol.AppModule{},
+		dipperBank.AppModule{},
 		vm.AppModule{},
 	)
 	// account permissions
 	maccPerms = map[string][]string{
 		auth.FeeCollectorName:     nil,
 		distr.ModuleName:          nil,
+		mint.ModuleName:           {supply.Minter},
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		gov.ModuleName:            {supply.Burner},
 	}
 )
 
@@ -68,64 +79,72 @@ func MakeCodec() *codec.Codec {
 	ModuleBasics.RegisterCodec(cdc)
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
+	codec.RegisterEvidences(cdc)
 	return cdc
 }
 
-type dipperProtocolApp struct {
+type DIPApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
+	invCheckPeriod uint
 	// keys to access the substores
 	keys  map[string]*sdk.KVStoreKey
 	tkeys map[string]*sdk.TransientStoreKey
 
-	// Keepers
+	// keepers
 	accountKeeper  auth.AccountKeeper
 	bankKeeper     bank.Keeper
+	supplyKeeper   supply.Keeper
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
 	distrKeeper    distr.Keeper
-	supplyKeeper   supply.Keeper
+	govKeeper      gov.Keeper
+	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
-	nsKeeper       dipperProtocol.Keeper
-	vmKeeper	   vm.Keeper
-
+	vmKeeper       vm.Keeper
+	dipperBankKeeper dipperBank.Keeper
+ 	//TODO there is a refundKeeper has deprecated, what is it? it must be fix.
 	// Module Manager
 	mm *module.Manager
 }
 
-// NewDipperProtocolApp is a constructor function for dipperProtocolApp
-func NewDipperProtocolApp(
-	logger log.Logger, db dbm.DB, baseAppOptions ...func(*bam.BaseApp),
-) *dipperProtocolApp {
+// NewDIPApp is a constructor function for DIPApp
+func NewDIPApp(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp),
+) *DIPApp {
 
 	// First define the top level codec that will be shared by the different modules
 	cdc := MakeCodec()
 
 	// BaseApp handles interactions with Tendermint through the ABCI protocol
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
-
+	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey,
 		auth.StoreKey,
+		//auth.RefundKey,
 		staking.StoreKey,
 		supply.StoreKey,
+		mint.StoreKey,
 		distr.StoreKey,
 		slashing.StoreKey,
+		gov.StoreKey,
 		params.StoreKey,
-		dipperProtocol.StoreKey,
 		vm.StoreKey,
-		vm.CodeKey,//TODO why is codekey
+		vm.CodeKey,
 		)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
-	var app = &dipperProtocolApp{
+	var app = &DIPApp{
 		BaseApp: bApp,
 		cdc:     cdc,
+		invCheckPeriod: invCheckPeriod,
 		keys:    keys,
 		tkeys:   tkeys,
 	}
@@ -134,10 +153,13 @@ func NewDipperProtocolApp(
 	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	bankSupspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
+	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
+	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
 	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
 	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable())
+	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	vmSubspace := app.paramsKeeper.Subspace(vm.DefaultParamspace)
 
 	// The AccountKeeper handles address -> account lookups
@@ -148,10 +170,13 @@ func NewDipperProtocolApp(
 		auth.ProtoBaseAccount,
 	)
 
+	//TODO refundkeeper
+	//app.refundKeeper = auth.NewRefundKeeper(app.cdc, keys[auth.RefundKey])
+
 	// The BankKeeper allows you perform sdk.Coins interactions
 	app.bankKeeper = bank.NewBaseKeeper(
 		app.accountKeeper,
-		bankSupspace,
+		bankSubspace,
 		bank.DefaultCodespace,
 		app.ModuleAccountAddrs(),
 	)
@@ -175,6 +200,14 @@ func NewDipperProtocolApp(
 		staking.DefaultCodespace,
 	)
 
+	app.mintKeeper = mint.NewKeeper(
+		app.cdc,
+		keys[mint.StoreKey],
+		mintSubspace,
+		&stakingKeeper,
+		app.supplyKeeper,
+		auth.FeeCollectorName)
+
 	app.distrKeeper = distr.NewKeeper(
 		app.cdc,
 		keys[distr.StoreKey],
@@ -194,6 +227,12 @@ func NewDipperProtocolApp(
 		slashing.DefaultCodespace,
 	)
 
+	app.crisisKeeper = crisis.NewKeeper(
+		crisisSubspace,
+		invCheckPeriod,
+		app.supplyKeeper,
+		auth.FeeCollectorName)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
@@ -202,11 +241,11 @@ func NewDipperProtocolApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	// The dipperProtocolKeeper is the Keeper from the module for this tutorial
+	// The dipperBankKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
-	app.nsKeeper = dipperProtocol.NewKeeper(
+	app.dipperBankKeeper = dipperBank.NewKeeper(
 		app.bankKeeper,
-		keys[dipperProtocol.StoreKey],
+		keys[dipperBank.StoreKey],
 		app.cdc,
 	)
 
@@ -217,21 +256,37 @@ func NewDipperProtocolApp(
 		vmSubspace,
 		app.accountKeeper)
 
+	// register the proposal types
+	govRouter := gov.NewRouter()
+	govRouter.
+		AddRoute(gov.RouterKey, gov.ProposalHandler).
+		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
+
+	app.govKeeper = gov.NewKeeper(
+		app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace, app.supplyKeeper,
+		&stakingKeeper, gov.DefaultCodespace,govRouter,
+	)
+
+
 	app.mm = module.NewManager(
+		dipperBank.NewAppModule(app.dipperBankKeeper, app.bankKeeper),
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		dipperProtocol.NewAppModule(app.nsKeeper, app.bankKeeper),
+		crisis.NewAppModule(&app.crisisKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
+		gov.NewAppModule(app.govKeeper, app.supplyKeeper),
+		mint.NewAppModule(app.mintKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 		vm.NewAppModule(app.vmKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName, vm.ModuleName)
+	app.mm.SetOrderBeginBlockers(mint.ModuleName, distr.ModuleName, slashing.ModuleName)
+	app.mm.SetOrderEndBlockers(crisis.ModuleName, gov.ModuleName, staking.ModuleName, vm.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils moodule must occur after staking so that pools are
@@ -243,8 +298,10 @@ func NewDipperProtocolApp(
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
-		dipperProtocol.ModuleName,
+		gov.ModuleName,
+		mint.ModuleName,
 		supply.ModuleName,
+		crisis.ModuleName,
 		genutil.ModuleName,
 		vm.ModuleName,
 	)
@@ -256,6 +313,9 @@ func NewDipperProtocolApp(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
+
+	//TODO refund is deprecated
+	//app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountKeeper, app.supplyKeeper, app.refundKeeper))
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(
@@ -285,7 +345,7 @@ func NewDefaultGenesisState() GenesisState {
 	return ModuleBasics.DefaultGenesis()
 }
 
-func (app *dipperProtocolApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *DIPApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 
 	err := app.cdc.UnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -296,18 +356,18 @@ func (app *dipperProtocolApp) InitChainer(ctx sdk.Context, req abci.RequestInitC
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-func (app *dipperProtocolApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *DIPApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
-func (app *dipperProtocolApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *DIPApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
-func (app *dipperProtocolApp) LoadHeight(height int64) error {
+func (app *DIPApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *dipperProtocolApp) ModuleAccountAddrs() map[string]bool {
+func (app *DIPApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -318,7 +378,7 @@ func (app *dipperProtocolApp) ModuleAccountAddrs() map[string]bool {
 
 //_________________________________________________________
 
-func (app *dipperProtocolApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *DIPApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
 	// as if they could withdraw from the start of the next block

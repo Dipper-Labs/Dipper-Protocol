@@ -2,8 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	app2 "github.com/Dipper-Protocol/app"
+	app "github.com/Dipper-Protocol/app"
+	"github.com/Dipper-Protocol/baseapp"
 	"github.com/Dipper-Protocol/client"
+	"github.com/Dipper-Protocol/store"
+	"github.com/spf13/viper"
 	"io"
 
 	"github.com/Dipper-Protocol/server"
@@ -27,7 +30,7 @@ const (
 	flagMinGasPrices = "minimum-gas-prices"
 )
 
-// dpd custom flags
+// dipd custom flags
 const flagInvCheckPeriod = "inv-check-period"
 
 var invCheckPeriod uint
@@ -35,7 +38,7 @@ var invCheckPeriod uint
 func main() {
 	cobra.EnableCommandSorting = false
 
-	cdc := app2.MakeCodec()
+	cdc := app.MakeCodec()
 
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
@@ -46,21 +49,21 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "dpd",
+		Use:               "dipd",
 		Short:             "dipperProtocol App Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 	// CLI commands to initialize the chain
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(ctx, cdc, app2.ModuleBasics, app2.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(ctx, cdc, genaccounts.AppModuleBasic{}, app2.DefaultNodeHome),
+		genutilcli.InitCmd(ctx, cdc, app.ModuleBasics, app.DefaultNodeHome),
+		genutilcli.CollectGenTxsCmd(ctx, cdc, genaccounts.AppModuleBasic{}, app.DefaultNodeHome),
 		genutilcli.GenTxCmd(
-			ctx, cdc, app2.ModuleBasics, staking.AppModuleBasic{},
-			genaccounts.AppModuleBasic{}, app2.DefaultNodeHome, app2.DefaultCLIHome,
+			ctx, cdc, app.ModuleBasics, staking.AppModuleBasic{},
+			genaccounts.AppModuleBasic{}, app.DefaultNodeHome, app.DefaultCLIHome,
 		),
-		genutilcli.ValidateGenesisCmd(ctx, cdc, app2.ModuleBasics),
+		genutilcli.ValidateGenesisCmd(ctx, cdc, app.ModuleBasics),
 		// AddGenesisAccountCmd allows users to add accounts to the genesis file
-		genaccscli.AddGenesisAccountCmd(ctx, cdc, app2.DefaultNodeHome, app2.DefaultCLIHome),
+		genaccscli.AddGenesisAccountCmd(ctx, cdc, app.DefaultNodeHome, app.DefaultCLIHome),
 		client.NewCompletionCmd(rootCmd, true),
 		replayCmd(),
 		client.LineBreak,
@@ -69,7 +72,7 @@ func main() {
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
 	// prepare and add flags
-	executor := cli.PrepareBaseCmd(rootCmd, "DP", app2.DefaultNodeHome)
+	executor := cli.PrepareBaseCmd(rootCmd, "DIP", app.DefaultNodeHome)
 	rootCmd.PersistentFlags().UintVar(&invCheckPeriod, flagInvCheckPeriod,
 		0, "Assert registered invariants every N blocks")
 	err := executor.Execute()
@@ -79,7 +82,11 @@ func main() {
 }
 
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application {
-	return app2.NewDipperProtocolApp(logger, db)
+	minGasPrices := viper.GetString(flagMinGasPrices)
+	return app.NewDIPApp(
+		logger, db, traceStore, true, invCheckPeriod,
+		baseapp.SetPruning(store.NewPruningOptionsFromString(viper.GetString("pruning"))), baseapp.SetMinGasPrices(minGasPrices),
+	)
 }
 
 func exportAppStateAndTMValidators(
@@ -87,17 +94,17 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		nsApp := app2.NewDipperProtocolApp(logger, db)
-		err := nsApp.LoadHeight(height)
+		dipApp := app.NewDIPApp(logger, db, traceStore, false, uint(1))
+		err := dipApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
 		}
-		return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+		return dipApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	nsApp := app2.NewDipperProtocolApp(logger, db)
+	dipApp := app.NewDIPApp(logger, db, traceStore, true, uint(1))
 
-	return nsApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+	return dipApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }
 
 // AddGenesisAccountCmd allows users to add accounts to the genesis file
@@ -109,7 +116,7 @@ func exportAppStateAndTMValidators(
 //		Long: strings.TrimSpace(`
 //Adds accounts to the genesis file so that you can start a chain with coins in the CLI:
 //
-//$ dpd add-genesis-account cosmos1tse7r2fadvlrrgau3pa0ss7cqh55wrv6y9alwh 1000STAKE,1000nametoken
+//$ dipd add-genesis-account cosmos1tse7r2fadvlrrgau3pa0ss7cqh55wrv6y9alwh 1000STAKE,1000nametoken
 //`),
 //		RunE: func(_ *cobra.Command, args []string) error {
 //			addr, err := sdk.AccAddressFromBech32(args[0])
