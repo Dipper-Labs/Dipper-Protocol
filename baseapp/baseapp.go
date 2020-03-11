@@ -57,6 +57,8 @@ type BaseApp struct {
 	baseKey *sdk.KVStoreKey // Main KVStore in cms
 
 	anteHandler    sdk.AnteHandler  // ante handler for fee and auth
+	feeRefundHandler sdk.FeeRefundHandler // fee handler for fee refund
+
 	initChainer    sdk.InitChainer  // initialize state with validators and state blob
 	beginBlocker   sdk.BeginBlocker // logic to run before any txs
 	endBlocker     sdk.EndBlocker   // logic to run after all txs, and to determine valset changes

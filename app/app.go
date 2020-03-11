@@ -105,7 +105,8 @@ type DIPApp struct {
 	paramsKeeper   params.Keeper
 	vmKeeper       vm.Keeper
 	dipperBankKeeper dipperBank.Keeper
- 	//TODO there is a refundKeeper has deprecated, what is it? it must be fix.
+ 	//TODO add refundKeeper
+	refundKeeper   auth.RefundKeeper
 	// Module Manager
 	mm *module.Manager
 }
@@ -170,8 +171,8 @@ func NewDIPApp(
 		auth.ProtoBaseAccount,
 	)
 
-	//TODO refundkeeper
-	//app.refundKeeper = auth.NewRefundKeeper(app.cdc, keys[auth.RefundKey])
+	//TODO add refundkeeper
+	app.refundKeeper = auth.NewRefundKeeper(app.cdc, keys[auth.RefundKey])
 
 	// The BankKeeper allows you perform sdk.Coins interactions
 	app.bankKeeper = bank.NewBaseKeeper(
@@ -314,8 +315,8 @@ func NewDIPApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	//TODO refund is deprecated
-	//app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountKeeper, app.supplyKeeper, app.refundKeeper))
+	//TODO add refund
+	app.SetFeeRefundHandler(auth.NewFeeRefundHandler(app.accountKeeper, app.supplyKeeper, app.refundKeeper))
 
 	// The AnteHandler handles signature verification and transaction pre-processing
 	app.SetAnteHandler(

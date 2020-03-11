@@ -16,6 +16,8 @@ const (
 
 	// QuerierRoute is the querier route for acc
 	QuerierRoute = StoreKey
+
+	RefundKey = "refund_fee"
 )
 
 var (

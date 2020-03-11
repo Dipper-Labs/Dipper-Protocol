@@ -34,10 +34,7 @@ func handleMsgContract(ctx sdk.Context, msg MsgContract, k Keeper) sdk.Result {
 	_, res, err2 := DoStateTransition(ctx, msg, k, gasLimit, false)
 	//TODO temporary, need to fix
 	if err2 != nil {
-		err, ok := err2.(sdk.Error)
-		if ok {
-			return err.Result()
-		}
+		return sdk.ErrInternal(err.Error()).Result()
 	}
 
 	ctx.EventManager().EmitEvent(
