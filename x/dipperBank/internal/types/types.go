@@ -185,7 +185,7 @@ func (b *BillBank) BorrowValueEstimate(amount int64, symbol string) int64 {
 	if err != nil {
 		return 0
 	}
-	return amount * oracle.GetPrice(symbol)/1000000
+	return amount * oracle.GetPrice(symbol)/sdk.NativeTokenFraction
 }
 
 func (b *BillBank) Borrow(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -309,7 +309,7 @@ func (b *BillBank) SupplyValueOf(symbol string, userAcc sdk.AccAddress) int64 {
 	if err != nil {
 		return 0
 	}
-	return b.SupplyBalanceOf(symbol, userAcc) * oracle.GetPrice(symbol)/1000000
+	return b.SupplyBalanceOf(symbol, userAcc) * oracle.GetPrice(symbol)/sdk.NativeTokenFraction
 }
 
 func (b *BillBank) Deposit(amount sdk.Coins, symbol string, userAcc sdk.AccAddress) error {
@@ -469,7 +469,7 @@ func (p Pools) Bytes() []byte{
 	return initBytes
 }
 
-//Oracle, maybe use chainlink later
+//Oracle, maybe use chainLink later
 type Oracle struct {
 	TokensPrice map[DSymbol]DPrice `json:"tokensPrice"`
 }

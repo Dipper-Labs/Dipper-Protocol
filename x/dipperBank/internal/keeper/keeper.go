@@ -38,12 +38,7 @@ func (k Keeper) GetBillBank(ctx sdk.Context) types.BillBank {
 }
 
 func (k Keeper) SetBillBank(ctx sdk.Context, bb types.BillBank) {
-	//if len(oracle.TokensPrice) == 0 {
-	//	return
-	//}
 	store := ctx.KVStore(k.storeKey)
-	//oracle, _ := bb.GetOracle()
-	//fmt.Println("in the end the oracle is", oracle) //for test set price
 	store.Set([]byte(types.DipperBank), k.cdc.MustMarshalBinaryBare(bb))
 }
 
@@ -53,20 +48,20 @@ func (k Keeper) GetNetValueOf(ctx sdk.Context, user sdk.AccAddress) int64 {
 }
 
 //Borrow methods
-func (k Keeper)GetBorrowBalanceOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
+func (k Keeper) GetBorrowBalanceOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
 	return k.GetBillBank(ctx).BorrowBalanceOf(symbol, user)
 }
 
-func (k Keeper)GetBorrowValueOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
+func (k Keeper) GetBorrowValueOf(ctx sdk.Context, symbol string, user sdk.AccAddress) int64 {
 	return k.GetBillBank(ctx).BorrowValueOf(symbol, user)
 }
 
-func (k Keeper)GetBorrowValueEstimate(ctx sdk.Context, amount int64, symbol string) int64{
+func (k Keeper) GetBorrowValueEstimate(ctx sdk.Context, amount int64, symbol string) int64{
 	bank := k.GetBillBank(ctx)
 	return bank.BorrowValueEstimate(amount, symbol)
 }
 
-func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
+func (k Keeper) BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
 	bank := k.GetBillBank(ctx)
 	err := bank.Borrow(amount, symbol, user)
 	if err != nil {
@@ -76,7 +71,7 @@ func (k Keeper)BankBorrow(ctx sdk.Context, amount sdk.Coins, symbol string, user
 	return nil
 }
 
-func (k Keeper)BankRepay(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
+func (k Keeper) BankRepay(ctx sdk.Context, amount sdk.Coins, symbol string, user sdk.AccAddress) error{
 	bank := k.GetBillBank(ctx)
 	err := bank.Repay(amount, symbol, user)
 	if err != nil {
