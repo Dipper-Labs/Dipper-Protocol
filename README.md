@@ -45,23 +45,23 @@ dipcli tx dipperBank bank-deposit 1000000eth eth --from bob\
 dipcli tx dipperBank bank-borrow 120000000dai dai --from bob\
 dipcli tx dipperBank bank-repay 120000000dai dai --from bob
 
-#deploy contract
+# deploy contract
 dipcli vm create --code_file=./demo/demo.bc \
 --from $(dipcli keys show -a alice) --amount=0pdip \
 --gas=1000000
-##query txhash
+## query txhash
 dipcli query tx <txhash>
-##query contract code
+## query contract code
 dipcli query vm code <contract address>
-##call contract method <transfer>
+## call contract method <transfer>
 dipcli vm call --from $(dipcli keys show -a alice) \
 --contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms \
 --method transfer  \
 --args  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002" \
 --amount 1000000pdip \
 --abi_file ./demo/demo.abi
-##call contract method <blanceof> 
+## call contract method <blanceof> 
 dipcli query account dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
-##call contract method <query>
+## call contract method <query>
 dipcli keys parse $(dipcli keys show -a alice)
 dipcli query vm call $(dipcli keys show -a alice) dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms balanceOf "000000000000000000000000DB8822D044FE1C13AA32AF72F27A113E849FC27E" 0pdip ./demo/demo.abi
