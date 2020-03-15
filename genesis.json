@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2019-12-10T02:02:38.026345614Z",
+  "genesis_time": "2020-03-15T03:39:43.572087732Z",
   "chain_id": "dipd-chain",
   "consensus_params": {
     "block": {
@@ -18,6 +18,90 @@
   },
   "app_hash": "",
   "app_state": {
+    "accounts": [
+      {
+        "address": "dip15a2h32ah8rdh3xs582u23x0jmdsr2m4q8fd0yh",
+        "coins": [
+          {
+            "denom": "dai",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "eth",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "pdip",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "stake",
+            "amount": "10000000000000000"
+          }
+        ],
+        "sequence_number": "0",
+        "account_number": "0",
+        "original_vesting": [],
+        "delegated_free": [],
+        "delegated_vesting": [],
+        "start_time": "0",
+        "end_time": "0",
+        "module_name": "",
+        "module_permissions": [
+          ""
+        ]
+      },
+      {
+        "address": "dip1xqzdxuwdt63dv536tf5u94jgngywhk4v8dzht9",
+        "coins": [
+          {
+            "denom": "dai",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "eth",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "pdip",
+            "amount": "10000000000000000"
+          },
+          {
+            "denom": "stake",
+            "amount": "10000000000000000"
+          }
+        ],
+        "sequence_number": "0",
+        "account_number": "0",
+        "original_vesting": [],
+        "delegated_free": [],
+        "delegated_vesting": [],
+        "start_time": "0",
+        "end_time": "0",
+        "module_name": "",
+        "module_permissions": [
+          ""
+        ]
+      }
+    ],
+    "supply": {
+      "supply": []
+    },
+    "staking": {
+      "params": {
+        "unbonding_time": "1814400000000000",
+        "max_validators": 100,
+        "max_entries": 7,
+        "bond_denom": "stake"
+      },
+      "last_total_power": "0",
+      "last_validator_powers": null,
+      "validators": null,
+      "delegations": null,
+      "unbonding_delegations": null,
+      "redelegations": null,
+      "exported": false
+    },
     "gov": {
       "starting_proposal_id": "1",
       "deposits": null,
@@ -26,7 +110,7 @@
       "deposit_params": {
         "min_deposit": [
           {
-            "denom": "dippertoken",
+            "denom": "stake",
             "amount": "10000000"
           }
         ],
@@ -41,6 +125,53 @@
         "veto": "0.334000000000000000"
       }
     },
+    "mint": {
+      "minter": {
+        "inflation": "0.130000000000000000",
+        "annual_provisions": "0.000000000000000000"
+      },
+      "params": {
+        "mint_denom": "stake",
+        "inflation_rate_change": "0.130000000000000000",
+        "inflation_max": "0.200000000000000000",
+        "inflation_min": "0.070000000000000000",
+        "goal_bonded": "0.670000000000000000",
+        "blocks_per_year": "6311520"
+      }
+    },
+    "distribution": {
+      "fee_pool": {
+        "community_pool": []
+      },
+      "community_tax": "0.020000000000000000",
+      "base_proposer_reward": "0.010000000000000000",
+      "bonus_proposer_reward": "0.040000000000000000",
+      "withdraw_addr_enabled": true,
+      "delegator_withdraw_infos": [],
+      "previous_proposer": "",
+      "outstanding_rewards": [],
+      "validator_accumulated_commissions": [],
+      "validator_historical_rewards": [],
+      "validator_current_rewards": [],
+      "delegator_starting_infos": [],
+      "validator_slash_events": []
+    },
+    "params": null,
+    "dipperBank": {
+      "whois_records": ""
+    },
+    "slashing": {
+      "params": {
+        "max_evidence_age": "120000000000",
+        "signed_blocks_window": "100",
+        "min_signed_per_window": "0.500000000000000000",
+        "downtime_jail_duration": "600000000000",
+        "slash_fraction_double_sign": "0.050000000000000000",
+        "slash_fraction_downtime": "0.010000000000000000"
+      },
+      "signing_infos": {},
+      "missed_blocks": {}
+    },
     "auth": {
       "params": {
         "max_memo_characters": "256",
@@ -48,6 +179,279 @@
         "tx_size_cost_per_byte": "10",
         "sig_verify_cost_ed25519": "590",
         "sig_verify_cost_secp256k1": "1000"
+      }
+    },
+    "crisis": {
+      "constant_fee": {
+        "denom": "stake",
+        "amount": "1000"
+      }
+    },
+    "vm": {
+      "params": {
+        "max_code_size": "1048576",
+        "vm_op_gas_params": [
+          "0",
+          "3",
+          "5",
+          "3",
+          "5",
+          "5",
+          "5",
+          "5",
+          "8",
+          "8",
+          "0",
+          "5",
+          "0",
+          "0",
+          "0",
+          "0",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "0",
+          "0",
+          "30",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "2",
+          "700",
+          "2",
+          "2",
+          "2",
+          "3",
+          "2",
+          "3",
+          "2",
+          "3",
+          "2",
+          "700",
+          "700",
+          "2",
+          "3",
+          "700",
+          "20",
+          "2",
+          "2",
+          "2",
+          "0",
+          "2",
+          "2",
+          "5",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "2",
+          "3",
+          "3",
+          "3",
+          "800",
+          "0",
+          "8",
+          "10",
+          "2",
+          "2",
+          "2",
+          "1",
+          "0",
+          "0",
+          "0",
+          "0",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "3",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "32000",
+          "700",
+          "700",
+          "0",
+          "700",
+          "32000",
+          "0",
+          "0",
+          "0",
+          "0",
+          "700",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "vm_common_gas_params": {
+          "ContractCreationGas": "53000",
+          "create_data_gas": "200"
+        }
       }
     },
     "genutil": {
@@ -71,9 +475,9 @@
                     "max_change_rate": "0.100000000000000000"
                   },
                   "min_self_delegation": "1",
-                  "delegator_address": "cosmos1md6hzu6zr8pf2xkej07cg7vgrprtkkskfv0wfw",
-                  "validator_address": "cosmosvaloper1md6hzu6zr8pf2xkej07cg7vgrprtkkskvcmm9a",
-                  "pubkey": "cosmosvalconspub1zcjduepqe4zsjeejreulnrmqks2amnxetnqfzgz5qmmgw47vuaej3nakudfsgr07jz",
+                  "delegator_address": "dip15a2h32ah8rdh3xs582u23x0jmdsr2m4q8fd0yh",
+                  "validator_address": "dipvaloper15a2h32ah8rdh3xs582u23x0jmdsr2m4q9992qa",
+                  "pubkey": "dipvalconspub1zcjduepqs2j8p7sjzd6gtg3xrt5zlgklqvvae4zsswcxefg2euyjezxj32zqj9y9gs",
                   "value": {
                     "denom": "stake",
                     "amount": "1000000"
@@ -89,119 +493,18 @@
               {
                 "pub_key": {
                   "type": "tendermint/PubKeySecp256k1",
-                  "value": "A+wg+AIpygN2BD2FIGbL/jg2tlmy0pZxpnjpIkVLvbHV"
+                  "value": "A6ZTXRxYLiY3Z1nKZE7y6QOCrz4xqG+/VKSt7sps5jP9"
                 },
-                "signature": "vWkW7dHPMjKLzHqeHQm85e/R6Hwt0v+Gq0HjEaBMgOg/zMUV9T8WJFL0dOWVRIsdXl1zW74wgUFyQe5yHVhvwg=="
+                "signature": "vq01j2iH+VOcyrTlksRrTSvxVTMk3yQ/FNgYalYRal4h2QfW5UomYiRxZ2E+drWcZPxoLbTBx8byRMa+zzJYuQ=="
               }
             ],
-            "memo": "9b42befcc603c275d1f61b6d01f72fbdc0994c54@172.16.163.181:26656"
+            "memo": "980e6a36655e2dd85fc7e0189698acf81f46a7a2@172.16.163.181:26656"
           }
         }
       ]
     },
-    "supply": {
-      "supply": []
-    },
     "bank": {
       "send_enabled": true
-    },
-    "distribution": {
-      "fee_pool": {
-        "community_pool": []
-      },
-      "community_tax": "0.020000000000000000",
-      "base_proposer_reward": "0.010000000000000000",
-      "bonus_proposer_reward": "0.040000000000000000",
-      "withdraw_addr_enabled": true,
-      "delegator_withdraw_infos": [],
-      "previous_proposer": "",
-      "outstanding_rewards": [],
-      "validator_accumulated_commissions": [],
-      "validator_historical_rewards": [],
-      "validator_current_rewards": [],
-      "delegator_starting_infos": [],
-      "validator_slash_events": []
-    },
-    "accounts": [
-      {
-        "address": "cosmos1md6hzu6zr8pf2xkej07cg7vgrprtkkskfv0wfw",
-        "coins": [
-          {
-            "denom": "dippertoken",
-            "amount": "10000000000000000"
-          },
-          {
-            "denom": "stake",
-            "amount": "10000000000000000"
-          }
-        ],
-        "sequence_number": "0",
-        "account_number": "0",
-        "original_vesting": [],
-        "delegated_free": [],
-        "delegated_vesting": [],
-        "start_time": "0",
-        "end_time": "0",
-        "module_name": "",
-        "module_permissions": [
-          ""
-        ]
-      },
-      {
-        "address": "cosmos1czw87vykk9tglefykxzgmlm7te29rmluma0h9k",
-        "coins": [
-          {
-            "denom": "dippertoken",
-            "amount": "10000000000000000"
-          },
-          {
-            "denom": "stake",
-            "amount": "1000000000000"
-          }
-        ],
-        "sequence_number": "0",
-        "account_number": "0",
-        "original_vesting": [],
-        "delegated_free": [],
-        "delegated_vesting": [],
-        "start_time": "0",
-        "end_time": "0",
-        "module_name": "",
-        "module_permissions": [
-          ""
-        ]
-      }
-    ],
-    "dipperBank": {
-      "whois_records": []
-    },
-    "params": null,
-    "staking": {
-      "params": {
-        "unbonding_time": "1814400000000000",
-        "max_validators": 100,
-        "max_entries": 7,
-        "bond_denom": "stake"
-      },
-      "last_total_power": "0",
-      "last_validator_powers": null,
-      "validators": null,
-      "delegations": null,
-      "unbonding_delegations": null,
-      "redelegations": null,
-      "exported": false
-    },
-    "slashing": {
-      "params": {
-        "max_evidence_age": "120000000000",
-        "signed_blocks_window": "100",
-        "min_signed_per_window": "0.500000000000000000",
-        "downtime_jail_duration": "600000000000",
-        "slash_fraction_double_sign": "0.050000000000000000",
-        "slash_fraction_downtime": "0.010000000000000000"
-      },
-      "signing_infos": {},
-      "missed_blocks": {}
     }
   }
 }
