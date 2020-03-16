@@ -15,8 +15,8 @@ include Makefile.ledger
 all: install
 
 install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/dipd
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/dipcli
+		go install $(BUILD_FLAGS) ./cmd/dipd
+		go install $(BUILD_FLAGS) ./cmd/dipcli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

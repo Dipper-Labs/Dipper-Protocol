@@ -3,6 +3,10 @@ this is basic finance protocol
 
 
 # Quick start
+## 1.0 install
+cd Dipper-Protocol
+make install
+
 ## 1.1 Initialize configuration files and genesis file
 dipd init dipd-official --chain-id dipd-chain\
 NOTE: If you have run the tutorial before, you can start from scratch with a\
@@ -39,16 +43,11 @@ curl http://127.0.0.1:26657/status
 
 # Dipper Bank contract
 ## 2.1 Withdraw/deposit/borrow/repay coin which bank supports.
-dipcli tx dipperBank set-oracleprice dipperBank eth 15000000000000 --from bob\
-dipcli tx dipperBank bank-withdraw 12000000000000eth eth --from bob\
-dipcli tx dipperBank bank-withdraw 15000000000000dai dai --from alice\
-dipcli tx dipperBank bank-deposit 1000000000000eth eth --from bob\
-dipcli tx dipperBank bank-borrow 12000000000000dai dai --from bob\
-dipcli tx dipperBank bank-repay 12000000000000dai dai --from bob
+
 
 # Smart contract property 
 ## 3.1 deploy contract
-dipcli vm create --code_file=./demo/demo.bc \
+dipcli vm create --code_file=./contract/demo/demo.bc \
 --from $(dipcli keys show -a alice) --amount=0pdip \
 --gas=1000000
 
@@ -64,11 +63,11 @@ dipcli vm call --from $(dipcli keys show -a alice) \
 --method transfer  \
 --args  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002" \
 --amount 1000000pdip \
---abi_file ./demo/demo.abi
+--abi_file ./contract/demo/demo.abi
 
 ## 3.5 call contract method, such as balanceOf
 dipcli query account dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
 
 ## 3.6 call contract method, such as query alice money
 dipcli keys parse $(dipcli keys show -a alice)
-dipcli query vm call $(dipcli keys show -a alice) dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms balanceOf "000000000000000000000000DB8822D044FE1C13AA32AF72F27A113E849FC27E" 0pdip ./demo/demo.abi
+dipcli query vm call $(dipcli keys show -a alice) dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms balanceOf "000000000000000000000000DB8822D044FE1C13AA32AF72F27A113E849FC27E" 0pdip ./contract/demo/demo.abi

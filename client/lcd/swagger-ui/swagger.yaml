@@ -30,7 +30,7 @@ tags:
     description: Query app version
 schemes:
   - https
-host: localhost:1317
+host: stargate.cosmos.network
 securityDefinitions:
   kms:
     type: basic

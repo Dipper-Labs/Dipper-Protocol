@@ -30,8 +30,6 @@ import (
 	"github.com/Dipper-Protocol/x/staking"
 	"github.com/Dipper-Protocol/x/supply"
 
-	"github.com/Dipper-Protocol/x/dipperBank"
-
 	paramsclient "github.com/Dipper-Protocol/x/params/client"
 )
 
@@ -59,7 +57,6 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 
-		dipperBank.AppModule{},
 		vm.AppModule{},
 	)
 	// account permissions
@@ -104,7 +101,6 @@ type DIPApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	vmKeeper       vm.Keeper
-	dipperBankKeeper dipperBank.Keeper
  	//TODO add refundKeeper
 	refundKeeper   auth.RefundKeeper
 	// Module Manager
@@ -242,14 +238,6 @@ func NewDIPApp(
 			app.slashingKeeper.Hooks()),
 	)
 
-	// The dipperBankKeeper is the Keeper from the module for this tutorial
-	// It handles interactions with the namestore
-	app.dipperBankKeeper = dipperBank.NewKeeper(
-		app.bankKeeper,
-		keys[dipperBank.StoreKey],
-		app.cdc,
-	)
-
 	app.vmKeeper = vm.NewKeeper(
 		app.cdc,
 		keys[vm.StoreKey],
@@ -271,7 +259,6 @@ func NewDIPApp(
 
 
 	app.mm = module.NewManager(
-		dipperBank.NewAppModule(app.dipperBankKeeper, app.bankKeeper),
 		genaccounts.NewAppModule(app.accountKeeper),
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
