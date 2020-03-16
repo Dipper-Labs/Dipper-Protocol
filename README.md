@@ -4,12 +4,12 @@ this is basic finance protocol
 
 # Quick start
 ## 1.0 install
-cd Dipper-Protocol
+cd Dipper-Protocol\
 make install
 
 ## 1.1 Initialize configuration files and genesis file
 dipd init dipd-official --chain-id dipd-chain\
-NOTE: If you have run the tutorial before, you can start from scratch with a\
+NOTE: If you have run the tutorial before, you can start from scratch with \
 dipd unsafe-reset-all\
 or by deleting both of the home folders\
 rm -rf ~/.dip*
@@ -23,7 +23,7 @@ dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000
 ## 1.3 create validator
 dipd gentx\
   --amount 1000000stake\
-  --commission-rate "0.10"\ 
+  --commission-rate "0.10"\
   --commission-max-rate "0.20"\ 
   --commission-max-change-rate "0.10"\ 
   --pubkey $(dipd tendermint show-validator)\ 
