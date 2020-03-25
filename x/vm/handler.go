@@ -2,9 +2,7 @@ package vm
 
 import (
 	"fmt"
-	"github.com/Dipper-Protocol/x/vm/keeper"
 	"github.com/Dipper-Protocol/x/vm/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	sdk "github.com/Dipper-Protocol/types"
 )
@@ -47,8 +45,3 @@ func handleMsgContract(ctx sdk.Context, msg MsgContract, k Keeper) sdk.Result {
 	return sdk.Result{Data: res.Data, GasUsed: res.GasUsed, Events: ctx.EventManager().Events()}
 }
 
-func EndBlocker(ctx sdk.Context, k keeper.Keeper) []abci.ValidatorUpdate {
-	k.StateDB.UpdateAccounts() //update account balance for fee refund when create/call contract
-	k.StateDB.WithContext(ctx).Commit(true)
-	return []abci.ValidatorUpdate{}
-}
