@@ -20,18 +20,12 @@ rm -rf ~/.dip*
 ```
 dipcli keys add alice
 dipcli keys add bob
-dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000pdip,10000000000000000eth,10000000000000000dai
-dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000000000000000pdip,10000000000000000eth,10000000000000000dai
+dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000pdip
+dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000000000000000pdip
 ```
 ## 1.3 create validator
 ```
-dipd gentx
-  --amount 1000000stake
-  --commission-rate "0.10"
-  --commission-max-rate "0.20"
-  --commission-max-change-rate "0.10"
-  --pubkey $(dipd tendermint show-validator)
-  --name alice
+dipd gentx --amount 1000000stake --commission-rate "0.10" --commission-max-rate "0.20" --commission-max-change-rate "0.10" --pubkey $(dipd tendermint show-validator) --name alice
 ```
 ## 1.4 collect gentx
 ```
@@ -49,9 +43,7 @@ curl http://127.0.0.1:26657/status
 # Smart contract property 
 ## 2.1 deploy contract
 ```
-dipcli vm create --code_file=./contract/demo/demo.bc
---from $(dipcli keys show -a alice) --amount=0pdip
---gas=1000000
+dipcli vm create --code_file=./contract/demo/demo.bc --from $(dipcli keys show -a alice) --amount=0pdip --gas=1000000
 ```
 ## 2.2 query txhash
 ```
@@ -63,12 +55,7 @@ dipcli query vm code <contract address>
 ```
 ## 2.4 call contract method <transfer>
 ```
-dipcli vm call --from $(dipcli keys show -a alice)
---contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
---method transfer
---args  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002"
---amount 1000000pdip
---abi_file ./contract/demo/demo.abi
+dipcli vm call --from $(dipcli keys show -a alice) --contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms --method transfer --args "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002" --amount 1000000pdip --abi_file ./contract/demo/demo.abi
 ```
 ## 2.5 call contract method, such as balanceOf
 ```
