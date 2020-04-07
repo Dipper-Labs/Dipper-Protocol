@@ -1,7 +1,6 @@
 # Dipper-Protocol
 this is basic finance protocol
 
-
 # Quick start
 ## 1.0 install
 ```
@@ -38,7 +37,6 @@ dipd gentx\
 ```
 dipd collect-gentxs
 ```
-
 ## 1.5 Configure your CLI to eliminate need for chain-id flag
 ```
 dipcli config chain-id dipd-chain\
@@ -51,7 +49,6 @@ curl http://127.0.0.1:26657/status
 # Dipper Bank contract
 ## 2.1 Withdraw/deposit/borrow/repay coin which bank supports.
 
-
 # Smart contract property 
 ## 3.1 deploy contract
 ```
@@ -59,17 +56,14 @@ dipcli vm create --code_file=./contract/demo/demo.bc \
 --from $(dipcli keys show -a alice) --amount=0pdip \
 --gas=1000000
 ```
-
 ## 3.2 query txhash
 ```
 dipcli query tx <txhash>
 ```
-
 ## 3.3 query contract code
 ```
 dipcli query vm code <contract address>
 ```
-
 ## 3.4 call contract method <transfer>
 ```
 dipcli vm call --from $(dipcli keys show -a alice) \
