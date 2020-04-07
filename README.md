@@ -4,33 +4,33 @@ this is basic finance protocol
 # Quick start
 ## 1.0 install
 ```
-statik -src=client/lcd/swagger-ui -dest=client/lcd -f -m\
-cd Dipper-Protocol\
+statik -src=client/lcd/swagger-ui -dest=client/lcd -f -m
+cd Dipper-Protocol
 make install
 ```
 ## 1.1 Initialize configuration files and genesis file
 ```
-dipd init dipd-official --chain-id dipd-chain\
-NOTE: If you have run the tutorial before, you can start from scratch with \
-dipd unsafe-reset-all\
-or by deleting both of the home folders\
+dipd init dipd-official --chain-id dipd-chain
+NOTE: If you have run the tutorial before, you can start from scratch with 
+dipd unsafe-reset-all
+or by deleting both of the home folders
 rm -rf ~/.dip*
 ```
 ## 1.2 Add both accounts, with coins to the genesis file
 ```
-dipcli keys add alice\
-dipcli keys add bob\
-dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000pdip,10000000000000000eth,10000000000000000dai\
+dipcli keys add alice
+dipcli keys add bob
+dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000pdip,10000000000000000eth,10000000000000000dai
 dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000000000000000pdip,10000000000000000eth,10000000000000000dai
 ```
 ## 1.3 create validator
 ```
-dipd gentx\
-  --amount 1000000stake\
-  --commission-rate "0.10"\
-  --commission-max-rate "0.20"\ 
-  --commission-max-change-rate "0.10"\ 
-  --pubkey $(dipd tendermint show-validator)\ 
+dipd gentx
+  --amount 1000000stake
+  --commission-rate "0.10"
+  --commission-max-rate "0.20"
+  --commission-max-change-rate "0.10"
+  --pubkey $(dipd tendermint show-validator)
   --name alice
 ```
 ## 1.4 collect gentx
@@ -39,18 +39,18 @@ dipd collect-gentxs
 ```
 ## 1.5 Configure your CLI to eliminate need for chain-id flag
 ```
-dipcli config chain-id dipd-chain\
-dipcli config output json\
-dipcli config indent true\
-dipcli config trust-node true\
-dipd start --log_level "*:debug" --trace\
+dipcli config chain-id dipd-chain
+dipcli config output json
+dipcli config indent true
+dipcli config trust-node true
+dipd start --log_level "*:debug" --trace
 curl http://127.0.0.1:26657/status
 ```
 # Smart contract property 
 ## 2.1 deploy contract
 ```
-dipcli vm create --code_file=./contract/demo/demo.bc \
---from $(dipcli keys show -a alice) --amount=0pdip \
+dipcli vm create --code_file=./contract/demo/demo.bc
+--from $(dipcli keys show -a alice) --amount=0pdip
 --gas=1000000
 ```
 ## 2.2 query txhash
@@ -63,11 +63,11 @@ dipcli query vm code <contract address>
 ```
 ## 2.4 call contract method <transfer>
 ```
-dipcli vm call --from $(dipcli keys show -a alice) \
---contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms \
---method transfer  \
---args  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002" \
---amount 1000000pdip \
+dipcli vm call --from $(dipcli keys show -a alice)
+--contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
+--method transfer
+--args  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002"
+--amount 1000000pdip
 --abi_file ./contract/demo/demo.abi
 ```
 ## 2.5 call contract method, such as balanceOf
