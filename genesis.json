@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2020-04-06T14:27:13.764725688Z",
+  "genesis_time": "2020-04-07T01:12:02.51427315Z",
   "chain_id": "dipd-chain",
   "consensus_params": {
     "block": {
@@ -18,6 +18,12 @@
   },
   "app_hash": "",
   "app_state": {
+    "crisis": {
+      "constant_fee": {
+        "denom": "stake",
+        "amount": "1000"
+      }
+    },
     "distribution": {
       "fee_pool": {
         "community_pool": []
@@ -35,9 +41,18 @@
       "delegator_starting_infos": [],
       "validator_slash_events": []
     },
+    "auth": {
+      "params": {
+        "max_memo_characters": "256",
+        "tx_sig_limit": "7",
+        "tx_size_cost_per_byte": "10",
+        "sig_verify_cost_ed25519": "590",
+        "sig_verify_cost_secp256k1": "1000"
+      }
+    },
     "accounts": [
       {
-        "address": "dip1qszx7c8f5rwkxsddcpv3g5yhzjcftm2jx8q83h",
+        "address": "dip1ltj8k7pmkurukj8pf5maf4g47g8zq9gl06xff5",
         "coins": [
           {
             "denom": "dai",
@@ -69,7 +84,7 @@
         ]
       },
       {
-        "address": "dip1yng80gclasy993svvqutdak3kcac5gsgy3hdnv",
+        "address": "dip1p9g2nx6t2qecg3k5zztmmcnvvfzxxuew0lyzgs",
         "coins": [
           {
             "denom": "dai",
@@ -101,49 +116,6 @@
         ]
       }
     ],
-    "slashing": {
-      "params": {
-        "max_evidence_age": "120000000000",
-        "signed_blocks_window": "100",
-        "min_signed_per_window": "0.500000000000000000",
-        "downtime_jail_duration": "600000000000",
-        "slash_fraction_double_sign": "0.050000000000000000",
-        "slash_fraction_downtime": "0.010000000000000000"
-      },
-      "signing_infos": {},
-      "missed_blocks": {}
-    },
-    "staking": {
-      "params": {
-        "unbonding_time": "1814400000000000",
-        "max_validators": 100,
-        "max_entries": 7,
-        "bond_denom": "stake"
-      },
-      "last_total_power": "0",
-      "last_validator_powers": null,
-      "validators": null,
-      "delegations": null,
-      "unbonding_delegations": null,
-      "redelegations": null,
-      "exported": false
-    },
-    "crisis": {
-      "constant_fee": {
-        "denom": "stake",
-        "amount": "1000"
-      }
-    },
-    "auth": {
-      "params": {
-        "max_memo_characters": "256",
-        "tx_sig_limit": "7",
-        "tx_size_cost_per_byte": "10",
-        "sig_verify_cost_ed25519": "590",
-        "sig_verify_cost_secp256k1": "1000"
-      }
-    },
-    "params": null,
     "mint": {
       "minter": {
         "inflation": "0.130000000000000000",
@@ -157,35 +129,6 @@
         "goal_bonded": "0.670000000000000000",
         "blocks_per_year": "6311520"
       }
-    },
-    "bank": {
-      "send_enabled": true
-    },
-    "gov": {
-      "starting_proposal_id": "1",
-      "deposits": null,
-      "votes": null,
-      "proposals": null,
-      "deposit_params": {
-        "min_deposit": [
-          {
-            "denom": "stake",
-            "amount": "10000000"
-          }
-        ],
-        "max_deposit_period": "172800000000000"
-      },
-      "voting_params": {
-        "voting_period": "172800000000000"
-      },
-      "tally_params": {
-        "quorum": "0.334000000000000000",
-        "threshold": "0.500000000000000000",
-        "veto": "0.334000000000000000"
-      }
-    },
-    "supply": {
-      "supply": []
     },
     "vm": {
       "params": {
@@ -454,6 +397,50 @@
         }
       }
     },
+    "gov": {
+      "starting_proposal_id": "1",
+      "deposits": null,
+      "votes": null,
+      "proposals": null,
+      "deposit_params": {
+        "min_deposit": [
+          {
+            "denom": "stake",
+            "amount": "10000000"
+          }
+        ],
+        "max_deposit_period": "172800000000000"
+      },
+      "voting_params": {
+        "voting_period": "172800000000000"
+      },
+      "tally_params": {
+        "quorum": "0.334000000000000000",
+        "threshold": "0.500000000000000000",
+        "veto": "0.334000000000000000"
+      }
+    },
+    "supply": {
+      "supply": []
+    },
+    "staking": {
+      "params": {
+        "unbonding_time": "1814400000000000",
+        "max_validators": 100,
+        "max_entries": 7,
+        "bond_denom": "stake"
+      },
+      "last_total_power": "0",
+      "last_validator_powers": null,
+      "validators": null,
+      "delegations": null,
+      "unbonding_delegations": null,
+      "redelegations": null,
+      "exported": false
+    },
+    "bank": {
+      "send_enabled": true
+    },
     "genutil": {
       "gentxs": [
         {
@@ -475,9 +462,9 @@
                     "max_change_rate": "0.100000000000000000"
                   },
                   "min_self_delegation": "1",
-                  "delegator_address": "dip1qszx7c8f5rwkxsddcpv3g5yhzjcftm2jx8q83h",
-                  "validator_address": "dipvaloper1qszx7c8f5rwkxsddcpv3g5yhzjcftm2jytgz4a",
-                  "pubkey": "dipvalconspub1zcjduepq3gthwvtcha38prw4fn8n5nz582e5p023hk5lj9qsza2mdj8xz27s025d3v",
+                  "delegator_address": "dip1ltj8k7pmkurukj8pf5maf4g47g8zq9gl06xff5",
+                  "validator_address": "dipvaloper1ltj8k7pmkurukj8pf5maf4g47g8zq9gldkwvd7",
+                  "pubkey": "dipvalconspub1zcjduepq54nytcfp7r64vr4p4ujaeepkpgg0pmsgvduk433vlkeq2czucfps9ypm5c",
                   "value": {
                     "denom": "stake",
                     "amount": "1000000"
@@ -493,15 +480,28 @@
               {
                 "pub_key": {
                   "type": "tendermint/PubKeySecp256k1",
-                  "value": "ApZ6fVr52Fl8n0TnJWhX1Pr+VXG9ZPUQsIs1Ch3qXrds"
+                  "value": "AxggH3yZ13R5wZKRISqeIo/wPHVD/et96LGhsh8AiEU2"
                 },
-                "signature": "DqQukPwmTKi9zFQ+hoP7kfNrIzaZRjRgnJYlx1qnlEVss8HeRArntBd/XvhSTBmOINwd2Rw/XnaAOPanhqgLtA=="
+                "signature": "i+EnZH/smIse3dHJ2lYFMiEUaTKhfFcrbCiAvtbP62R5yv8091lTIKpjLIpgiqyUzU8hdueQ3cQXl7CQI2D+kg=="
               }
             ],
-            "memo": "b314b18eb94265d540890265afce842b1ea9a3f5@172.16.163.181:26656"
+            "memo": "1cc6602317e17b0afa6b60613e644b2fcca98907@172.16.163.181:26656"
           }
         }
       ]
+    },
+    "params": null,
+    "slashing": {
+      "params": {
+        "max_evidence_age": "120000000000",
+        "signed_blocks_window": "100",
+        "min_signed_per_window": "0.500000000000000000",
+        "downtime_jail_duration": "600000000000",
+        "slash_fraction_double_sign": "0.050000000000000000",
+        "slash_fraction_downtime": "0.010000000000000000"
+      },
+      "signing_infos": {},
+      "missed_blocks": {}
     }
   }
 }
