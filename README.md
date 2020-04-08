@@ -1,8 +1,9 @@
 # Dipper-Protocol
-the next generation of basic finance protocol
+the next generation of basic finance protocol.
+
 
 # Quick start
-build a private blockchain
+build a private blockchain, if you want to jion our testnet or get more detail, you can click [this link](http://docs.dippernetwork.com "DIP").
 ## 1.0 install
 ```
 cd Dipper-Protocol
@@ -66,5 +67,4 @@ dipcli query account dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
 dipcli keys parse $(dipcli keys show -a alice)
 dipcli query vm call $(dipcli keys show -a alice) dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms balanceOf "000000000000000000000000DB8822D044FE1C13AA32AF72F27A113E849FC27E" 0pdip ./contract/demo/demo.abi
 ```
-#More
-if you want to jion our testnet or get more detail, you can click [this link](http://docs.dippernetwork.com "DIP") 
+
