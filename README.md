@@ -4,7 +4,6 @@ this is basic finance protocol
 # Quick start
 ## 1.0 install
 ```
-statik -src=client/lcd/swagger-ui -dest=client/lcd -f -m
 cd Dipper-Protocol
 make install
 ```
