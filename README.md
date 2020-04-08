@@ -3,7 +3,7 @@ the next generation of basic finance protocol.
 
 
 # Quick start
-build a private blockchain, if you want to jion our testnet or get more detail, you can click [this link](http://docs.dippernetwork.com "DIP").
+To build a private blockchain, if you want to jion our testnet or get more detail, you can click [this link](http://docs.dippernetwork.com "DIP").
 ## 1.0 install
 ```
 cd Dipper-Protocol
