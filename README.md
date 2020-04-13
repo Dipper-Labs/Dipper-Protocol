@@ -21,12 +21,12 @@ rm -rf ~/.dip*
 ```
 dipcli keys add alice
 dipcli keys add bob
-dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000stake,10000000000000000pdip
-dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000stake,10000000000000000pdip
+dipd add-genesis-account $(dipcli keys show alice -a) 10000000000000000pdip
+dipd add-genesis-account $(dipcli keys show bob -a) 10000000000000000pdip
 ```
 ## 1.3 create validator
 ```
-dipd gentx --amount 1000000stake --commission-rate "0.10" --commission-max-rate "0.20" --commission-max-change-rate "0.10" --pubkey $(dipd tendermint show-validator) --name alice
+dipd gentx --amount 1000000pdip --commission-rate "0.10" --commission-max-rate "0.20" --commission-max-change-rate "0.10" --pubkey $(dipd tendermint show-validator) --name alice
 ```
 ## 1.4 collect gentx
 ```
