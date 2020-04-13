@@ -41,6 +41,16 @@ dipcli config trust-node true
 dipd start --log_level "*:debug" --trace
 curl http://127.0.0.1:26657/status
 ```
+## 1.6 transfer asset
+```
+dipcli send --from $(dipcli keys show bob -a)  --to $(dipcli keys show alice -a) --amount 1000000000000pdip
+ ```
+
+## 1.7 query account
+```
+dipcli query account  $(dipcli keys show jack -a)
+dipcli query account  $(dipcli keys show alice -a)
+```
 # Smart contract property 
 ## 2.1 deploy contract
 ```
