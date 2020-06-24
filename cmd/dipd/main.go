@@ -147,7 +147,6 @@ func exportAppStateAndTMValidators(
 //			if err = cdc.UnmarshalJSON(genDoc.AppState, &appState); err != nil {
 //				return err
 //			}
-//			//TODO temporary case
 //			authGenState := auth.GetGenesisStateFromAppState(cdc, appState)
 //			if authGenState.Accounts.Contains(addr) {
 //				return fmt.Errorf("cannot add account at existing address %s", addr)
