@@ -68,7 +68,7 @@ func GetCmdQueryCode(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "code",
 		Short: "Querying commands for Contract Code",
-		Long: strings.TrimSpace(fmt.Sprintf(`Query Contract Code by accAddr.
+		Long: strings.TrimSpace(fmt.Sprintf(`Query Contract Code by Account Address.
 Example:
 $ %s query vm code [address]`, version.ClientName)),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -103,7 +103,7 @@ func GetCmdGetStorage(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "storage [account] [key]",
 		Short: "Querying storage for an account at a given key",
-		Long: strings.TrimSpace(fmt.Sprintf(`Query Contract Code by accAddr.
+		Long: strings.TrimSpace(fmt.Sprintf(`Query Contract Code by Account Address.
 Example:
 $ %s query vm code [address]`, version.ClientName)),
 		Args: cobra.ExactArgs(2),

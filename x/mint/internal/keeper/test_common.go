@@ -65,7 +65,7 @@ func newTestInput(t *testing.T) testInput {
 	blacklistedAddrs[bondPool.String()] = true
 	blacklistedAddrs[minterAcc.String()] = true
 
-	paramsKeeper := params.NewKeeper(types.ModuleCdc, keyParams, tkeyParams, params.DefaultCodespace)
+	paramsKeeper := params.NewKeeper(types.ModuleCdc, keyParams, tkeyParams)
 	accountKeeper := auth.NewAccountKeeper(types.ModuleCdc, keyAcc, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, paramsKeeper.Subspace(bank.DefaultParamspace), bank.DefaultCodespace, blacklistedAddrs)
 	maccPerms := map[string][]string{

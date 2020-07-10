@@ -133,6 +133,8 @@ func NewDIPApp(
 		params.StoreKey,
 		vm.StoreKey,
 		vm.CodeKey,
+		vm.StoreDebugKey,
+		vm.LogKey,
 		)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -147,7 +149,7 @@ func NewDIPApp(
 	}
 
 	// The ParamsKeeper handles parameter storage for the application
-	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
+	app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
 	// Set specific supspaces
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
@@ -242,6 +244,8 @@ func NewDIPApp(
 		app.cdc,
 		keys[vm.StoreKey],
 		keys[vm.CodeKey],
+		keys[vm.LogKey],
+		keys[vm.StoreDebugKey],
 		vmSubspace,
 		app.accountKeeper)
 

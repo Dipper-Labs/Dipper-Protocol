@@ -77,14 +77,14 @@ func setupTest() (vmKeeper Keeper, ctx sdk.Context) {
 		slashing.StoreKey,
 		gov.StoreKey,
 		params.StoreKey,
-		//cipal.StoreKey,
-		//ipal.StoreKey,
 		StoreKey,
 		CodeKey,
+		LogKey,
+		StoreDebugKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, staking.TStoreKey, params.TStoreKey)
 
-	paramsKeeper := params.NewKeeper(cdc, keys[params.StoreKey], tkeys[params.TStoreKey], params.DefaultCodespace)
+	paramsKeeper := params.NewKeeper(cdc, keys[params.StoreKey], tkeys[params.TStoreKey])
 	authSubspace := paramsKeeper.Subspace(auth.DefaultParamspace)
 
 	vmSubspace := paramsKeeper.Subspace(DefaultParamspace)
@@ -96,6 +96,8 @@ func setupTest() (vmKeeper Keeper, ctx sdk.Context) {
 		cdc,
 		keys[StoreKey],
 		keys[CodeKey],
+		keys[LogKey],
+		keys[StoreDebugKey],
 		vmSubspace,
 		accountKeeper)
 
@@ -124,14 +126,19 @@ func GetTestAccount() auth.BaseAccount {
 }
 
 func newEVM() *EVM {
-	keyAcc := sdk.NewKVStoreKey(auth.StoreKey)
-	keyParams := sdk.NewKVStoreKey(params.StoreKey)
-	tkeyParams := sdk.NewTransientStoreKey(params.TStoreKey)
+	authKey := sdk.NewKVStoreKey(auth.StoreKey)
+	paramsKey := sdk.NewKVStoreKey(params.StoreKey)
+	tParamsKey := sdk.NewTransientStoreKey(params.TStoreKey)
 
-	paramsKeeper := params.NewKeeper(types.ModuleCdc, keyParams, tkeyParams, params.DefaultCodespace)
-	accountKeeper := auth.NewAccountKeeper(types.ModuleCdc, keyAcc, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
+	paramsKeeper := params.NewKeeper(types.ModuleCdc, paramsKey, tParamsKey)
+	accountKeeper := auth.NewAccountKeeper(types.ModuleCdc, authKey, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 
-	keys := sdk.NewKVStoreKeys(auth.StoreKey, StoreKey, CodeKey)
+	logger := log.NewNopLogger()
+	db := dbm.NewMemDB()
 
-	return NewEVM(Context{}, NewCommitStateDB(accountKeeper, keys[StoreKey], keys[CodeKey]), Config{})
+	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(authKey, sdk.StoreTypeDB, db)
+	ms.LoadLatestVersion()
+
+	return NewEVM(Context{}, NewCommitStateDB(accountKeeper, authKey, authKey, authKey, sdk.NewKVStoreKey(StoreDebugKey)).WithContext(sdk.NewContext(ms, abci.Header{}, false, logger)), Config{})
 }

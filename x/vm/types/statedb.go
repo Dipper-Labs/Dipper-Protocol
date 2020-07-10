@@ -1,12 +1,12 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/Dipper-Protocol/x/vm/common/math"
 	"math/big"
 	"sort"
 	"sync"
-
-	ethstate "github.com/ethereum/go-ethereum/core/state"
 
 	"github.com/tendermint/tendermint/crypto"
 
@@ -30,9 +30,11 @@ type CommitStateDB struct {
 	// StateDB interface. Perhaps there is a better way.
 	ctx sdk.Context
 
-	ak         auth.AccountKeeper
-	storageKey sdk.StoreKey
-	codeKey    sdk.StoreKey
+	ak              auth.AccountKeeper
+	storageKey      sdk.StoreKey
+	codeKey         sdk.StoreKey
+	logKey          sdk.StoreKey
+	storageDebugKey sdk.StoreKey
 
 	// maps that hold 'live' objects, which will get modified while processing a
 	// state transition
@@ -45,8 +47,6 @@ type CommitStateDB struct {
 	thash, bhash sdk.Hash
 	txIndex      int
 	logs         map[sdk.Hash][]*Log
-	logSize      uint
-
 	// TODO: Determine if we actually need this as we do not need preimages in
 	// the SDK, but it seems to be used elsewhere in Geth.
 	preimages map[sdk.Hash][]byte
@@ -74,11 +74,13 @@ type CommitStateDB struct {
 // CONTRACT: Stores used for state must be cache-wrapped as the ordering of the
 // key/value space matters in determining the merkle root.
 //func NewCommitStateDB(ctx sdk.Context, ak auth.AccountKeeper, storageKey, codeKey sdk.StoreKey) *CommitStateDB {
-func NewCommitStateDB(ak auth.AccountKeeper, storageKey, codeKey sdk.StoreKey) *CommitStateDB {
+func NewCommitStateDB(ak auth.AccountKeeper, storageKey, codeKey, logKey, storageDebugKey sdk.StoreKey) *CommitStateDB {
 	return &CommitStateDB{
 		ak:                ak,
 		storageKey:        storageKey,
 		codeKey:           codeKey,
+		logKey:            logKey,
+		storageDebugKey:   storageDebugKey,
 		stateObjects:      make(map[string]*stateObject),
 		stateObjectsDirty: make(map[string]struct{}),
 		logs:              make(map[sdk.Hash][]*Log),
@@ -92,6 +94,8 @@ func NewStateDB(db *CommitStateDB) *CommitStateDB {
 		ak:                db.ak,
 		storageKey:        db.storageKey,
 		codeKey:           db.codeKey,
+		logKey:            db.logKey,
+		storageDebugKey:   db.storageDebugKey,
 		stateObjects:      make(map[string]*stateObject),
 		stateObjectsDirty: make(map[string]struct{}),
 		logs:              make(map[sdk.Hash][]*Log),
@@ -170,9 +174,8 @@ func (csdb *CommitStateDB) AddLog(log *Log) {
 	log.TxHash = csdb.thash
 	log.BlockHash = csdb.bhash
 	log.TxIndex = uint(csdb.txIndex)
-	log.Index = csdb.logSize
+	log.Index = csdb.updateLogIndexByOne(false)
 	csdb.logs[csdb.thash] = append(csdb.logs[csdb.thash], log)
-	csdb.logSize++
 }
 
 // AddPreimage records a SHA3 preimage seen by the VM.
@@ -300,8 +303,22 @@ func (csdb *CommitStateDB) GetCommittedState(addr sdk.AccAddress, hash sdk.Hash)
 }
 
 // GetLogs returns the current logs for a given hash in the state.
-func (csdb *CommitStateDB) GetLogs(hash sdk.Hash) []*Log {
-	return csdb.logs[hash]
+func (csdb *CommitStateDB) GetLogs(hash sdk.Hash) (logs []*Log) {
+	r, ok := csdb.logs[hash]
+	if ok {
+		return r
+	}
+
+	ctx := csdb.ctx
+	store := ctx.KVStore(csdb.logKey)
+	d := store.Get(hash.Bytes())
+	err := json.Unmarshal(d, &logs)
+	if err != nil {
+		ctx.Logger().Error(err.Error())
+		return
+	}
+
+	return
 }
 
 // Logs returns all the current logs in the state.
@@ -407,8 +424,70 @@ func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) {
 		csdb.stateObjectsDirty[addr] = struct{}{}
 	}
 
+	csdb.commitLogs()
+	csdb.ClearLogs()
+
 	// invalidate journal because reverting across transactions is not allowed
 	csdb.clearJournalAndRefund()
+}
+
+func (csdb *CommitStateDB) commitLogs() {
+	ctx := csdb.ctx
+	store := ctx.KVStore(csdb.logKey)
+
+	var hs []string
+	for h := range csdb.logs {
+		hs = append(hs, h.String())
+	}
+	sort.Strings(hs)
+
+	for _, h := range hs {
+		hash := sdk.HexToHash(h)
+		d, err := json.Marshal(csdb.logs[hash])
+		if err != nil {
+			ctx.Logger().Error(err.Error())
+			continue
+		}
+
+		ctx.Logger().Debug("save log----", hash.String(), ":", string(d))
+		store.Set(hash.Bytes(), d)
+	}
+}
+
+func (csdb *CommitStateDB) ClearLogs() {
+	for k := range csdb.logs {
+		delete(csdb.logs, k)
+	}
+}
+
+
+func (csdb *CommitStateDB) updateLogIndexByOne(isSubtract bool) uint64 {
+	ctx := csdb.ctx
+	store := ctx.KVStore(csdb.logKey)
+
+	value := big.NewInt(0)
+	if store.Has(LogIndexKey) {
+		d := store.Get(LogIndexKey)
+		value.SetBytes(d)
+
+		if isSubtract {
+			if value.Uint64() == 0 {
+				ctx.Logger().Error(fmt.Sprintf("current logIndex is 0, can not to be Subtracted"))
+				return 0
+			}
+			value.SetUint64(value.Uint64() - 1)
+		} else {
+			if value.Uint64() == math.MaxUint64 {
+				ctx.Logger().Error(fmt.Sprintf("current logIndex will out of range"))
+				return value.Uint64()
+			}
+			value.SetUint64(value.Uint64() + 1)
+		}
+	}
+
+	store.Set(LogIndexKey, value.Bytes())
+
+	return value.Uint64()
 }
 
 // IntermediateRoot returns the current root hash of the state. It is called in
@@ -479,9 +558,9 @@ func (csdb *CommitStateDB) RevertToSnapshot(revID int) {
 
 // Database retrieves the low level database supporting the lower level trie
 // ops. It is not used in Ethermint, so it returns nil.
-func (csdb *CommitStateDB) Database() ethstate.Database {
-	return nil
-}
+//func (csdb *CommitStateDB) Database() ethstate.Database {
+//	return nil
+//}
 
 // Empty returns whether the state object is either non-existent or empty
 // according to the EIP161 specification (balance = nonce = code = 0).
@@ -533,7 +612,6 @@ func (csdb *CommitStateDB) Reset(_ sdk.Hash) error {
 	csdb.bhash = sdk.Hash{}
 	csdb.txIndex = 0
 	csdb.logs = make(map[sdk.Hash][]*Log)
-	csdb.logSize = 0
 	csdb.preimages = make(map[sdk.Hash][]byte)
 
 	csdb.clearJournalAndRefund()
@@ -613,7 +691,6 @@ func (csdb *CommitStateDB) Copy() *CommitStateDB {
 		stateObjectsDirty: make(map[string]struct{}, len(csdb.journal.dirties)),
 		refund:            csdb.refund,
 		logs:              make(map[sdk.Hash][]*Log, len(csdb.logs)),
-		logSize:           csdb.logSize,
 		preimages:         make(map[sdk.Hash][]byte),
 		journal:           newJournal(),
 	}

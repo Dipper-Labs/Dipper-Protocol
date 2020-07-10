@@ -7,7 +7,7 @@ import (
 
 	"github.com/tendermint/tendermint/crypto"
 	yaml "gopkg.in/yaml.v2"
-
+	"github.com/Dipper-Protocol/hexutil"
 	sdk "github.com/Dipper-Protocol/types"
 	"github.com/Dipper-Protocol/x/auth/exported"
 )
@@ -27,9 +27,7 @@ type BaseAccount struct {
 	PubKey        crypto.PubKey  `json:"public_key" yaml:"public_key"`
 	AccountNumber uint64         `json:"account_number" yaml:"account_number"`
 	Sequence      uint64         `json:"sequence" yaml:"sequence"`
-
-	// contract code hash
-	CodeHash []byte
+	CodeHash      hexutil.Bytes  `json:"code_hash" yaml:"code_hash"`
 }
 
 // NewBaseAccount creates a new BaseAccount object
@@ -47,20 +45,8 @@ func NewBaseAccount(address sdk.AccAddress, coins sdk.Coins,
 
 // String implements fmt.Stringer
 func (acc BaseAccount) String() string {
-	var pubkey string
-
-	if acc.PubKey != nil {
-		pubkey = sdk.MustBech32ifyAccPub(acc.PubKey)
-	}
-
-	return fmt.Sprintf(`Account:
-  Address:       %s
-  Pubkey:        %s
-  Coins:         %s
-  AccountNumber: %d
-  Sequence:      %d`,
-		acc.Address, pubkey, acc.Coins, acc.AccountNumber, acc.Sequence,
-	)
+	out, _ := acc.MarshalYAML()
+	return out.(string)
 }
 
 // ProtoBaseAccount - a prototype function for BaseAccount
@@ -151,19 +137,26 @@ func (acc *BaseAccount) SpendableCoins(_ time.Time) sdk.Coins {
 
 // Balance returns the balance of an account
 func (acc *BaseAccount) Balance() sdk.Int {
-	return acc.GetCoins().AmountOf(sdk.NativeTokenName)
+	coins := acc.GetCoins()
+	if coins == nil {
+		return sdk.NewInt(0)
+	}
+	return coins.AmountOf(sdk.NativeTokenName)
 }
 
 // SetBalance sets an account's balance of native token
 func (acc *BaseAccount) SetBalance(amt sdk.Int) {
 	coins := acc.GetCoins()
 	diff := amt.Sub(coins.AmountOf(sdk.NativeTokenName))
-	if diff.IsZero() {
+	switch {
+	case diff.IsZero():
 		return
-	} else if diff.IsPositive() {
+
+	case diff.IsPositive():
 		// Increase coins to amount
 		coins = coins.Add(sdk.Coins{sdk.NewCoin(sdk.NativeTokenName, diff)})
-	} else {
+
+	default:
 		// Decrease coin to amount
 		coins = coins.Sub(sdk.Coins{sdk.NewCoin(sdk.NativeTokenName, diff.Neg())})
 	}
@@ -237,25 +230,8 @@ func NewBaseVestingAccount(baseAccount *BaseAccount, originalVesting sdk.Coins,
 
 // String implements fmt.Stringer
 func (bva BaseVestingAccount) String() string {
-	var pubkey string
-
-	if bva.PubKey != nil {
-		pubkey = sdk.MustBech32ifyAccPub(bva.PubKey)
-	}
-
-	return fmt.Sprintf(`Vesting Account:
-  Address:          %s
-  Pubkey:           %s
-  Coins:            %s
-  AccountNumber:    %d
-  Sequence:         %d
-  OriginalVesting:  %s
-  DelegatedFree:    %s
-  DelegatedVesting: %s
-  EndTime:          %d `,
-		bva.Address, pubkey, bva.Coins, bva.AccountNumber, bva.Sequence,
-		bva.OriginalVesting, bva.DelegatedFree, bva.DelegatedVesting, bva.EndTime,
-	)
+	out, _ := bva.MarshalYAML()
+	return out.(string)
 }
 
 // spendableCoins returns all the spendable coins for a vesting account given a
@@ -425,27 +401,8 @@ func NewContinuousVestingAccount(
 }
 
 func (cva ContinuousVestingAccount) String() string {
-	var pubkey string
-
-	if cva.PubKey != nil {
-		pubkey = sdk.MustBech32ifyAccPub(cva.PubKey)
-	}
-
-	return fmt.Sprintf(`Continuous Vesting Account:
-  Address:          %s
-  Pubkey:           %s
-  Coins:            %s
-  AccountNumber:    %d
-  Sequence:         %d
-  OriginalVesting:  %s
-  DelegatedFree:    %s
-  DelegatedVesting: %s
-  StartTime:        %d
-  EndTime:          %d `,
-		cva.Address, pubkey, cva.Coins, cva.AccountNumber, cva.Sequence,
-		cva.OriginalVesting, cva.DelegatedFree, cva.DelegatedVesting,
-		cva.StartTime, cva.EndTime,
-	)
+	out, _ := cva.MarshalYAML()
+	return out.(string)
 }
 
 // GetVestedCoins returns the total number of vested coins. If no coins are vested,

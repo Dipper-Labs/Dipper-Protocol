@@ -154,8 +154,10 @@ func (ch addLogChange) revert(s *CommitStateDB) {
 		s.logs[ch.txhash] = logs[:len(logs)-1]
 	}
 
-	s.logSize--
+	//s.logSize--
+	s.updateLogIndexByOne(true)
 }
+
 
 func (ch addLogChange) dirtied() *sdk.AccAddress {
 	return nil
