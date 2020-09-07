@@ -1,14 +1,15 @@
 package app
 
 import (
+	"io"
+	"os"
+
 	"encoding/json"
 	"github.com/Dipper-Protocol/x/crisis"
 	"github.com/Dipper-Protocol/x/genaccounts"
 	"github.com/Dipper-Protocol/x/gov"
 	"github.com/Dipper-Protocol/x/mint"
 	"github.com/Dipper-Protocol/x/vm"
-	"io"
-	"os"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
