@@ -1,13 +1,13 @@
 package app
 
 import (
-	"io"
 	"encoding/json"
 	"github.com/Dipper-Protocol/x/crisis"
 	"github.com/Dipper-Protocol/x/genaccounts"
 	"github.com/Dipper-Protocol/x/gov"
 	"github.com/Dipper-Protocol/x/mint"
 	"github.com/Dipper-Protocol/x/vm"
+	"io"
 	"os"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -101,8 +101,8 @@ type DIPApp struct {
 	crisisKeeper   crisis.Keeper
 	paramsKeeper   params.Keeper
 	vmKeeper       vm.Keeper
- 	//TODO add refundKeeper
-	refundKeeper   auth.RefundKeeper
+	//TODO add refundKeeper
+	refundKeeper auth.RefundKeeper
 	// Module Manager
 	mm *module.Manager
 }
@@ -123,7 +123,6 @@ func NewDIPApp(
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey,
 		auth.StoreKey,
-		//auth.RefundKey,
 		staking.StoreKey,
 		supply.StoreKey,
 		mint.StoreKey,
@@ -135,17 +134,17 @@ func NewDIPApp(
 		vm.CodeKey,
 		vm.StoreDebugKey,
 		vm.LogKey,
-		)
+	)
 
 	tkeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
 	// Here you initialize your application with the store keys it requires
 	var app = &DIPApp{
-		BaseApp: bApp,
-		cdc:     cdc,
+		BaseApp:        bApp,
+		cdc:            cdc,
 		invCheckPeriod: invCheckPeriod,
-		keys:    keys,
-		tkeys:   tkeys,
+		keys:           keys,
+		tkeys:          tkeys,
 	}
 
 	// The ParamsKeeper handles parameter storage for the application
@@ -260,7 +259,6 @@ func NewDIPApp(
 		app.cdc, keys[gov.StoreKey], app.paramsKeeper, govSubspace, app.supplyKeeper,
 		&stakingKeeper, gov.DefaultCodespace, govRouter,
 	)
-
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
