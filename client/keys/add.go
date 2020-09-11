@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/client/input"
-	"github.com/Dipper-Protocol/crypto/keys"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -163,7 +163,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if viper.GetString(FlagPublicKey) != "" {
-		pk, err := sdk.GetAccPubKeyBech32(viper.GetString(FlagPublicKey))
+		pk, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, viper.GetString(FlagPublicKey))
 		if err != nil {
 			return err
 		}
@@ -215,7 +215,7 @@ func runAddCmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		mnemonic, err = bip39.NewMnemonic(entropySeed[:])
+		mnemonic, err = bip39.NewMnemonic(entropySeed)
 		if err != nil {
 			return err
 		}
@@ -295,7 +295,8 @@ func printCreate(cmd *cobra.Command, info keys.Info, showMnemonic bool, mnemonic
 		}
 		cmd.PrintErrln(string(jsonString))
 	default:
-		return fmt.Errorf("I can't speak: %s", output)
+		return fmt.Errorf(
+			"i can't speak: %s", output)
 	}
 
 	return nil

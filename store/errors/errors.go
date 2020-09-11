@@ -1,7 +1,7 @@
 package errors
 
 import (
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // nolint - reexport

@@ -3,11 +3,12 @@ package baseapp
 
 import (
 	"fmt"
+	"io"
 
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // File for storing in-package BaseApp optional functions,
@@ -28,14 +29,9 @@ func SetMinGasPrices(gasPricesStr string) func(*BaseApp) {
 	return func(bap *BaseApp) { bap.setMinGasPrices(gasPrices) }
 }
 
-// SetHaltHeight returns a BaseApp option function that sets the halt block height.
-func SetHaltHeight(blockHeight uint64) func(*BaseApp) {
-	return func(bap *BaseApp) { bap.setHaltHeight(blockHeight) }
-}
-
-// SetHaltTime returns a BaseApp option function that sets the halt block time.
-func SetHaltTime(haltTime uint64) func(*BaseApp) {
-	return func(bap *BaseApp) { bap.setHaltTime(haltTime) }
+// SetHaltHeight returns a BaseApp option function that sets the halt height.
+func SetHaltHeight(height uint64) func(*BaseApp) {
+	return func(bap *BaseApp) { bap.setHaltHeight(height) }
 }
 
 func (app *BaseApp) SetName(name string) {
@@ -67,41 +63,6 @@ func (app *BaseApp) SetCMS(cms store.CommitMultiStore) {
 	app.cms = cms
 }
 
-func (app *BaseApp) SetInitChainer(initChainer sdk.InitChainer) {
-	if app.sealed {
-		panic("SetInitChainer() on sealed BaseApp")
-	}
-	app.initChainer = initChainer
-}
-
-func (app *BaseApp) SetBeginBlocker(beginBlocker sdk.BeginBlocker) {
-	if app.sealed {
-		panic("SetBeginBlocker() on sealed BaseApp")
-	}
-	app.beginBlocker = beginBlocker
-}
-
-func (app *BaseApp) SetEndBlocker(endBlocker sdk.EndBlocker) {
-	if app.sealed {
-		panic("SetEndBlocker() on sealed BaseApp")
-	}
-	app.endBlocker = endBlocker
-}
-
-func (app *BaseApp) SetAnteHandler(ah sdk.AnteHandler) {
-	if app.sealed {
-		panic("SetAnteHandler() on sealed BaseApp")
-	}
-	app.anteHandler = ah
-}
-
-func (app *BaseApp) SetFeeRefundHandler(fh sdk.FeeRefundHandler) {
-	if app.sealed {
-		panic("SetFeeRefundHandler on sealed BaseApp")
-	}
-	app.feeRefundHandler = fh
-}
-
 func (app *BaseApp) SetAddrPeerFilter(pf sdk.PeerFilter) {
 	if app.sealed {
 		panic("SetAddrPeerFilter() on sealed BaseApp")
@@ -121,4 +82,14 @@ func (app *BaseApp) SetFauxMerkleMode() {
 		panic("SetFauxMerkleMode() on sealed BaseApp")
 	}
 	app.fauxMerkleMode = true
+}
+
+func FauxMerkleMode() func(*BaseApp) {
+	return func(app *BaseApp) { app.SetFauxMerkleMode() }
+}
+
+// SetCommitMultiStoreTracer sets the store tracer on the BaseApp's underlying
+// CommitMultiStore.
+func (app *BaseApp) SetCommitMultiStoreTracer(w io.Writer) {
+	app.cms.SetTracer(w)
 }

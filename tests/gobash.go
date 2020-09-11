@@ -14,7 +14,7 @@ import (
 // logging STDOUT/STDERR to t.
 // nolint: errcheck
 func ExecuteT(t *testing.T, cmd, input string) (stdout, stderr string) {
-	t.Log("Running", cmd)
+	t.Log(cmd)
 
 	// split cmd to name and args
 	split := strings.Split(cmd, " ")
@@ -52,13 +52,13 @@ func ExecuteT(t *testing.T, cmd, input string) (stdout, stderr string) {
 	stdout = strings.Trim(string(outbz), "\n")
 	stderr = strings.Trim(string(errbz), "\n")
 
-	return
+	return stdout, stderr
 }
 
 // Execute the command, launch goroutines to log stdout/err to t.
 // Caller should wait for .Wait() or .Stop() to terminate.
 func GoExecuteT(t *testing.T, cmd string) (proc *Process) {
-	t.Log("Running", cmd)
+	t.Log(cmd)
 
 	// Split cmd to name and args.
 	split := strings.Split(cmd, " ")

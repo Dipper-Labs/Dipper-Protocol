@@ -5,12 +5,12 @@ import (
 
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/cachekv"
-	"github.com/Dipper-Protocol/store/tracekv"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
-// Wrapper type for dbm.Db with implementation of KVStore
+// Store - Wrapper type for dbm.Db with implementation of KVStore
 type Store struct {
 	dbm.DB
 }

@@ -9,11 +9,11 @@ import (
 
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 
-	"github.com/Dipper-Protocol/client/context"
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	"github.com/Dipper-Protocol/types/rest"
-	"github.com/Dipper-Protocol/version"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/types/rest"
+	"github.com/Dipper-Labs/Dipper-Protocol/version"
 
 	"github.com/tendermint/tendermint/p2p"
 )

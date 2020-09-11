@@ -7,7 +7,7 @@ import (
 
 	dbm "github.com/tendermint/tm-db"
 
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 func TestStore(t *testing.T) {

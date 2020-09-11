@@ -21,13 +21,12 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	pvm "github.com/tendermint/tendermint/privval"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	"github.com/Dipper-Protocol/server/config"
-	"github.com/Dipper-Protocol/version"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/server/config"
+	"github.com/Dipper-Labs/Dipper-Protocol/version"
 )
 
-// server context
 type Context struct {
 	Config *cfg.Config
 	Logger log.Logger
@@ -73,6 +72,7 @@ func PersistentPreRunEFn(context *Context) func(*cobra.Command, []string) error 
 	}
 }
 
+// nolint
 // If a new config is created, change some of the default tendermint settings
 func interceptLoadConfig() (conf *cfg.Config, err error) {
 	tmpConf := cfg.DefaultConfig()
@@ -116,11 +116,11 @@ func interceptLoadConfig() (conf *cfg.Config, err error) {
 	return
 }
 
-// add server commands
 func AddCommands(
 	ctx *Context, cdc *codec.Codec,
 	rootCmd *cobra.Command,
-	appCreator AppCreator, appExport AppExporter) {
+	appCreator AppCreator,
+	appExport AppExporter) {
 
 	rootCmd.PersistentFlags().String("log_level", ctx.Config.LogLevel, "Log level")
 

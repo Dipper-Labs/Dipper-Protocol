@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/tests"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
 )
 
 func Test_updateKeyCommand(t *testing.T) {

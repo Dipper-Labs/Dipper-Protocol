@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"fmt"
 
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // An sdk.Tx which is its own sdk.Msg.

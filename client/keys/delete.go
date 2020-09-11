@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/Dipper-Protocol/client/input"
-	"github.com/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
 
 	"github.com/spf13/cobra"
 )

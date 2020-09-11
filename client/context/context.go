@@ -17,11 +17,11 @@ import (
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/client/keys"
-	"github.com/Dipper-Protocol/codec"
-	cryptokeys "github.com/Dipper-Protocol/crypto/keys"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	cryptokeys "github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 var (
@@ -265,7 +265,7 @@ func (ctx CLIContext) PrintOutput(toPrint fmt.Stringer) (err error) {
 }
 
 // GetFromFields returns a from account address and Keybase name given either
-// an address or key name. If genOnly is true, only a valid Bech32 cosmos
+// an address or key name. If genOnly is true, only a valid Bech32 dip
 // address is returned.
 func GetFromFields(from string, genOnly bool) (sdk.AccAddress, string, error) {
 	if from == "" {

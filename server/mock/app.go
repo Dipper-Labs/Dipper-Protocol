@@ -10,9 +10,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	bam "github.com/Dipper-Protocol/baseapp"
-	"github.com/Dipper-Protocol/codec"
-	sdk "github.com/Dipper-Protocol/types"
+	bam "github.com/Dipper-Labs/Dipper-Protocol/baseapp"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // NewApp creates a simple mock kvstore app for testing. It should work
@@ -89,7 +89,7 @@ func InitChainer(key sdk.StoreKey) func(sdk.Context, abci.RequestInitChain) abci
 		genesisState := new(GenesisJSON)
 		err := json.Unmarshal(stateJSON, genesisState)
 		if err != nil {
-			panic(err) // TODO https://github.com/Dipper-Protocol/issues/468
+			panic(err) // TODO https://github.com/Dipper-Labs/Dipper-Protocol/issues/468
 			// return sdk.ErrGenesisParse("").TraceCause(err, "")
 		}
 

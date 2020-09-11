@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
 )
 
 const (
@@ -149,6 +149,7 @@ func loadConfigFile(cfgFile string) (*toml.Tree, error) {
 	return tree, nil
 }
 
+// nolint
 func saveConfigFile(cfgFile string, tree *toml.Tree) error {
 	fp, err := os.OpenFile(cfgFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {

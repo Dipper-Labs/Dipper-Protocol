@@ -5,12 +5,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 func TestDefaultConfig(t *testing.T) {
 	cfg := DefaultConfig()
-	require.True(t, cfg.GetMinGasPrices().IsZero())
+	require.True(t, cfg.GetMinGasPrices().IsAllPositive())
 }
 
 func TestSetMinimumFees(t *testing.T) {

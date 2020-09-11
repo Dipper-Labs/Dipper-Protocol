@@ -11,7 +11,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 type (

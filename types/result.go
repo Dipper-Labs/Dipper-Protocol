@@ -7,18 +7,24 @@ import (
 	"math"
 	"strings"
 
-	"github.com/Dipper-Protocol/codec"
-
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
+
+// GasInfo defines tx execution gas context.
+type GasInfo struct {
+	// GasWanted is the maximum units of work we allow this tx to perform.
+	GasWanted uint64
+
+	// GasUsed is the amount of gas actually consumed. NOTE: unimplemented
+	GasUsed uint64
+}
 
 // Result is the union of ResponseFormat and ResponseCheckTx.
 type Result struct {
 	// Code is the response code, is stored back on the chain.
-	Code CodeType
+	Code uint32
 
-	// Codespace is the string referring to the domain of an error
-	Codespace CodespaceType
+	Codespace string
 
 	// Data is any data returned from the app.
 	// Data has to be length prefixed in order to separate
@@ -41,7 +47,7 @@ type Result struct {
 
 // TODO: In the future, more codes may be OK.
 func (res Result) IsOK() bool {
-	return res.Code.IsOK()
+	return res.Code == 0
 }
 
 // ABCIMessageLogs represents a slice of ABCIMessageLog.
@@ -70,7 +76,7 @@ func NewABCIMessageLog(i uint16, success bool, log string, events Events) ABCIMe
 // String implements the fmt.Stringer interface for the ABCIMessageLogs type.
 func (logs ABCIMessageLogs) String() (str string) {
 	if logs != nil {
-		raw, err := codec.Cdc.MarshalJSON(logs)
+		raw, err := json.Marshal(logs)
 		if err == nil {
 			str = string(raw)
 		}
@@ -91,13 +97,10 @@ type TxResponse struct {
 	Info      string          `json:"info,omitempty"`
 	GasWanted int64           `json:"gas_wanted,omitempty"`
 	GasUsed   int64           `json:"gas_used,omitempty"`
+	Events    StringEvents    `json:"events,omitempty"`
 	Codespace string          `json:"codespace,omitempty"`
 	Tx        Tx              `json:"tx,omitempty"`
 	Timestamp string          `json:"timestamp,omitempty"`
-
-	// DEPRECATED: Remove in the next next major release in favor of using the
-	// ABCIMessageLog.Events field.
-	Events StringEvents `json:"events,omitempty"`
 }
 
 // NewResponseResultTx returns a TxResponse given a ResultTx from tendermint

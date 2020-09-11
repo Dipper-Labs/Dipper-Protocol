@@ -8,8 +8,8 @@ import (
 
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/tests"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
 )
 
 func Test_runAddCmdBasic(t *testing.T) {

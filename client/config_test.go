@@ -10,10 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
 )
 
-// For https://github.com/Dipper-Protocol/issues/3899
 func Test_runConfigCmdTwiceWithShorterNodeValue(t *testing.T) {
 	// Prepare environment
 	t.Parallel()

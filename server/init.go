@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 
-	"github.com/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
 
-	clkeys "github.com/Dipper-Protocol/client/keys"
-	sdk "github.com/Dipper-Protocol/types"
+	clkeys "github.com/Dipper-Labs/Dipper-Protocol/client/keys"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // GenerateCoinKey returns the address of a public key, along with the secret

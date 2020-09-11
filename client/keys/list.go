@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"github.com/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
 	"github.com/spf13/cobra"
 )
 

@@ -5,9 +5,9 @@ import (
 
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/cachekv"
-	"github.com/Dipper-Protocol/store/dbadapter"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/dbadapter"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 //----------------------------------------
@@ -57,7 +57,7 @@ func NewStore(
 	stores map[types.StoreKey]types.CacheWrapper, keys map[string]types.StoreKey,
 	traceWriter io.Writer, traceContext types.TraceContext,
 ) Store {
-	return NewFromKVStore(dbadapter.Store{db}, stores, keys, traceWriter, traceContext)
+	return NewFromKVStore(dbadapter.Store{DB: db}, stores, keys, traceWriter, traceContext)
 }
 
 func newCacheMultiStoreFromCMS(cms Store) Store {

@@ -3,7 +3,7 @@ package gaskv
 import (
 	"io"
 
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 var _ types.KVStore = &Store{}

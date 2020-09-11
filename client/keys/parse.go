@@ -13,8 +13,8 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/Dipper-Protocol/client/flags"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 var bech32Prefixes = []string{
@@ -71,7 +71,7 @@ func parseKeyStringCommand() *cobra.Command {
 		Use:   "parse <hex-or-bech32-address>",
 		Short: "Parse address from hex to bech32 and vice versa",
 		Long: `Convert and print to stdout key addresses and fingerprints from
-hexadecimal into bech32 cosmos prefixed format and vice versa.
+hexadecimal into bech32 dip prefixed format and vice versa.
 `,
 		Args: cobra.ExactArgs(1),
 		RunE: parseKey,

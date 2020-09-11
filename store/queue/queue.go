@@ -3,10 +3,10 @@ package store
 // TODO: make it independent from list
 /*
 import (
-	"github.com/Dipper-Protocol/codec"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 
-	"github.com/Dipper-Protocol/store/list"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/list"
 )
 
 // Key for the top element position in the queue

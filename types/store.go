@@ -3,7 +3,8 @@ package types
 import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 // nolint - reexport
@@ -23,6 +24,10 @@ type (
 	KVStore          = types.KVStore
 	Iterator         = types.Iterator
 )
+
+// StoreDecoderRegistry defines each of the modules store decoders. Used for ImportExport
+// simulation.
+type StoreDecoderRegistry map[string]func(cdc *codec.Codec, kvA, kvB cmn.KVPair) string
 
 // Iterator over all the keys with a certain prefix in ascending order
 func KVStorePrefixIterator(kvs KVStore, prefix []byte) Iterator {

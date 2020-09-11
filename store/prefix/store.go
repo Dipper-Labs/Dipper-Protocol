@@ -2,11 +2,12 @@ package prefix
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
-	"github.com/Dipper-Protocol/store/cachekv"
-	"github.com/Dipper-Protocol/store/tracekv"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 var _ types.KVStore = Store{}
@@ -187,4 +188,14 @@ func stripPrefix(key []byte, prefix []byte) []byte {
 // wrapping types.PrefixEndBytes
 func cpIncr(bz []byte) []byte {
 	return types.PrefixEndBytes(bz)
+}
+
+// Error returns an error if the prefixIterator is invalid defined by the Valid
+// method.
+func (iter *prefixIterator) Error() error {
+	if !iter.Valid() {
+		return errors.New("invalid prefixIterator")
+	}
+
+	return nil
 }

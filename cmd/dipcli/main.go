@@ -1,59 +1,56 @@
 package main
 
 import (
-	"github.com/Dipper-Protocol/app"
-	"github.com/Dipper-Protocol/x/auth"
-	"github.com/Dipper-Protocol/x/bank"
 	"os"
 	"path"
 
-	"github.com/Dipper-Protocol/client"
-	"github.com/Dipper-Protocol/client/keys"
-	"github.com/Dipper-Protocol/client/lcd"
-	"github.com/Dipper-Protocol/client/rpc"
-	sdk "github.com/Dipper-Protocol/types"
-	"github.com/Dipper-Protocol/version"
-	authcmd "github.com/Dipper-Protocol/x/auth/client/cli"
-	authrest "github.com/Dipper-Protocol/x/auth/client/rest"
-	bankcmd "github.com/Dipper-Protocol/x/bank/client/cli"
-	vmcli "github.com/Dipper-Protocol/x/vm/client/cli"
+	v0 "github.com/Dipper-Labs/Dipper-Protocol/app/v0"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
 
+	"github.com/Dipper-Labs/Dipper-Protocol/app"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
+	authcmd "github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/client/cli"
+	authrest "github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/client/rest"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/bank"
+	bankcmd "github.com/Dipper-Labs/Dipper-Protocol/app/v0/bank/client/cli"
+	vmcli "github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/client/cli"
+	"github.com/Dipper-Labs/Dipper-Protocol/client"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/lcd"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/rpc"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/version"
 )
 
 func main() {
 	cobra.EnableCommandSorting = false
 
-	cdc := app.MakeCodec()
+	cdc := app.MakeLatestCodec()
 
-	// Read in the configuration file for the sdk
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
 	config.Seal()
 
 	rootCmd := &cobra.Command{
 		Use:   "dipcli",
-		Short: "dipperProtocol Client",
+		Short: "DIP Network Client",
 	}
 
-	// Add --chain-id to persistent flags and mark it required
 	rootCmd.PersistentFlags().String(client.FlagChainID, "", "Chain ID of tendermint node")
 	rootCmd.PersistentPreRunE = func(_ *cobra.Command, _ []string) error {
 		return initConfig(rootCmd)
 	}
 
-	// Construct Root Command
 	rootCmd.AddCommand(
+		client.ConfigCmd(app.DefaultCLIHome),
+		rpc.StatusCommand(),
+		queryCmd(cdc),
+		client.LineBreak,
 		bankcmd.SendTxCmd(cdc),
 		vmcli.VMCmd(cdc),
-		rpc.StatusCommand(),
-		client.ConfigCmd(app.DefaultCLIHome),
-		queryCmd(cdc),
 		txCmd(cdc),
 		client.LineBreak,
 		lcd.ServeCommand(cdc, registerRoutes),
@@ -74,14 +71,14 @@ func main() {
 func registerRoutes(rs *lcd.RestServer) {
 	client.RegisterRoutes(rs.CliCtx, rs.Mux)
 	authrest.RegisterTxRoutes(rs.CliCtx, rs.Mux)
-	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
+	v0.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }
 
 func queryCmd(cdc *amino.Codec) *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:     "query",
 		Aliases: []string{"q"},
-		Short:   "Querying subcommands",
+		Short:   "Querying subCommands",
 	}
 
 	queryCmd.AddCommand(
@@ -89,13 +86,12 @@ func queryCmd(cdc *amino.Codec) *cobra.Command {
 		client.LineBreak,
 		rpc.ValidatorCommand(cdc),
 		rpc.BlockCommand(),
-		authcmd.QueryTxsByEventsCmd(cdc),
 		authcmd.QueryTxCmd(cdc),
+		authcmd.QueryTxsByEventsCmd(cdc),
 		client.LineBreak,
 	)
 
-	// add modules' query commands
-	app.ModuleBasics.AddQueryCommands(queryCmd, cdc)
+	v0.ModuleBasics.AddQueryCommands(queryCmd, cdc)
 
 	return queryCmd
 }
@@ -113,22 +109,20 @@ func txCmd(cdc *amino.Codec) *cobra.Command {
 		authcmd.GetMultiSignCommand(cdc),
 		client.LineBreak,
 		authcmd.GetBroadcastCommand(cdc),
-		//authcmd.GetEncodeCommand(cdc),
+		authcmd.GetEncodeCommand(cdc),
+		authcmd.GetDecodeCommand(cdc),
 		client.LineBreak,
 	)
 
-	// add modules' tx commands
-	app.ModuleBasics.AddTxCommands(txCmd, cdc)
+	v0.ModuleBasics.AddTxCommands(txCmd, cdc)
 
 	// remove auth and bank commands as they're mounted under the root tx command
 	var cmdsToRemove []*cobra.Command
-
 	for _, cmd := range txCmd.Commands() {
 		if cmd.Use == auth.ModuleName || cmd.Use == bank.ModuleName {
 			cmdsToRemove = append(cmdsToRemove, cmd)
 		}
 	}
-
 	txCmd.RemoveCommand(cmdsToRemove...)
 
 	return txCmd

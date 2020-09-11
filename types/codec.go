@@ -1,6 +1,6 @@
 package types
 
-import "github.com/Dipper-Protocol/codec"
+import "github.com/Dipper-Labs/Dipper-Protocol/codec"
 
 // Register the sdk message type
 func RegisterCodec(cdc *codec.Codec) {

@@ -1,8 +1,8 @@
 package rootmulti
 
 import (
-	"github.com/Dipper-Protocol/store/dbadapter"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/dbadapter"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 var commithash = []byte("FAKE_HASH")

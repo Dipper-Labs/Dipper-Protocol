@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -26,6 +26,7 @@ func TestCoin(t *testing.T) {
 	require.Equal(t, NewInt(5), NewCoin(testDenom1, NewInt(5)).Amount)
 }
 
+// nolint
 func TestIsEqualCoin(t *testing.T) {
 	cases := []struct {
 		inputOne Coin

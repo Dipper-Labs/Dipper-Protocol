@@ -14,8 +14,8 @@ import (
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/Dipper-Protocol/store/rootmulti"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/rootmulti"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an

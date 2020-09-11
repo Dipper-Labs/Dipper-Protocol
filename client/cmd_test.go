@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/client"
+	"github.com/Dipper-Labs/Dipper-Protocol/client"
 )
 
 func TestValidateCmd(t *testing.T) {
@@ -37,10 +37,10 @@ func TestValidateCmd(t *testing.T) {
 		args    []string
 		wantErr bool
 	}{
-		{"misspelled command", []string{"comission"}, true},
+		{"misspelled command", []string{"comission"}, true}, // nolint: misspell
 		{"no command provided", []string{}, false},
-		{"help flag", []string{"comission", "--help"}, false},
-		{"shorthand help flag", []string{"comission", "-h"}, false},
+		{"help flag", []string{"comission", "--help"}, false},       // nolint: misspell
+		{"shorthand help flag", []string{"comission", "-h"}, false}, // nolint: misspell
 	}
 
 	for _, tt := range tests {

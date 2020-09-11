@@ -7,8 +7,8 @@ import (
 	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/Dipper-Protocol/crypto/keys"
-	"github.com/Dipper-Protocol/crypto/keys/mintkey"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/mintkey"
 )
 
 func TestArmorUnarmorPrivKey(t *testing.T) {

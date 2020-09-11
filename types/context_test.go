@@ -13,8 +13,8 @@ import (
 
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/Dipper-Protocol/store"
-	"github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store"
+	"github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 type MockLogger struct {
@@ -89,12 +89,6 @@ func TestLogContext(t *testing.T) {
 	ctx.Logger().Info("info")
 	ctx.Logger().Error("error")
 	require.Equal(t, *logger.logs, []string{"debug", "info", "error"})
-}
-
-type dummy int64
-
-func (d dummy) Clone() interface{} {
-	return d
 }
 
 // Testing saving/loading sdk type values to/from the context

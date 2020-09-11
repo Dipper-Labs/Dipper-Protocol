@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/tests"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
 )
 
 func Test_runDeleteCmd(t *testing.T) {

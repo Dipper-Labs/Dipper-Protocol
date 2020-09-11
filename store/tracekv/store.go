@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 const (

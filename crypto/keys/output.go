@@ -1,7 +1,7 @@
 package keys
 
 import (
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // KeyOutput defines a structure wrapping around an Info object used for output
@@ -52,7 +52,7 @@ func Bech32KeysOutput(infos []Info) ([]KeyOutput, error) {
 func Bech32ConsKeyOutput(keyInfo Info) (KeyOutput, error) {
 	consAddr := sdk.ConsAddress(keyInfo.GetPubKey().Address().Bytes())
 
-	bechPubKey, err := sdk.Bech32ifyConsPub(keyInfo.GetPubKey())
+	bechPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, keyInfo.GetPubKey())
 	if err != nil {
 		return KeyOutput{}, err
 	}
@@ -64,7 +64,7 @@ func Bech32ConsKeyOutput(keyInfo Info) (KeyOutput, error) {
 func Bech32ValKeyOutput(keyInfo Info) (KeyOutput, error) {
 	valAddr := sdk.ValAddress(keyInfo.GetPubKey().Address().Bytes())
 
-	bechPubKey, err := sdk.Bech32ifyValPub(keyInfo.GetPubKey())
+	bechPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeValPub, keyInfo.GetPubKey())
 	if err != nil {
 		return KeyOutput{}, err
 	}
@@ -77,7 +77,7 @@ func Bech32ValKeyOutput(keyInfo Info) (KeyOutput, error) {
 // public keys will be added.
 func Bech32KeyOutput(keyInfo Info) (KeyOutput, error) {
 	accAddr := sdk.AccAddress(keyInfo.GetPubKey().Address().Bytes())
-	bechPubKey, err := sdk.Bech32ifyAccPub(keyInfo.GetPubKey())
+	bechPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, keyInfo.GetPubKey())
 	if err != nil {
 		return KeyOutput{}, err
 	}
@@ -90,7 +90,7 @@ func Bech32KeyOutput(keyInfo Info) (KeyOutput, error) {
 		for i, pk := range mInfo.PubKeys {
 			accAddr := sdk.AccAddress(pk.PubKey.Address().Bytes())
 
-			bechPubKey, err := sdk.Bech32ifyAccPub(pk.PubKey)
+			bechPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, pk.PubKey)
 			if err != nil {
 				return KeyOutput{}, err
 			}

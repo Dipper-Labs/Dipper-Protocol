@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Dipper-Protocol/tests"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

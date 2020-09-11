@@ -3,7 +3,7 @@ package keys
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
 )
 
 // Commands registers a sub-tree of commands to interact with

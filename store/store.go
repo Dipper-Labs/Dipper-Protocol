@@ -3,8 +3,8 @@ package store
 import (
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/rootmulti"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/rootmulti"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 func NewCommitMultiStore(db dbm.DB) types.CommitMultiStore {

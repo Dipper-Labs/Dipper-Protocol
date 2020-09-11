@@ -9,11 +9,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/Dipper-Protocol/crypto"
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	"github.com/Dipper-Protocol/crypto/keys/keyerror"
-	"github.com/Dipper-Protocol/crypto/keys/mintkey"
-	"github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/keyerror"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/mintkey"
+	"github.com/Dipper-Labs/Dipper-Protocol/types"
 
 	bip39 "github.com/cosmos/go-bip39"
 
@@ -54,7 +54,7 @@ const (
 )
 
 const (
-	// used for deriving seed from mnemonic
+	// DefaultBIP39Passphrase - used for deriving seed from mnemonic
 	DefaultBIP39Passphrase = ""
 
 	// bits of entropy to draw when creating a mnemonic
@@ -152,7 +152,6 @@ func (kb dbKeybase) CreateLedger(name string, algo SigningAlgo, hrp string, acco
 	}
 	pub := priv.PubKey()
 
-	// Note: Once Cosmos App v1.3.1 is compulsory, it could be possible to check that pubkey and addr match
 	return kb.writeLedgerKey(name, pub, *hdPath), nil
 }
 
@@ -235,6 +234,7 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 
 	var priv tmcrypto.PrivKey
 
+	// nolint
 	switch info.(type) {
 	case localInfo:
 		linfo := info.(localInfo)
@@ -297,6 +297,7 @@ func (kb dbKeybase) ExportPrivateKeyObject(name string, passphrase string) (tmcr
 
 	var priv tmcrypto.PrivKey
 
+	// nolint
 	switch info.(type) {
 	case localInfo:
 		linfo := info.(localInfo)
@@ -434,6 +435,7 @@ func (kb dbKeybase) Update(name, oldpass string, getNewpass func() (string, erro
 	if err != nil {
 		return err
 	}
+	// nolint
 	switch info.(type) {
 	case localInfo:
 		linfo := info.(localInfo)

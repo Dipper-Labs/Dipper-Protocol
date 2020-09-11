@@ -3,7 +3,7 @@ package keys
 import (
 	"testing"
 
-	sdk "github.com/Dipper-Protocol/types"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/multisig"
@@ -12,13 +12,13 @@ import (
 
 func TestBech32KeysOutput(t *testing.T) {
 	tmpKey := secp256k1.GenPrivKey().PubKey()
-	bechTmpKey := sdk.MustBech32ifyAccPub(tmpKey)
+	bechTmpKey := sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, tmpKey)
 	tmpAddr := sdk.AccAddress(tmpKey.Address().Bytes())
 
 	multisigPks := multisig.NewPubKeyMultisigThreshold(1, []crypto.PubKey{tmpKey})
 	multiInfo := NewMultiInfo("multisig", multisigPks)
 	accAddr := sdk.AccAddress(multiInfo.GetPubKey().Address().Bytes())
-	bechPubKey := sdk.MustBech32ifyAccPub(multiInfo.GetPubKey())
+	bechPubKey := sdk.MustBech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, multiInfo.GetPubKey())
 
 	expectedOutput := NewKeyOutput(multiInfo.GetName(), multiInfo.GetType().String(), accAddr.String(), bechPubKey)
 	expectedOutput.Threshold = 1

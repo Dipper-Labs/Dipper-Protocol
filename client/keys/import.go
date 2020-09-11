@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io/ioutil"
 
-	"github.com/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
 	"github.com/spf13/cobra"
 )
 

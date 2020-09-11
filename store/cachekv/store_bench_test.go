@@ -7,14 +7,14 @@ import (
 
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/cachekv"
-	"github.com/Dipper-Protocol/store/dbadapter"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/dbadapter"
 )
 
 func benchmarkCacheKVStoreIterator(numKVs int, b *testing.B) {
 	mem := dbadapter.Store{DB: dbm.NewMemDB()}
 	cstore := cachekv.NewStore(mem)
-	keys := make([]string, numKVs, numKVs)
+	keys := make([]string, numKVs)
 
 	for i := 0; i < numKVs; i++ {
 		key := make([]byte, 32)

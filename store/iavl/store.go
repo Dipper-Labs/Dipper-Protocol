@@ -1,14 +1,13 @@
 package iavl
 
 import (
-	"fmt"
 	"io"
 	"sync"
 
-	"github.com/Dipper-Protocol/store/cachekv"
-	serrors "github.com/Dipper-Protocol/store/errors"
-	"github.com/Dipper-Protocol/store/tracekv"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
+	sdkerrors "github.com/Dipper-Labs/Dipper-Protocol/types/errors"
 
 	"github.com/pkg/errors"
 	"github.com/tendermint/iavl"
@@ -231,10 +230,10 @@ func getHeight(tree Tree, req abci.RequestQuery) int64 {
 // If latest-1 is not present, use latest (which must be present)
 // if you care to have the latest data to see a tx results, you must
 // explicitly set the height you want to see
+// nolint
 func (st *Store) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 	if len(req.Data) == 0 {
-		msg := "Query cannot be zero length"
-		return serrors.ErrTxDecode(msg).QueryResult()
+		return sdkerrors.QueryResult(sdkerrors.Wrap(sdkerrors.ErrTxDecode, "query cannot be zero length"))
 	}
 
 	tree := st.tree
@@ -293,8 +292,7 @@ func (st *Store) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 		res.Value = cdc.MustMarshalBinaryLengthPrefixed(KVs)
 
 	default:
-		msg := fmt.Sprintf("Unexpected Query path: %v", req.Path)
-		return serrors.ErrUnknownRequest(msg).QueryResult()
+		return sdkerrors.QueryResult(sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unexpected query path: %v", req.Path))
 	}
 
 	return

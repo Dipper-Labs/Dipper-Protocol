@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 // Key for the length of the list

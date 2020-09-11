@@ -15,8 +15,8 @@ import (
 	pvm "github.com/tendermint/tendermint/privval"
 	tversion "github.com/tendermint/tendermint/version"
 
-	"github.com/Dipper-Protocol/codec"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // ShowNodeIDCmd - ported from Tendermint, dump node ID to stdout
@@ -53,7 +53,7 @@ func ShowValidatorCmd(ctx *Context) *cobra.Command {
 				return printlnJSON(valPubKey)
 			}
 
-			pubkey, err := sdk.Bech32ifyConsPub(valPubKey)
+			pubkey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, valPubKey)
 			if err != nil {
 				return err
 			}

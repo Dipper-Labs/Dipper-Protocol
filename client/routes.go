@@ -3,7 +3,7 @@ package client
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/Dipper-Protocol/client/context"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
 )
 
 // Register routes

@@ -10,9 +10,9 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	"github.com/Dipper-Protocol/crypto/keys/mintkey"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/mintkey"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 func init() {
@@ -43,43 +43,6 @@ func TestCreateLedgerUnsupportedAlgo(t *testing.T) {
 	assert.Equal(t, "unsupported signing algo: only secp256k1 is supported", err.Error())
 }
 
-func TestCreateLedger(t *testing.T) {
-	kb := NewInMemory()
-
-	// test_cover and test_unit will result in different answers
-	// test_cover does not compile some dependencies so ledger is disabled
-	// test_unit may add a ledger mock
-	// both cases are acceptable
-	ledger, err := kb.CreateLedger("some_account", Secp256k1, "cosmos", 3, 1)
-
-	if err != nil {
-		assert.Error(t, err)
-		assert.Equal(t, "ledger nano S: support for ledger devices is not available in this executable", err.Error())
-		assert.Nil(t, ledger)
-		t.Skip("ledger nano S: support for ledger devices is not available in this executable")
-		return
-	}
-
-	// The mock is available, check that the address is correct
-	pubKey := ledger.GetPubKey()
-	pk, err := sdk.Bech32ifyAccPub(pubKey)
-	assert.NoError(t, err)
-	assert.Equal(t, "cosmospub1addwnpepqdszcr95mrqqs8lw099aa9h8h906zmet22pmwe9vquzcgvnm93eqygufdlv", pk)
-
-	// Check that restoring the key gets the same results
-	restoredKey, err := kb.Get("some_account")
-	assert.NotNil(t, restoredKey)
-	assert.Equal(t, "some_account", restoredKey.GetName())
-	assert.Equal(t, TypeLedger, restoredKey.GetType())
-	pubKey = restoredKey.GetPubKey()
-	pk, err = sdk.Bech32ifyAccPub(pubKey)
-	assert.Equal(t, "cosmospub1addwnpepqdszcr95mrqqs8lw099aa9h8h906zmet22pmwe9vquzcgvnm93eqygufdlv", pk)
-
-	path, err := restoredKey.GetPath()
-	assert.NoError(t, err)
-	assert.Equal(t, "44'/118'/3'/0/1", path.String())
-}
-
 // TestKeyManagement makes sure we can manipulate these keys well
 func TestKeyManagement(t *testing.T) {
 	// make the storage with reasonable defaults
@@ -87,7 +50,7 @@ func TestKeyManagement(t *testing.T) {
 
 	algo := Secp256k1
 	n1, n2, n3 := "personal", "business", "other"
-	p1, p2 := "1234", "really-secure!@#$"
+	p1, p2 := passwd1234, "really-secure!@#$"
 
 	// Check empty state
 	l, err := cstore.List()
@@ -114,7 +77,7 @@ func TestKeyManagement(t *testing.T) {
 	require.NotNil(t, err)
 	_, err = cstore.GetByAddress(accAddr(i2))
 	require.NoError(t, err)
-	addr, err := sdk.AccAddressFromBech32("cosmos1yq8lgssgxlx9smjhes6ryjasmqmd3ts2559g0t")
+	addr, err := sdk.AccAddressFromBech32("dip1yq8lgssgxlx9smjhes6ryjasmqmd3ts2qyr0gu")
 	require.NoError(t, err)
 	_, err = cstore.GetByAddress(addr)
 	require.NotNil(t, err)
@@ -170,7 +133,7 @@ func TestSignVerify(t *testing.T) {
 	algo := Secp256k1
 
 	n1, n2, n3 := "some dude", "a dudette", "dude-ish"
-	p1, p2, p3 := "1234", "foobar", "foobar"
+	p1, p2, p3 := passwd1234, passwdfoobar, passwdfoobar
 
 	// create two users and get their info
 	i1, _, err := cstore.CreateMnemonic(n1, English, p1, algo)
@@ -320,7 +283,7 @@ func TestAdvancedKeyManagement(t *testing.T) {
 
 	algo := Secp256k1
 	n1, n2 := "old-name", "new name"
-	p1, p2 := "1234", "foobar"
+	p1, p2 := passwd1234, passwdfoobar
 
 	// make sure key works with initial password
 	_, _, err := cstore.CreateMnemonic(n1, English, p1, algo)
@@ -368,7 +331,7 @@ func TestSeedPhrase(t *testing.T) {
 
 	algo := Secp256k1
 	n1, n2 := "lost-key", "found-again"
-	p1, p2 := "1234", "foobar"
+	p1, p2 := passwd1234, passwdfoobar
 
 	// make sure key works with initial password
 	info, mnemonic, err := cstore.CreateMnemonic(n1, English, p1, algo)

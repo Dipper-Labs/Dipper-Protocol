@@ -10,13 +10,13 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/cachemulti"
-	"github.com/Dipper-Protocol/store/dbadapter"
-	"github.com/Dipper-Protocol/store/errors"
-	"github.com/Dipper-Protocol/store/iavl"
-	"github.com/Dipper-Protocol/store/tracekv"
-	"github.com/Dipper-Protocol/store/transient"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/cachemulti"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/dbadapter"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/iavl"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/transient"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
+	sdkerrors "github.com/Dipper-Labs/Dipper-Protocol/types/errors"
 )
 
 const (
@@ -317,19 +317,17 @@ func (rs *Store) Query(req abci.RequestQuery) abci.ResponseQuery {
 	path := req.Path
 	storeName, subpath, err := parsePath(path)
 	if err != nil {
-		return err.QueryResult()
+		return sdkerrors.QueryResult(err)
 	}
 
 	store := rs.getStoreByName(storeName)
 	if store == nil {
-		msg := fmt.Sprintf("no such store: %s", storeName)
-		return errors.ErrUnknownRequest(msg).QueryResult()
+		return sdkerrors.QueryResult(sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "no such store: %s", storeName))
 	}
 
 	queryable, ok := store.(types.Queryable)
 	if !ok {
-		msg := fmt.Sprintf("store %s doesn't support queries", storeName)
-		return errors.ErrUnknownRequest(msg).QueryResult()
+		return sdkerrors.QueryResult(sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "store %s (type %T) doesn't support queries", storeName, store))
 	}
 
 	// trim the path and make the query
@@ -341,12 +339,12 @@ func (rs *Store) Query(req abci.RequestQuery) abci.ResponseQuery {
 	}
 
 	if res.Proof == nil || len(res.Proof.Ops) == 0 {
-		return errors.ErrInternal("proof is unexpectedly empty; ensure height has not been pruned").QueryResult()
+		return sdkerrors.QueryResult(sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "proof is unexpectedly empty; ensure height has not been pruned"))
 	}
 
 	commitInfo, errMsg := getCommitInfo(rs.db, res.Height)
 	if errMsg != nil {
-		return errors.ErrInternal(errMsg.Error()).QueryResult()
+		return sdkerrors.QueryResult(err)
 	}
 
 	// Restore origin path and append proof op.
@@ -363,10 +361,9 @@ func (rs *Store) Query(req abci.RequestQuery) abci.ResponseQuery {
 // parsePath expects a format like /<storeName>[/<subpath>]
 // Must start with /, subpath may be empty
 // Returns error if it doesn't start with /
-func parsePath(path string) (storeName string, subpath string, err errors.Error) {
+func parsePath(path string) (storeName string, subpath string, err error) {
 	if !strings.HasPrefix(path, "/") {
-		err = errors.ErrUnknownRequest(fmt.Sprintf("invalid path: %s", path))
-		return
+		return storeName, subpath, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid path: %s", path)
 	}
 
 	paths := strings.SplitN(path[1:], "/", 2)
@@ -380,7 +377,7 @@ func parsePath(path string) (storeName string, subpath string, err errors.Error)
 }
 
 //----------------------------------------
-
+// nolint
 func (rs *Store) loadCommitStoreFromParams(key types.StoreKey, id types.CommitID, params storeParams) (store types.CommitStore, err error) {
 	var db dbm.DB
 
@@ -398,7 +395,7 @@ func (rs *Store) loadCommitStoreFromParams(key types.StoreKey, id types.CommitID
 		return iavl.LoadStore(db, id, rs.pruningOpts, rs.lazyLoading)
 
 	case types.StoreTypeDB:
-		return commitDBStoreAdapter{dbadapter.Store{db}}, nil
+		return commitDBStoreAdapter{Store: dbadapter.Store{DB: db}}, nil
 
 	case types.StoreTypeTransient:
 		_, ok := key.(*types.TransientStoreKey)

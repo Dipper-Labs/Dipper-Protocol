@@ -7,8 +7,8 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/iavl"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/iavl"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 func TestVerifyIAVLStoreQueryProof(t *testing.T) {

@@ -1,11 +1,9 @@
 package store
 
 import (
-	"github.com/Dipper-Protocol/store/types"
-	stypes "github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
-// Import cosmos-sdk/types/store.go for convenience.
 // nolint
 type (
 	PruningOptions   = types.PruningOptions
@@ -27,9 +25,9 @@ type (
 	StoreType        = types.StoreType
 	Queryable        = types.Queryable
 	TraceContext     = types.TraceContext
-	Gas              = stypes.Gas
+	Gas              = types.Gas
 	GasMeter         = types.GasMeter
-	GasConfig        = stypes.GasConfig
+	GasConfig        = types.GasConfig
 )
 
 // nolint - reexport

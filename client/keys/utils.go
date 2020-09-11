@@ -10,9 +10,9 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	"gopkg.in/yaml.v2"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/client/input"
-	"github.com/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
 )
 
 // available output formats.
@@ -69,7 +69,7 @@ func ReadPassphraseFromStdin(name string) (string, error) {
 
 	passphrase, err := input.GetPassword(prompt, buf)
 	if err != nil {
-		return passphrase, fmt.Errorf("Error reading passphrase: %v", err)
+		return passphrase, fmt.Errorf("error reading passphrase: %v", err)
 	}
 
 	return passphrase, nil

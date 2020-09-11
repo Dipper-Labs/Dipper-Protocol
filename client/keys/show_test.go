@@ -10,10 +10,10 @@ import (
 	"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/crypto/keys"
-	"github.com/Dipper-Protocol/tests"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 func Test_multiSigKey_Properties(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_multiSigKey_Properties(t *testing.T) {
 	assert.Equal(t, "myMultisig", tmp.GetName())
 	assert.Equal(t, keys.TypeMulti, tmp.GetType())
 	assert.Equal(t, "D3923267FA8A3DD367BB768FA8BDC8FF7F89DA3F", tmp.GetPubKey().Address().String())
-	assert.Equal(t, "cosmos16wfryel63g7axeamw68630wglalcnk3l0zuadc", tmp.GetAddress().String())
+	assert.Equal(t, "dip16wfryel63g7axeamw68630wglalcnk3lmj6620", tmp.GetAddress().String())
 }
 
 func Test_showKeysCmd(t *testing.T) {

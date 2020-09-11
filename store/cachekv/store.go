@@ -10,9 +10,8 @@ import (
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/types"
-
-	"github.com/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 // If value is nil but deleted is false, it means the parent doesn't have the
@@ -109,6 +108,7 @@ func (store *Store) Write() {
 
 	// TODO: Consider allowing usage of Batch, which would allow the write to
 	// at least happen atomically.
+	// nolint
 	for _, key := range keys {
 		cacheValue := store.cache[key]
 		if cacheValue.deleted {

@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/Dipper-Protocol/client/context"
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	"github.com/Dipper-Protocol/types/rest"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/types/rest"
 
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
 )

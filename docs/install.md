@@ -37,12 +37,12 @@ go version
 
 ```
 
-### Build and install nch
+### Build and install dip
 
 ```bash
 # get source code
 git clone https://github.com/Dipper-Labs/Dipper-Protocol.git
-cd Dipper-Protocol && git checkout v2.0
+cd Dipper-Protocol && git checkout v1.0.0
 
 # Install the app into your $GOBIN
 make install

@@ -14,9 +14,9 @@ import (
 
 	bip39 "github.com/cosmos/go-bip39"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	"github.com/Dipper-Protocol/tests"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // If ledger support (build tag) has been enabled, which implies a CGO dependency,
@@ -41,8 +41,7 @@ func (mock LedgerSECP256K1Mock) GetPublicKeySECP256K1(derivationPath []uint32) (
 	if derivationPath[0] != 44 {
 		return nil, errors.New("Invalid derivation path")
 	}
-
-	if derivationPath[1] != sdk.GetConfig().GetCoinType() {
+	if derivationPath[1] != sdk.CoinType {
 		return nil, errors.New("Invalid derivation path")
 	}
 

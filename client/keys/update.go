@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
 )
 
 func updateKeyCommand() *cobra.Command {

@@ -3,8 +3,8 @@ package keys
 import (
 	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 
-	"github.com/Dipper-Protocol/codec"
-	"github.com/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
 )
 
 var cdc *codec.Codec

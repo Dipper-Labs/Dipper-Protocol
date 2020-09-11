@@ -10,10 +10,10 @@ import (
 
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/store/dbadapter"
-	"github.com/Dipper-Protocol/store/prefix"
-	"github.com/Dipper-Protocol/store/tracekv"
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/dbadapter"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/prefix"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/tracekv"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 func bz(s string) []byte { return []byte(s) }
@@ -38,7 +38,7 @@ func newTraceKVStore(w io.Writer) *tracekv.Store {
 }
 
 func newEmptyTraceKVStore(w io.Writer) *tracekv.Store {
-	memDB := dbadapter.Store{dbm.NewMemDB()}
+	memDB := dbadapter.Store{DB: dbm.NewMemDB()}
 	tc := types.TraceContext(map[string]interface{}{"blockHeight": 64})
 
 	return tracekv.NewStore(memDB, w, tc)
@@ -279,7 +279,7 @@ func TestTraceKVStorePrefix(t *testing.T) {
 }
 
 func TestTraceKVStoreGetStoreType(t *testing.T) {
-	memDB := dbadapter.Store{dbm.NewMemDB()}
+	memDB := dbadapter.Store{DB: dbm.NewMemDB()}
 	store := newEmptyTraceKVStore(nil)
 	require.Equal(t, memDB.GetStoreType(), store.GetStoreType())
 }

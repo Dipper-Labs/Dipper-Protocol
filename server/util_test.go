@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	"github.com/stretchr/testify/require"
-
-	"github.com/Dipper-Protocol/codec"
 )
 
 func TestInsertKeyJSON(t *testing.T) {

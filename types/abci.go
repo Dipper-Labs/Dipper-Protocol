@@ -4,6 +4,9 @@ import abci "github.com/tendermint/tendermint/abci/types"
 
 // InitChainer initializes application state at genesis
 type InitChainer func(ctx Context, req abci.RequestInitChain) abci.ResponseInitChain
+type InitChainer1 func(ctx Context, deliverTx DeliverTx, req abci.RequestInitChain) abci.ResponseInitChain
+
+type DeliverTx func(txBytes []byte) abci.ResponseDeliverTx
 
 // BeginBlocker runs code before the transactions in a block
 //
@@ -19,3 +22,5 @@ type EndBlocker func(ctx Context, req abci.RequestEndBlock) abci.ResponseEndBloc
 
 // PeerFilter responds to p2p filtering queries from Tendermint
 type PeerFilter func(info string) abci.ResponseQuery
+
+type PostEndBlockHandler func(res *abci.ResponseEndBlock)

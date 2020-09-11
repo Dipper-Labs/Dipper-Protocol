@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/client/keys"
-	"github.com/Dipper-Protocol/server"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/server"
 )
 
 func TestGenerateCoinKey(t *testing.T) {

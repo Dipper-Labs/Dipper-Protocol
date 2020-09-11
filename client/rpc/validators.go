@@ -13,11 +13,11 @@ import (
 
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/Dipper-Protocol/client/context"
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	sdk "github.com/Dipper-Protocol/types"
-	"github.com/Dipper-Protocol/types/rest"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/types/rest"
 )
 
 // TODO these next two functions feel kinda hacky based on their placement
@@ -64,7 +64,7 @@ func ValidatorCommand(cdc *codec.Codec) *cobra.Command {
 	return cmd
 }
 
-// Validator output in bech32 format
+// ValidatorOutput -  output validator in bech32 format
 type ValidatorOutput struct {
 	Address          sdk.ConsAddress `json:"address"`
 	PubKey           string          `json:"pub_key"`
@@ -72,7 +72,7 @@ type ValidatorOutput struct {
 	VotingPower      int64           `json:"voting_power"`
 }
 
-// Validators at a certain height output in bech32 format
+// ResultValidatorsOutput - Validators at a certain height output in bech32 format
 type ResultValidatorsOutput struct {
 	BlockHeight int64             `json:"block_height"`
 	Validators  []ValidatorOutput `json:"validators"`
@@ -100,7 +100,7 @@ func (rvo ResultValidatorsOutput) String() string {
 }
 
 func bech32ValidatorOutput(validator *tmtypes.Validator) (ValidatorOutput, error) {
-	bechValPubkey, err := sdk.Bech32ifyConsPub(validator.PubKey)
+	bechValPubkey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, validator.PubKey)
 	if err != nil {
 		return ValidatorOutput{}, err
 	}
@@ -154,7 +154,7 @@ func GetValidators(cliCtx context.CLIContext, height *int64) (ResultValidatorsOu
 
 // REST
 
-// Validator Set at a height REST handler
+// ValidatorSetRequestHandlerFn - Validator Set at a height REST handler
 func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -184,7 +184,7 @@ func ValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	}
 }
 
-// Latest Validator Set REST handler
+// LatestValidatorSetRequestHandlerFn - Latest Validator Set REST handler
 func LatestValidatorSetRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		output, err := GetValidators(cliCtx, nil)

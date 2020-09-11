@@ -1,12 +1,14 @@
 package types
 
-// Router provides handlers for each transaction type.
+import "regexp"
+
+var IsAlphaNumeric = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
+
 type Router interface {
 	AddRoute(r string, h Handler) Router
-	Route(path string) Handler
+	Route(ctx Context, path string) Handler
 }
 
-// QueryRouter provides queryables for each query path.
 type QueryRouter interface {
 	AddRoute(r string, h Querier) QueryRouter
 	Route(path string) Querier

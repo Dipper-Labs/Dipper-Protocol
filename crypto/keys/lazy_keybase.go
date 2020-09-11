@@ -6,8 +6,8 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 var _ Keybase = lazyKeybase{}

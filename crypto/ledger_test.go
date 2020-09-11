@@ -9,14 +9,12 @@ import (
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 	cryptoAmino "github.com/tendermint/tendermint/crypto/encoding/amino"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	"github.com/Dipper-Protocol/tests"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 func TestLedgerErrorHandling(t *testing.T) {
-	// first, try to generate a key, must return an error
-	// (no panic)
 	path := *hd.NewParams(44, 555, 0, false, 0)
 	_, err := NewPrivKeyLedgerSecp256k1Unsafe(path)
 	require.Error(t, err)
@@ -29,31 +27,30 @@ func TestPublicKeyUnsafe(t *testing.T) {
 	require.NotNil(t, priv)
 
 	require.Equal(t, "eb5ae98721034fef9cd7c4c63588d3b03feb5281b9d232cba34d6f3d71aee59211ffbfe1fe87",
-		fmt.Sprintf("%x", priv.PubKey().Bytes()),
-		"Is your device using test mnemonic: %s ?", tests.TestMnemonic)
+		fmt.Sprintf("%x", priv.PubKey().Bytes()), "Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 
-	pubKeyAddr, err := sdk.Bech32ifyAccPub(priv.PubKey())
+	pubKeyAddr, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, priv.PubKey())
 	require.NoError(t, err)
-	require.Equal(t, "cosmospub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgw0urza0",
+	require.Equal(t, "dippub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgwj0c32v",
 		pubKeyAddr, "Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 
 	addr := sdk.AccAddress(priv.PubKey().Address()).String()
-	require.Equal(t, "cosmos1w34k53py5v5xyluazqpq65agyajavep2rflq6h",
+	require.Equal(t, "dip1w34k53py5v5xyluazqpq65agyajavep2hee8aq",
 		addr, "Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 }
 
 func TestPublicKeyUnsafeHDPath(t *testing.T) {
 	expectedAnswers := []string{
-		"cosmospub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgw0urza0",
-		"cosmospub1addwnpepqfsdqjr68h7wjg5wacksmqaypasnra232fkgu5sxdlnlu8j22ztxvlqvd65",
-		"cosmospub1addwnpepqw3xwqun6q43vtgw6p4qspq7srvxhcmvq4jrx5j5ma6xy3r7k6dtxmrkh3d",
-		"cosmospub1addwnpepqvez9lrp09g8w7gkv42y4yr5p6826cu28ydrhrujv862yf4njmqyyjr4pjs",
-		"cosmospub1addwnpepq06hw3enfrtmq8n67teytcmtnrgcr0yntmyt25kdukfjkerdc7lqg32rcz7",
-		"cosmospub1addwnpepqg3trf2gd0s2940nckrxherwqhgmm6xd5h4pcnrh4x7y35h6yafmcpk5qns",
-		"cosmospub1addwnpepqdm6rjpx6wsref8wjn7ym6ntejet430j4szpngfgc20caz83lu545vuv8hp",
-		"cosmospub1addwnpepqvdhtjzy2wf44dm03jxsketxc07vzqwvt3vawqqtljgsr9s7jvydjmt66ew",
-		"cosmospub1addwnpepqwystfpyxwcava7v3t7ndps5xzu6s553wxcxzmmnxevlzvwrlqpzz695nw9",
-		"cosmospub1addwnpepqw970u6gjqkccg9u3rfj99857wupj2z9fqfzy2w7e5dd7xn7kzzgkgqch0r",
+		"dippub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgwj0c32v",
+		"dippub1addwnpepqfsdqjr68h7wjg5wacksmqaypasnra232fkgu5sxdlnlu8j22ztxvznh7dh",
+		"dippub1addwnpepqw3xwqun6q43vtgw6p4qspq7srvxhcmvq4jrx5j5ma6xy3r7k6dtxxsdyxw",
+		"dippub1addwnpepqvez9lrp09g8w7gkv42y4yr5p6826cu28ydrhrujv862yf4njmqyy0swj9n",
+		"dippub1addwnpepq06hw3enfrtmq8n67teytcmtnrgcr0yntmyt25kdukfjkerdc7lqgvect4a",
+		"dippub1addwnpepqg3trf2gd0s2940nckrxherwqhgmm6xd5h4pcnrh4x7y35h6yafmcu90nyn",
+		"dippub1addwnpepqdm6rjpx6wsref8wjn7ym6ntejet430j4szpngfgc20caz83lu54530h5qz",
+		"dippub1addwnpepqvdhtjzy2wf44dm03jxsketxc07vzqwvt3vawqqtljgsr9s7jvydjxcpfwd",
+		"dippub1addwnpepqwystfpyxwcava7v3t7ndps5xzu6s553wxcxzmmnxevlzvwrlqpzz8k0qex",
+		"dippub1addwnpepqw970u6gjqkccg9u3rfj99857wupj2z9fqfzy2w7e5dd7xn7kzzgk4nrycq",
 	}
 
 	const numIters = 10
@@ -74,7 +71,7 @@ func TestPublicKeyUnsafeHDPath(t *testing.T) {
 		tmp := priv.(PrivKeyLedgerSecp256k1)
 		(&tmp).AssertIsPrivKeyInner()
 
-		pubKeyAddr, err := sdk.Bech32ifyAccPub(priv.PubKey())
+		pubKeyAddr, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, priv.PubKey())
 		require.NoError(t, err)
 		require.Equal(t,
 			expectedAnswers[i], pubKeyAddr,
@@ -99,7 +96,7 @@ func TestPublicKeyUnsafeHDPath(t *testing.T) {
 
 func TestPublicKeySafe(t *testing.T) {
 	path := *hd.NewFundraiserParams(0, sdk.CoinType, 0)
-	priv, addr, err := NewPrivKeyLedgerSecp256k1(path, "cosmos")
+	priv, addr, err := NewPrivKeyLedgerSecp256k1(path, "dip")
 
 	require.Nil(t, err, "%s", err)
 	require.NotNil(t, priv)
@@ -108,12 +105,12 @@ func TestPublicKeySafe(t *testing.T) {
 		fmt.Sprintf("%x", priv.PubKey().Bytes()),
 		"Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 
-	pubKeyAddr, err := sdk.Bech32ifyAccPub(priv.PubKey())
+	pubKeyAddr, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, priv.PubKey())
 	require.NoError(t, err)
-	require.Equal(t, "cosmospub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgw0urza0",
+	require.Equal(t, "dippub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgwj0c32v",
 		pubKeyAddr, "Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 
-	require.Equal(t, "cosmos1w34k53py5v5xyluazqpq65agyajavep2rflq6h",
+	require.Equal(t, "dip1w34k53py5v5xyluazqpq65agyajavep2hee8aq",
 		addr, "Is your device using test mnemonic: %s ?", tests.TestMnemonic)
 
 	addr2 := sdk.AccAddress(priv.PubKey().Address()).String()
@@ -122,29 +119,29 @@ func TestPublicKeySafe(t *testing.T) {
 
 func TestPublicKeyHDPath(t *testing.T) {
 	expectedPubKeys := []string{
-		"cosmospub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgw0urza0",
-		"cosmospub1addwnpepqfsdqjr68h7wjg5wacksmqaypasnra232fkgu5sxdlnlu8j22ztxvlqvd65",
-		"cosmospub1addwnpepqw3xwqun6q43vtgw6p4qspq7srvxhcmvq4jrx5j5ma6xy3r7k6dtxmrkh3d",
-		"cosmospub1addwnpepqvez9lrp09g8w7gkv42y4yr5p6826cu28ydrhrujv862yf4njmqyyjr4pjs",
-		"cosmospub1addwnpepq06hw3enfrtmq8n67teytcmtnrgcr0yntmyt25kdukfjkerdc7lqg32rcz7",
-		"cosmospub1addwnpepqg3trf2gd0s2940nckrxherwqhgmm6xd5h4pcnrh4x7y35h6yafmcpk5qns",
-		"cosmospub1addwnpepqdm6rjpx6wsref8wjn7ym6ntejet430j4szpngfgc20caz83lu545vuv8hp",
-		"cosmospub1addwnpepqvdhtjzy2wf44dm03jxsketxc07vzqwvt3vawqqtljgsr9s7jvydjmt66ew",
-		"cosmospub1addwnpepqwystfpyxwcava7v3t7ndps5xzu6s553wxcxzmmnxevlzvwrlqpzz695nw9",
-		"cosmospub1addwnpepqw970u6gjqkccg9u3rfj99857wupj2z9fqfzy2w7e5dd7xn7kzzgkgqch0r",
+		"dippub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgwj0c32v",
+		"dippub1addwnpepqfsdqjr68h7wjg5wacksmqaypasnra232fkgu5sxdlnlu8j22ztxvznh7dh",
+		"dippub1addwnpepqw3xwqun6q43vtgw6p4qspq7srvxhcmvq4jrx5j5ma6xy3r7k6dtxxsdyxw",
+		"dippub1addwnpepqvez9lrp09g8w7gkv42y4yr5p6826cu28ydrhrujv862yf4njmqyy0swj9n",
+		"dippub1addwnpepq06hw3enfrtmq8n67teytcmtnrgcr0yntmyt25kdukfjkerdc7lqgvect4a",
+		"dippub1addwnpepqg3trf2gd0s2940nckrxherwqhgmm6xd5h4pcnrh4x7y35h6yafmcu90nyn",
+		"dippub1addwnpepqdm6rjpx6wsref8wjn7ym6ntejet430j4szpngfgc20caz83lu54530h5qz",
+		"dippub1addwnpepqvdhtjzy2wf44dm03jxsketxc07vzqwvt3vawqqtljgsr9s7jvydjxcpfwd",
+		"dippub1addwnpepqwystfpyxwcava7v3t7ndps5xzu6s553wxcxzmmnxevlzvwrlqpzz8k0qex",
+		"dippub1addwnpepqw970u6gjqkccg9u3rfj99857wupj2z9fqfzy2w7e5dd7xn7kzzgk4nrycq",
 	}
 
 	expectedAddrs := []string{
-		"cosmos1w34k53py5v5xyluazqpq65agyajavep2rflq6h",
-		"cosmos19ewxwemt6uahejvwf44u7dh6tq859tkyvarh2q",
-		"cosmos1a07dzdjgjsntxpp75zg7cgatgq0udh3pcdcxm3",
-		"cosmos1qvw52lmn9gpvem8welghrkc52m3zczyhlqjsl7",
-		"cosmos17m78ka80fqkkw2c4ww0v4xm5nsu2drgrlm8mn2",
-		"cosmos1ferh9ll9c452d2p8k2v7heq084guygkn43up9e",
-		"cosmos10vf3sxmjg96rqq36axcphzfsl74dsntuehjlw5",
-		"cosmos1cq83av8cmnar79h0rg7duh9gnr7wkh228a7fxg",
-		"cosmos1dszhfrt226jy5rsre7e48vw9tgwe90uerfyefa",
-		"cosmos1734d7qsylzrdt05muhqqtpd90j8mp4y6rzch8l",
+		"dip1w34k53py5v5xyluazqpq65agyajavep2hee8aq",
+		"dip19ewxwemt6uahejvwf44u7dh6tq859tkycd9sdh",
+		"dip1a07dzdjgjsntxpp75zg7cgatgq0udh3pva7pux",
+		"dip1qvw52lmn9gpvem8welghrkc52m3zczyhts5hcf",
+		"dip17m78ka80fqkkw2c4ww0v4xm5nsu2drgrttpu5a",
+		"dip1ferh9ll9c452d2p8k2v7heq084guygknpp6xzw",
+		"dip10vf3sxmjg96rqq36axcphzfsl74dsntud85cfr",
+		"dip1cq83av8cmnar79h0rg7duh9gnr7wkh22ndcwpl",
+		"dip1dszhfrt226jy5rsre7e48vw9tgwe90uehez7w2",
+		"dip1734d7qsylzrdt05muhqqtpd90j8mp4y6hj7sqg",
 	}
 
 	const numIters = 10
@@ -156,7 +153,7 @@ func TestPublicKeyHDPath(t *testing.T) {
 		path := *hd.NewFundraiserParams(0, sdk.CoinType, i)
 		fmt.Printf("Checking keys at %v\n", path)
 
-		priv, addr, err := NewPrivKeyLedgerSecp256k1(path, "cosmos")
+		priv, addr, err := NewPrivKeyLedgerSecp256k1(path, "dip")
 		require.Nil(t, err, "%s", err)
 		require.NotNil(t, addr)
 		require.NotNil(t, priv)
@@ -172,7 +169,7 @@ func TestPublicKeyHDPath(t *testing.T) {
 		tmp := priv.(PrivKeyLedgerSecp256k1)
 		(&tmp).AssertIsPrivKeyInner()
 
-		pubKeyAddr, err := sdk.Bech32ifyAccPub(priv.PubKey())
+		pubKeyAddr, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeAccPub, priv.PubKey())
 		require.NoError(t, err)
 		require.Equal(t,
 			expectedPubKeys[i], pubKeyAddr,

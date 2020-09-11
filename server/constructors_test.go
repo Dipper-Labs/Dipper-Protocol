@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/tests"
+	"github.com/Dipper-Labs/Dipper-Protocol/tests"
 )
 
 func Test_openDB(t *testing.T) {

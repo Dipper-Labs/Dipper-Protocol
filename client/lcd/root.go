@@ -14,14 +14,14 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	rpcserver "github.com/tendermint/tendermint/rpc/lib/server"
 
-	"github.com/Dipper-Protocol/client/context"
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	keybase "github.com/Dipper-Protocol/crypto/keys"
-	"github.com/Dipper-Protocol/server"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	keybase "github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	"github.com/Dipper-Labs/Dipper-Protocol/server"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/Dipper-Protocol/client/lcd/statik"
+	_ "github.com/Dipper-Labs/Dipper-Protocol/client/lcd/statik"
 )
 
 // RestServer represents the Light Client Rest server

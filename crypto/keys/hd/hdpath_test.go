@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/types"
 
 	bip39 "github.com/cosmos/go-bip39"
 	"github.com/stretchr/testify/assert"

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"

@@ -9,12 +9,13 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/codec"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 const (
@@ -92,8 +93,5 @@ func ExportCmd(ctx *Context, cdc *codec.Codec, appExporter AppExporter) *cobra.C
 }
 
 func isEmptyState(db dbm.DB) bool {
-	if db.Stats()["leveldb.sstables"] != "" {
-		return false
-	}
-	return true
+	return db.Stats()["leveldb.sstables"] == ""
 }

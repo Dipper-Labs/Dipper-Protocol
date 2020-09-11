@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"github.com/Dipper-Protocol/codec"
+	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 )
 
 var cdc *codec.Codec
@@ -12,12 +12,12 @@ func init() {
 	cdc.Seal()
 }
 
-// marshal keys
+// MarshalJSON  - marshal keys
 func MarshalJSON(o interface{}) ([]byte, error) {
 	return cdc.MarshalJSON(o)
 }
 
-// unmarshal json
+// UnmarshalJSON - unmarshal json
 func UnmarshalJSON(bz []byte, ptr interface{}) error {
 	return cdc.UnmarshalJSON(bz, ptr)
 }

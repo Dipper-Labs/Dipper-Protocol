@@ -11,10 +11,10 @@ import (
 	"github.com/tendermint/tendermint/crypto/multisig"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/Dipper-Protocol/client/flags"
-	"github.com/Dipper-Protocol/crypto"
-	"github.com/Dipper-Protocol/crypto/keys"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/flags"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 const (

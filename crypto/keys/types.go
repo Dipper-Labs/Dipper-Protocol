@@ -6,8 +6,8 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/multisig"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	"github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	"github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 // Keybase exposes operations on a generic keystore
@@ -31,7 +31,6 @@ type Keybase interface {
 	// Derive computes a BIP39 seed from th mnemonic and bip39Passwd.
 	// Derive private key from the seed using the BIP44 params.
 	// Encrypt the key to disk using encryptPasswd.
-	// See https://github.com/Dipper-Protocol/issues/2095
 	Derive(name, mnemonic, bip39Passwd, encryptPasswd string, params hd.BIP44Params) (Info, error)
 
 	// CreateLedger creates, stores, and returns a new Ledger key reference

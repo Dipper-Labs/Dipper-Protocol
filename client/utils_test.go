@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Dipper-Protocol/client"
+	"github.com/Dipper-Labs/Dipper-Protocol/client"
 )
 
 func TestPaginate(t *testing.T) {

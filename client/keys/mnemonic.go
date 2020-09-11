@@ -8,7 +8,7 @@ import (
 	bip39 "github.com/bartekn/go-bip39"
 	"github.com/spf13/cobra"
 
-	"github.com/Dipper-Protocol/client/input"
+	"github.com/Dipper-Labs/Dipper-Protocol/client/input"
 )
 
 const (
@@ -65,7 +65,7 @@ func runMnemonicCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	mnemonic, err := bip39.NewMnemonic(entropySeed[:])
+	mnemonic, err := bip39.NewMnemonic(entropySeed)
 	if err != nil {
 		return err
 	}

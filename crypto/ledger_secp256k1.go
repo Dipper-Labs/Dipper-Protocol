@@ -11,8 +11,8 @@ import (
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 	tmsecp256k1 "github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/Dipper-Protocol/crypto/keys/hd"
-	sdk "github.com/Dipper-Protocol/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/crypto/keys/hd"
+	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
 var (
@@ -119,8 +119,7 @@ func LedgerShowAddress(path hd.BIP44Params, expectedPubKey tmcrypto.PubKey) erro
 		return fmt.Errorf("the key's pubkey does not match with the one retrieved from Ledger. Check that the HD path and device are the correct ones")
 	}
 
-	config := sdk.GetConfig()
-	pubKey2, _, err := getPubKeyAddrSafe(device, path, config.GetBech32AccountAddrPrefix())
+	pubKey2, _, err := getPubKeyAddrSafe(device, path, sdk.Bech32PrefixAccAddr)
 	if err != nil {
 		return err
 	}
@@ -171,7 +170,7 @@ func warnIfErrors(f func() error) {
 }
 
 func convertDERtoBER(signatureDER []byte) ([]byte, error) {
-	sigDER, err := btcec.ParseDERSignature(signatureDER[:], btcec.S256())
+	sigDER, err := btcec.ParseDERSignature(signatureDER, btcec.S256())
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +239,7 @@ func getPubKeyUnsafe(device LedgerSECP256K1, path hd.BIP44Params) (tmcrypto.PubK
 	}
 
 	// re-serialize in the 33-byte compressed format
-	cmp, err := btcec.ParsePubKey(publicKey[:], btcec.S256())
+	cmp, err := btcec.ParsePubKey(publicKey, btcec.S256())
 	if err != nil {
 		return nil, fmt.Errorf("error parsing public key: %v", err)
 	}
@@ -264,7 +263,7 @@ func getPubKeyAddrSafe(device LedgerSECP256K1, path hd.BIP44Params, hrp string) 
 	}
 
 	// re-serialize in the 33-byte compressed format
-	cmp, err := btcec.ParsePubKey(publicKey[:], btcec.S256())
+	cmp, err := btcec.ParsePubKey(publicKey, btcec.S256())
 	if err != nil {
 		return nil, "", fmt.Errorf("error parsing public key: %v", err)
 	}

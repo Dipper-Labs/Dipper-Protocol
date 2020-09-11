@@ -5,7 +5,7 @@ import (
 
 	cmn "github.com/tendermint/tendermint/libs/common"
 
-	"github.com/Dipper-Protocol/store/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/store/types"
 )
 
 // Gets the first item.
