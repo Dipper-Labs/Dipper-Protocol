@@ -20,6 +20,7 @@ var (
 	KeyInflationMin        = []byte("InflationMin")
 	KeyGoalBonded          = []byte("GoalBonded")
 	KeyBlocksPerYear       = []byte("BlocksPerYear")
+	KeyMaxProvisions       = []byte("MaxProvisions")
 )
 
 // mint parameters
@@ -30,6 +31,7 @@ type Params struct {
 	InflationMin        sdk.Dec `json:"inflation_min" yaml:"inflation_min"`                 // minimum inflation rate
 	GoalBonded          sdk.Dec `json:"goal_bonded" yaml:"goal_bonded"`                     // goal of percent bonded atoms
 	BlocksPerYear       uint64  `json:"blocks_per_year" yaml:"blocks_per_year"`             // expected blocks per year
+	MaxProvisions       sdk.Dec `json:"max_provisions" yaml:"max_provisions"`
 }
 
 // ParamTable for minting module.
@@ -38,7 +40,7 @@ func ParamKeyTable() params.KeyTable {
 }
 
 func NewParams(mintDenom string, inflationRateChange, inflationMax,
-	inflationMin, goalBonded sdk.Dec, blocksPerYear uint64) Params {
+	inflationMin, goalBonded sdk.Dec, blocksPerYear uint64, maxProvisions sdk.Dec) Params {
 
 	return Params{
 		MintDenom:           mintDenom,
@@ -47,6 +49,7 @@ func NewParams(mintDenom string, inflationRateChange, inflationMax,
 		InflationMin:        inflationMin,
 		GoalBonded:          goalBonded,
 		BlocksPerYear:       blocksPerYear,
+		MaxProvisions:       maxProvisions,
 	}
 }
 
@@ -61,11 +64,12 @@ func (p Params) Equal(p2 Params) bool {
 func DefaultParams() Params {
 	return Params{
 		MintDenom:           sdk.DefaultBondDenom,
-		InflationRateChange: sdk.NewDecWithPrec(3, 2),
-		InflationMax:        sdk.NewDecWithPrec(5, 2),
-		InflationMin:        sdk.NewDecWithPrec(2, 2),
+		InflationRateChange: sdk.NewDecWithPrec(6, 2),
+		InflationMax:        sdk.NewDecWithPrec(10, 2),
+		InflationMin:        sdk.NewDecWithPrec(4, 2),
 		GoalBonded:          sdk.NewDecWithPrec(67, 2),
 		BlocksPerYear:       uint64(60 * 60 * 8766 / 5), // assuming 5 second block times
+		MaxProvisions:       sdk.NewDec(350000000).Mul(sdk.NewDec(1000000000000)),
 	}
 }
 
@@ -117,6 +121,7 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 		params.NewParamSetPair(KeyInflationMin, &p.InflationMin, validateInflationMin),
 		params.NewParamSetPair(KeyGoalBonded, &p.GoalBonded, validateGoalBonded),
 		params.NewParamSetPair(KeyBlocksPerYear, &p.BlocksPerYear, validateBlocksPerYear),
+		params.NewParamSetPair(KeyMaxProvisions, &p.MaxProvisions, validateMaxProvisions),
 	}
 }
 
@@ -208,6 +213,19 @@ func validateBlocksPerYear(i interface{}) error {
 
 	if v == 0 {
 		return fmt.Errorf("blocks per year must be positive: %d", v)
+	}
+
+	return nil
+}
+
+func validateMaxProvisions(i interface{}) error {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsNegative() {
+		return fmt.Errorf("max provisions cannot be negative: %s", v)
 	}
 
 	return nil

@@ -8,16 +8,18 @@ import (
 
 // Minter represents the minting state.
 type Minter struct {
-	Inflation        sdk.Dec `json:"inflation" yaml:"inflation"`                 // current annual inflation rate
-	AnnualProvisions sdk.Dec `json:"annual_provisions" yaml:"annual_provisions"` // current annual expected provisions
+	Inflation         sdk.Dec `json:"inflation" yaml:"inflation"`                 // current annual inflation rate
+	AnnualProvisions  sdk.Dec `json:"annual_provisions" yaml:"annual_provisions"` // current annual expected provisions
+	CurrentProvisions sdk.Dec `json:"current_provisions" yaml:"current_provisions"`
 }
 
-// NewMinter returns a new Minter object with the given inflation and annual
-// provisions values.
-func NewMinter(inflation, annualProvisions sdk.Dec) Minter {
+// NewMinter returns a new Minter object with the given inflation, provisions values
+// and current provisions
+func NewMinter(inflation, annualProvisions, currentProvisions sdk.Dec) Minter {
 	return Minter{
-		Inflation:        inflation,
-		AnnualProvisions: annualProvisions,
+		Inflation:         inflation,
+		AnnualProvisions:  annualProvisions,
+		CurrentProvisions: currentProvisions,
 	}
 }
 
@@ -26,14 +28,15 @@ func InitialMinter(inflation sdk.Dec) Minter {
 	return NewMinter(
 		inflation,
 		sdk.NewDec(0),
+		sdk.NewDec(0),
 	)
 }
 
 // DefaultInitialMinter returns a default initial Minter object for a new chain
-// which uses an inflation rate of 13%.
+// which uses an inflation rate of 4%.
 func DefaultInitialMinter() Minter {
 	return InitialMinter(
-		sdk.NewDecWithPrec(13, 2),
+		sdk.NewDecWithPrec(4, 2),
 	)
 }
 
@@ -46,18 +49,19 @@ func ValidateMinter(minter Minter) error {
 	return nil
 }
 
-// NextInflationRate returns the new inflation rate for the next hour.
+// NextInflationRate returns the new inflation rate for the next block.
 func (m Minter) NextInflationRate(params Params, bondedRatio sdk.Dec) sdk.Dec {
 	// The target annual inflation rate is recalculated for each previsions cycle. The
 	// inflation is also subject to a rate change (positive or negative) depending on
 	// the distance from the desired ratio (67%). The maximum rate change possible is
-	// defined to be 10% per year, however the annual inflation is capped as between
-	// 10% and 20%.
+	// defined to be 6% per year, however the annual inflation is capped as between
+	// 4% and 10%.
 
 	// (1 - bondedRatio/GoalBonded) * InflationRateChange
 	inflationRateChangePerYear := sdk.OneDec().
 		Sub(bondedRatio.Quo(params.GoalBonded)).
 		Mul(params.InflationRateChange)
+
 	inflationRateChange := inflationRateChangePerYear.Quo(sdk.NewDec(int64(params.BlocksPerYear)))
 
 	// adjust the new annual inflation for this next cycle

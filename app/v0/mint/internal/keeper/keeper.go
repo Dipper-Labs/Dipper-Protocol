@@ -7,6 +7,7 @@ import (
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/mint/internal/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/params"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/supply"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
@@ -102,6 +103,14 @@ func (k Keeper) MintCoins(ctx sdk.Context, newCoins sdk.Coins) error {
 		return nil
 	}
 	return k.supplyKeeper.MintCoins(ctx, types.ModuleName, newCoins)
+}
+
+func (k Keeper) GetAllVestings(ctx sdk.Context) (vestings []supply.Vesting) {
+	return k.supplyKeeper.GetAllVestings(ctx)
+}
+
+func (k Keeper) RemoveVesting(ctx sdk.Context, address sdk.AccAddress) {
+	k.supplyKeeper.RemoveVesting(ctx, address)
 }
 
 // AddCollectedFees implements an alias call to the underlying supply keeper's
