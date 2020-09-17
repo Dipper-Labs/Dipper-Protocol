@@ -16,9 +16,13 @@ func deleteFinishedVestings(ctx sdk.Context, k Keeper, vestings []supply.Vesting
 
 // BeginBlocker mints new tokens for the previous block.
 func BeginBlocker(ctx sdk.Context, k Keeper) {
-	// fetch stored minter & params
 	minter := k.GetMinter(ctx)
 	params := k.GetParams(ctx)
+
+	// MaxProvisions: Maximum amount of mining, default value is 3.5e DIP
+	if minter.CurrentProvisions.GTE(params.MaxProvisions) {
+		return
+	}
 
 	// calculate supplyExcludingVesting
 	totalStakingSupply := k.StakingTokenSupply(ctx)
@@ -31,11 +35,14 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 	bondedRatio := k.BondedRatio(ctx)
 	minter.Inflation = minter.NextInflationRate(params, bondedRatio)
 	minter.AnnualProvisions = minter.NextAnnualProvisions(params, supplyExcludingVesting)
-	k.SetMinter(ctx, minter)
 
 	// mint coins, update supply
 	mintedCoin := minter.BlockProvision(params)
 	mintedCoins := sdk.NewCoins(mintedCoin)
+
+	// update CurrentProvisions and save minter status to store
+	minter.CurrentProvisions = minter.CurrentProvisions.Add(mintedCoin.Amount.ToDec())
+	k.SetMinter(ctx, minter)
 
 	err := k.MintCoins(ctx, mintedCoins)
 	if err != nil {
@@ -54,6 +61,7 @@ func BeginBlocker(ctx sdk.Context, k Keeper) {
 			sdk.NewAttribute(types.AttributeKeyBondedRatio, bondedRatio.String()),
 			sdk.NewAttribute(types.AttributeKeyInflation, minter.Inflation.String()),
 			sdk.NewAttribute(types.AttributeKeyAnnualProvisions, minter.AnnualProvisions.String()),
+			sdk.NewAttribute(types.AttributeKeyCurrentProvisions, minter.CurrentProvisions.String()),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
 		),
 	)
