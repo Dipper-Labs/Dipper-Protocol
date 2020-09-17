@@ -17,6 +17,9 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryTotalSupply:
 			return queryTotalSupply(ctx, req, k)
 
+		case types.QueryTotalVesting:
+			return queryTotalVesting(ctx, req, k)
+
 		case types.QuerySupplyOf:
 			return querySupplyOf(ctx, req, k)
 
@@ -62,6 +65,18 @@ func querySupplyOf(ctx sdk.Context, req abci.RequestQuery, k Keeper) ([]byte, er
 	supply := k.GetSupply(ctx).GetTotal().AmountOf(params.Denom)
 
 	res, err := supply.MarshalJSON()
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
+
+func queryTotalVesting(ctx sdk.Context, _ abci.RequestQuery, k Keeper) ([]byte, error) {
+	vestings := k.GetAllVestings(ctx)
+
+	vestingAmount := types.CalculateVestingAmount(ctx.BlockTime().Unix(), vestings)
+	res, err := vestingAmount.MarshalJSON()
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

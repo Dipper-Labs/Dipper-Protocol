@@ -48,3 +48,7 @@ type (
 	Supply        = types.Supply
 	Vesting       = types.Vesting
 )
+
+var (
+	CalculateVestingAmount = types.CalculateVestingAmount
+)

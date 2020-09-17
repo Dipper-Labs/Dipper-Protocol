@@ -2,8 +2,9 @@ package types
 
 // query endpoints supported by the supply Querier
 const (
-	QueryTotalSupply = "total_supply"
-	QuerySupplyOf    = "supply_of"
+	QueryTotalSupply  = "total_supply"
+	QuerySupplyOf     = "supply_of"
+	QueryTotalVesting = "total_vestings"
 )
 
 // QueryTotalSupply defines the params for the following queries:

@@ -28,6 +28,11 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 		"/supply/total/{denom}",
 		supplyOfHandlerFn(cliCtx),
 	).Methods("GET")
+
+	r.HandleFunc(
+		"/supply/vesting",
+		totalVestingHandlerFn(cliCtx),
+	).Methods("GET")
 }
 
 // HTTP request handler to query the total supply of coins
@@ -79,6 +84,24 @@ func supplyOfHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		res, height, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QuerySupplyOf), bz)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		cliCtx = cliCtx.WithHeight(height)
+		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func totalVestingHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
+		if !ok {
+			return
+		}
+
+		res, height, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryTotalVesting), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
