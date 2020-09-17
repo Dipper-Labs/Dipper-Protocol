@@ -29,20 +29,20 @@ func TestNextInflation(t *testing.T) {
 		{sdk.OneDec(), sdk.NewDecWithPrec(5, 2),
 			sdk.OneDec().Sub(sdk.OneDec().Quo(params.GoalBonded)).Mul(params.InflationRateChange).Quo(blocksPerYear)},
 
-		// 50% bonded, starting at 2% inflation and being increased
-		{sdk.NewDecWithPrec(5, 1), sdk.NewDecWithPrec(2, 2),
+		// 50% bonded, starting at 4% inflation and being increased
+		{sdk.NewDecWithPrec(5, 1), sdk.NewDecWithPrec(4, 2),
 			sdk.OneDec().Sub(sdk.NewDecWithPrec(5, 1).Quo(params.GoalBonded)).Mul(params.InflationRateChange).Quo(blocksPerYear)},
 
-		// test 2% minimum stop (testing with 100% bonded)
-		{sdk.OneDec(), sdk.NewDecWithPrec(2, 2), sdk.ZeroDec()},
-		//{sdk.OneDec(), sdk.NewDecWithPrec(1000000001, 10), sdk.NewDecWithPrec(-5, 2)},
+		// test 4% minimum stop (testing with 100% bonded)
+		{sdk.OneDec(), sdk.NewDecWithPrec(4, 2), sdk.ZeroDec()},
+		{sdk.OneDec(), sdk.NewDecWithPrec(40000000001, 12), sdk.NewDecWithPrec(-1, 12)},
 
-		// test 5% maximum stop (testing with 0% bonded)
-		{sdk.ZeroDec(), sdk.NewDecWithPrec(5, 2), sdk.ZeroDec()},
-		//{sdk.ZeroDec(), sdk.NewDecWithPrec(1999999999, 10), sdk.NewDecWithPrec(1, 3)},
+		// test 10% maximum stop (testing with 0% bonded)
+		{sdk.ZeroDec(), sdk.NewDecWithPrec(1, 1), sdk.ZeroDec()},
+		{sdk.ZeroDec(), sdk.NewDecWithPrec(99999999999, 12), sdk.NewDecWithPrec(1, 12)},
 
 		// perfect balance shouldn't change inflation
-		{sdk.NewDecWithPrec(67, 2), sdk.NewDecWithPrec(3, 2), sdk.ZeroDec()},
+		{sdk.NewDecWithPrec(67, 2), sdk.NewDecWithPrec(5, 2), sdk.ZeroDec()},
 	}
 	for i, tc := range tests {
 		minter.Inflation = tc.setInflation

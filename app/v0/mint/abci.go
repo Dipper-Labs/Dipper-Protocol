@@ -8,7 +8,7 @@ import (
 
 func deleteFinishedVestings(ctx sdk.Context, k Keeper, vestings []supply.Vesting) {
 	for _, vesting := range vestings {
-		if ctx.BlockTime().Unix() > vesting.EndTime {
+		if ctx.BlockTime().Unix() >= vesting.EndTime {
 			k.RemoveVesting(ctx, vesting.Address)
 		}
 	}
