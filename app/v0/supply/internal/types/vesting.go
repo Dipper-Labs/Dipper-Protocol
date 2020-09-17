@@ -29,10 +29,13 @@ func CalculateVestingAmount(blockTime int64, vestings []Vesting) sdk.Coins {
 				}
 
 				amt = amt.Add(vestingCoins)
+			} else {
+				amt = amt.Add(vesting.Amount)
 			}
 		} else if vesting.StartTime == 0 {
 			amt = amt.Add(vesting.Amount)
 		}
 	}
+
 	return amt
 }
