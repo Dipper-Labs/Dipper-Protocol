@@ -27,6 +27,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 			GetCmdQueryParams(cdc),
 			GetCmdQueryInflation(cdc),
 			GetCmdQueryAnnualProvisions(cdc),
+			GetCmdQueryCurrentProvisions(cdc),
 		)...,
 	)
 
@@ -96,6 +97,31 @@ func GetCmdQueryAnnualProvisions(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryAnnualProvisions)
+			res, _, err := cliCtx.QueryWithData(route, nil)
+			if err != nil {
+				return err
+			}
+
+			var inflation sdk.Dec
+			if err := cdc.UnmarshalJSON(res, &inflation); err != nil {
+				return err
+			}
+
+			return cliCtx.PrintOutput(inflation)
+		},
+	}
+}
+
+// GetCmdQueryCurrentProvisions implements a command to return the current provisions.
+func GetCmdQueryCurrentProvisions(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "current-provisions",
+		Short: "Query the current provisions",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			route := fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryCurrentProvisions)
 			res, _, err := cliCtx.QueryWithData(route, nil)
 			if err != nil {
 				return err
