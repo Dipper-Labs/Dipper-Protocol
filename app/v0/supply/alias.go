@@ -46,4 +46,9 @@ type (
 	ModuleAccount = types.ModuleAccount
 	GenesisState  = types.GenesisState
 	Supply        = types.Supply
+	Vesting       = types.Vesting
+)
+
+var (
+	CalculateVestingAmount = types.CalculateVestingAmount
 )

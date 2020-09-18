@@ -22,6 +22,9 @@ func NewQuerier(k Keeper) sdk.Querier {
 		case types.QueryAnnualProvisions:
 			return queryAnnualProvisions(ctx, k)
 
+		case types.QueryCurrentProvisions:
+			return queryCurrentProvisions(ctx, k)
+
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
@@ -54,6 +57,17 @@ func queryAnnualProvisions(ctx sdk.Context, k Keeper) ([]byte, error) {
 	minter := k.GetMinter(ctx)
 
 	res, err := codec.MarshalJSONIndent(k.cdc, minter.AnnualProvisions)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
+
+func queryCurrentProvisions(ctx sdk.Context, k Keeper) ([]byte, error) {
+	minter := k.GetMinter(ctx)
+
+	res, err := codec.MarshalJSONIndent(k.cdc, minter.CurrentProvisions)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

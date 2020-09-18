@@ -71,7 +71,7 @@ func TestExport(t *testing.T) {
 	require.Equal(t, 1, len(vals))
 
 	// situation 2: with jail white list
-	jailWhiteList := []string{"dipvaloper1hhepxhdarkl7wsdj3c9vcp07ragrj7wqhz9arx"}
+	jailWhiteList := []string{"dipvaloper1cxrsu9v7g45mj6l2xuyvr0gyjc0fzm28da08jc"}
 	_, _, err = app.ExportAppStateAndValidators(true, jailWhiteList)
 	require.NoError(t, err)
 

@@ -17,15 +17,15 @@ type Supply struct {
 	Total sdk.Coins `json:"total" yaml:"total"` // total supply of tokens registered on the chain
 }
 
+// GetTotal returns the supply total.
+func (supply Supply) GetTotal() sdk.Coins {
+	return supply.Total
+}
+
 // SetTotal sets the total supply.
 func (supply Supply) SetTotal(total sdk.Coins) exported.SupplyI {
 	supply.Total = total
 	return supply
-}
-
-// GetTotal returns the supply total.
-func (supply Supply) GetTotal() sdk.Coins {
-	return supply.Total
 }
 
 // NewSupply creates a new Supply instance

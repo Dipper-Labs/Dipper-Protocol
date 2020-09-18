@@ -71,3 +71,69 @@ func (k Keeper) ValidatePermissions(macc exported.ModuleAccountI) error {
 	}
 	return nil
 }
+
+// for Vesting
+// GetVesting get vesting
+func (k Keeper) GetVesting(ctx sdk.Context, addr sdk.AccAddress) (exist bool, vesting types.Vesting) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(VestingStoreKey(addr))
+	if bz == nil {
+		return false, vesting
+	}
+
+	err := k.cdc.UnmarshalBinaryBare(bz, &vesting)
+	if err != nil {
+		panic(err)
+	}
+
+	return true, vesting
+}
+
+// SetAccount implements sdk.AccountKeeper.
+func (k Keeper) SetVesting(ctx sdk.Context, vesting types.Vesting) {
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.MarshalBinaryBare(vesting)
+	if err != nil {
+		panic(err)
+	}
+	store.Set(VestingStoreKey(vesting.Address), bz)
+}
+
+// GetAllVestings returns all vestings in the supplyKeeper.
+func (k Keeper) GetAllVestings(ctx sdk.Context) (vestings []types.Vesting) {
+	appendVesting := func(vesting types.Vesting) (stop bool) {
+		vestings = append(vestings, vesting)
+		return false
+	}
+	k.IterateVestings(ctx, appendVesting)
+	return
+}
+
+// RemoveAccount removes an account for the account mapper store.
+func (k Keeper) RemoveVesting(ctx sdk.Context, address sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	store.Delete(VestingStoreKey(address))
+}
+
+// IterateVestings
+func (k Keeper) IterateVestings(ctx sdk.Context, process func(types.Vesting) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, VestingStoreKeyPrefix)
+	defer iter.Close()
+	for {
+		if !iter.Valid() {
+			return
+		}
+		val := iter.Value()
+		var vesting types.Vesting
+		err := k.cdc.UnmarshalBinaryBare(val, &vesting)
+		if err != nil {
+			panic(err)
+		}
+
+		if process(vesting) {
+			return
+		}
+		iter.Next()
+	}
+}

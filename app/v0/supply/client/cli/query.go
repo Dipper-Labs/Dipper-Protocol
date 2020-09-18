@@ -26,6 +26,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 	supplyQueryCmd.AddCommand(client.GetCommands(
 		GetCmdQueryTotalSupply(cdc),
+		GetCmdQueryTotalVesting(cdc),
 	)...)
 
 	return supplyQueryCmd
@@ -101,4 +102,40 @@ func querySupplyOf(cliCtx context.CLIContext, cdc *codec.Codec, denom string) er
 	}
 
 	return cliCtx.PrintOutput(supply)
+}
+
+// GetCmdQueryTotalSupply implements the query total supply command.
+func GetCmdQueryTotalVesting(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "vesting [denom]",
+		Short: "Query the total supply of coins of the chain",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query total vesting of coins that are held by accounts in the chain.
+
+Example:
+$ %s query %s vesting
+`,
+				version.ClientName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			return queryTotalVesting(cliCtx, cdc)
+		},
+	}
+}
+
+func queryTotalVesting(cliCtx context.CLIContext, cdc *codec.Codec) error {
+	res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryTotalVesting), nil)
+	if err != nil {
+		return err
+	}
+
+	var totalVesting sdk.Coins
+	err = cdc.UnmarshalJSON(res, &totalVesting)
+	if err != nil {
+		return err
+	}
+
+	return cliCtx.PrintOutput(totalVesting)
 }
