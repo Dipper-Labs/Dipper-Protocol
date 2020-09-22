@@ -13,9 +13,12 @@ import (
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/protocol"
+	v0 "github.com/Dipper-Labs/Dipper-Protocol/app/v0"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/bank"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/distribution"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/params"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/slashing"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/staking"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/supply"
 	"github.com/Dipper-Labs/Dipper-Protocol/store"
@@ -30,12 +33,16 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	authSubspace := paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := paramsKeeper.Subspace(bank.DefaultParamspace)
 	stakingSubspace := paramsKeeper.Subspace(staking.DefaultParamspace)
+	slashingSubspace := paramsKeeper.Subspace(slashing.DefaultParamspace)
+	distributionSubspace := paramsKeeper.Subspace(distribution.DefaultParamspace)
 
 	// module account perms for supply keeper
 	var maccPerms = map[string][]string{
+		distribution.ModuleName:   nil,
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 	}
+
 	// keeper
 	accountKeeper := auth.NewAccountKeeper(cdc, protocol.Keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
 	bankKeeper := bank.NewBaseKeeper(accountKeeper, bankSubspace, nil)
@@ -46,11 +53,20 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 		protocol.TKeys[staking.TStoreKey],
 		supplyKeeper,
 		stakingSubspace)
+	slashingKeeper := slashing.NewKeeper(cdc, protocol.Keys[slashing.StoreKey], stakingKeeper, slashingSubspace)
+	distributionKeeper := distribution.NewKeeper(
+		cdc,
+		protocol.Keys[distribution.StoreKey],
+		distributionSubspace,
+		stakingKeeper,
+		supplyKeeper,
+		auth.FeeCollectorName,
+		v0.ModuleAccountAddrs())
 
 	// setup stakingKeeper hooks
-	//stakingKeeper.SetHooks(
-	//	staking.NewMultiStakingHooks(distrKeeper.Hooks(), slashingKeeper.Hooks()),
-	//)
+	stakingKeeper.SetHooks(
+		staking.NewMultiStakingHooks(distributionKeeper.Hooks(), slashingKeeper.Hooks()),
+	)
 
 	// new db
 	dataDir := filepath.Join("/tmp", "testdata")
@@ -67,6 +83,8 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	ms.MountStoreWithDB(protocol.Keys[auth.StoreKey], sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(protocol.Keys[supply.StoreKey], sdk.StoreTypeIAVL, nil)
 	ms.MountStoreWithDB(protocol.Keys[staking.StoreKey], sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(protocol.Keys[slashing.StoreKey], sdk.StoreTypeIAVL, nil)
+	ms.MountStoreWithDB(protocol.Keys[distribution.StoreKey], sdk.StoreTypeIAVL, nil)
 
 	// mount tstores
 	ms.MountStoreWithDB(protocol.TKeys[params.TStoreKey], sdk.StoreTypeTransient, nil)
@@ -123,6 +141,17 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	params.MaxEntries = uint16(b.N + 100)
 	params.MaxLever = sdk.NewDec(10000000)
 	stakingKeeper.SetParams(ctx, params)
+
+	// setup distribution current rewards
+	rewardsAmount := sdk.NewDecCoins(sdk.NewCoins(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(sdk.NativeTokenFraction*10))))
+	currentRewardsP0 := distribution.NewValidatorCurrentRewards(rewardsAmount, 0)
+	currentRewardsP1 := distribution.NewValidatorCurrentRewards(rewardsAmount, 1)
+	distributionKeeper.SetValidatorCurrentRewards(ctx, valAddr, currentRewardsP0)
+	distributionKeeper.SetValidatorCurrentRewards(ctx, valAddr, currentRewardsP1)
+	// setup distribution historical rewards
+	historicalRewards := distribution.NewValidatorHistoricalRewards(rewardsAmount, 1)
+	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 0, historicalRewards)
+	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 1, historicalRewards)
 
 	// reset timer
 	b.ResetTimer()
