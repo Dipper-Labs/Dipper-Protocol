@@ -20,6 +20,7 @@ type (
 	MsgContract   = types.MsgContract
 	CommitStateDB = types.CommitStateDB
 	Log           = types.Log
+	Params        = types.Params
 
 	GenesisState = types.GenesisState
 )
@@ -28,6 +29,9 @@ var (
 	// functions aliases
 	NewKeeper        = keeper.NewKeeper
 	NewCommitStateDB = types.NewCommitStateDB
+	NewMsgContract   = types.NewMsgContract
+	NewParams        = types.NewParams
+	DefaultParams    = types.DefaultParams
 
 	CreateAddress  = common.CreateAddress
 	CreateAddress2 = common.CreateAddress2
