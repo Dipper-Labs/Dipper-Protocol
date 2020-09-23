@@ -1,3 +1,6 @@
 package staking
 
-var HandleMsgDelegate = handleMsgDelegate
+var (
+	HandleMsgDelegate   = handleMsgDelegate
+	HandleMsgUndelegate = handleMsgUndelegate
+)

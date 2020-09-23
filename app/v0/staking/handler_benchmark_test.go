@@ -2,7 +2,6 @@ package staking_test
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -25,7 +24,17 @@ import (
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
-func Benchmark_handleMsgDelegate(b *testing.B) {
+const (
+	dbPath    = "/tmp/testdata"
+	varAddr   = "dipvaloper18dyhj6ncf5r9m5ecseeyv8xjmeyu3ug0pvrjjn"
+	varPubkey = "dipvalconspub1zcjduepqe88trqmzgwa044v0k0emax74nxewtcea87muae2g9qpw5smhlc3qqe8ck7"
+)
+
+var (
+	delegateAmount = sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(sdk.NativeTokenFraction*100))
+)
+
+func prepareTest(b *testing.B, dbPath string) (k staking.Keeper, addrs []sdk.AccAddress, ms store.CommitMultiStore, ctx sdk.Context, valAddr sdk.ValAddress) {
 	cdc := app.MakeLatestCodec()
 
 	// params
@@ -69,13 +78,12 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	)
 
 	// new db
-	dataDir := filepath.Join("/tmp", "testdata")
-	defer os.RemoveAll(dataDir)
-	db, err := sdk.NewLevelDB("application", dataDir)
+	os.RemoveAll(dbPath)
+	db, err := sdk.NewLevelDB("application", dbPath)
 	require.Nil(b, err)
 
 	// new store
-	ms := store.NewCommitMultiStore(db)
+	ms = store.NewCommitMultiStore(db)
 	ms.SetPruning(store.PruneSyncable)
 
 	// mount stores
@@ -95,14 +103,12 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 
 	// new context
 	logger := log.NewNopLogger()
-	//logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
-	ctx := sdk.NewContext(ms, abci.Header{}, false, nil).WithLogger(logger)
+	ctx = sdk.NewContext(ms, abci.Header{}, false, logger)
 
-	// init account banlance
+	// account init balance
 	coins := sdk.NewCoins(sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(sdk.NativeTokenFraction*1000)))
 
 	// generate accounts
-	var addrs []sdk.AccAddress
 	for i := 0; i < b.N; i++ {
 		privateKey := ed25519.GenPrivKey()
 		publicKey := privateKey.PubKey()
@@ -119,22 +125,14 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	}
 
 	// setup validators
-	valAddr, err := sdk.ValAddressFromBech32("dipvaloper18dyhj6ncf5r9m5ecseeyv8xjmeyu3ug0pvrjjn")
+	valAddr, err = sdk.ValAddressFromBech32(varAddr)
 	require.Nil(b, err)
-	valPubkey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, "dipvalconspub1zcjduepqe88trqmzgwa044v0k0emax74nxewtcea87muae2g9qpw5smhlc3qqe8ck7")
+	valPubkey, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeConsPub, varPubkey)
 	require.Nil(b, err)
 	valDesc := staking.NewDescription("mock_moniker", "mock_identity", "mock_website", "mock_details")
 	validator := staking.NewValidator(valAddr, valPubkey, valDesc)
 	stakingKeeper.SetValidator(ctx, validator)
 	stakingKeeper.AddValidatorTokensAndShares(ctx, validator, sdk.NewInt(sdk.NativeTokenFraction*1000000), true)
-
-	// setup delegate msgs
-	delegateAmount := sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(sdk.NativeTokenFraction*100))
-	var msgs []staking.MsgDelegate
-	for _, addr := range addrs {
-		msg := staking.NewMsgDelegate(addr, valAddr, delegateAmount)
-		msgs = append(msgs, msg)
-	}
 
 	// setup staking params
 	params := staking.DefaultParams()
@@ -148,17 +146,64 @@ func Benchmark_handleMsgDelegate(b *testing.B) {
 	currentRewardsP1 := distribution.NewValidatorCurrentRewards(rewardsAmount, 1)
 	distributionKeeper.SetValidatorCurrentRewards(ctx, valAddr, currentRewardsP0)
 	distributionKeeper.SetValidatorCurrentRewards(ctx, valAddr, currentRewardsP1)
+
 	// setup distribution historical rewards
 	historicalRewards := distribution.NewValidatorHistoricalRewards(rewardsAmount, 1)
 	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 0, historicalRewards)
 	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 1, historicalRewards)
+
+	return stakingKeeper, addrs, ms, ctx, valAddr
+}
+
+func Benchmark_handleMsgDelegate(b *testing.B) {
+	k, addrs, ms, ctx, valAddr := prepareTest(b, dbPath)
+
+	// setup delegate msgs
+	var msgs []staking.MsgDelegate
+	for _, addr := range addrs {
+		msg := staking.NewMsgDelegate(addr, valAddr, delegateAmount)
+		msgs = append(msgs, msg)
+	}
 
 	// reset timer
 	b.ResetTimer()
 
 	// benchmark test
 	for i := 0; i < b.N; i++ {
-		staking.HandleMsgDelegate(ctx, msgs[i], stakingKeeper)
+		staking.HandleMsgDelegate(ctx, msgs[i], k)
+	}
+
+	ms.Commit()
+}
+
+func Benchmark_handleMsgUnDelegate(b *testing.B) {
+	k, addrs, ms, ctx, valAddr := prepareTest(b, dbPath)
+
+	// do delegate
+	var delegateMsgs []staking.MsgDelegate
+	for _, addr := range addrs {
+		msg := staking.NewMsgDelegate(addr, valAddr, delegateAmount)
+		delegateMsgs = append(delegateMsgs, msg)
+	}
+
+	for i := 0; i < b.N; i++ {
+		staking.HandleMsgDelegate(ctx, delegateMsgs[i], k)
+	}
+
+	// do undelegate
+	var undelegateMsgs []staking.MsgUndelegate
+	for _, addr := range addrs {
+		msg := staking.NewMsgUndelegate(addr, valAddr, delegateAmount)
+		undelegateMsgs = append(undelegateMsgs, msg)
+	}
+
+	ms.Commit()
+	// reset timer
+	b.ResetTimer()
+
+	// benchmark test
+	for i := 0; i < b.N; i++ {
+		staking.HandleMsgUndelegate(ctx, undelegateMsgs[i], k)
 	}
 
 	ms.Commit()
