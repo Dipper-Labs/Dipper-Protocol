@@ -1,17 +1,20 @@
 package vm
 
 import (
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/client/cli"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/keeper"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
 )
 
 const (
-	ModuleName        = types.ModuleName
-	StoreKey          = types.StoreKey
-	RouterKey         = types.RouterKey
-	QuerierRoute      = types.QuerierRoute
-	DefaultParamspace = keeper.DefaultParamspace
+	ModuleName           = types.ModuleName
+	StoreKey             = types.StoreKey
+	RouterKey            = types.RouterKey
+	QuerierRoute         = types.QuerierRoute
+	DefaultParamspace    = keeper.DefaultParamspace
+	EventTypeNewContract = types.EventTypeNewContract
+	AttributeKeyAddress  = types.AttributeKeyAddress
 )
 
 type (
@@ -35,6 +38,8 @@ var (
 
 	CreateAddress  = common.CreateAddress
 	CreateAddress2 = common.CreateAddress2
+	GenPayload     = cli.GenPayload
+	CodeFromFile   = cli.CodeFromFile
 
 	ValidateGenesis = types.ValidateGenesis
 

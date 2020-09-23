@@ -1,7 +1,6 @@
 package vm
 
 import (
-	"fmt"
 	"math/big"
 	"time"
 
@@ -25,7 +24,6 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 	if contract.CodeAddr != nil {
 		precompiles := PrecompiledContracts
 		if p := precompiles[contract.CodeAddr.String()]; p != nil {
-			fmt.Println("RunPrecompiledContract ...")
 			return RunPrecompiledContract(p, input, contract)
 		}
 	}

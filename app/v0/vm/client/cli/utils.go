@@ -67,8 +67,6 @@ func AbiFromFile(abiFile string) (abiObj abi.ABI, err error) {
 }
 
 func GenPayload(abiFile, method string, args []string) (payload []byte, m abi.Method, err error) {
-	//fmt.Fprintf(os.Stderr, fmt.Sprintf("abiFile = %s, method = %s, args = %v, len=%d\n", abiFile, method, args, len(args)))
-
 	emptyMethod := abi.Method{}
 	abiObj, err := AbiFromFile(abiFile)
 	if err != nil {
