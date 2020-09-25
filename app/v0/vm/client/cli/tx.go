@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/hex"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -114,9 +113,6 @@ func ContractCallCmd(cdc *codec.Codec) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			dump := make([]byte, len(payload)*2)
-			hex.Encode(dump, payload)
 
 			contractAddr, err := sdk.AccAddressFromBech32(viper.GetString(flagContractAddr))
 			if err != nil {

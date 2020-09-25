@@ -53,7 +53,7 @@ func (app *DIPApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Re
 }
 
 // InitChainer - custom logic for initialization
-func (app *DIPApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *DIPApp) InitChainer(_ sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	return app.InitChain(req)
 }
 
