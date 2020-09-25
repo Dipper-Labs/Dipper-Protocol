@@ -152,6 +152,12 @@ func prepareTest(b *testing.B, dbPath string) (k staking.Keeper, addrs []sdk.Acc
 	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 0, historicalRewards)
 	distributionKeeper.SetValidatorHistoricalRewards(ctx, valAddr, 1, historicalRewards)
 
+	//setup distribution outstanding rewards
+	distributionKeeper.SetValidatorOutstandingRewards(ctx, valAddr, sdk.DecCoins{})
+
+	// setup distribution FeePool
+	distributionKeeper.SetFeePool(ctx, distribution.FeePool{})
+
 	return stakingKeeper, addrs, ms, ctx, valAddr
 }
 
