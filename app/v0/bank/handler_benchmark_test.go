@@ -79,6 +79,7 @@ func Benchmark_handleMsgSend(b *testing.B) {
 		msgs = append(msgs, msgSend)
 	}
 
+	ms.Commit()
 	// reset benchmark timer
 	b.ResetTimer()
 
