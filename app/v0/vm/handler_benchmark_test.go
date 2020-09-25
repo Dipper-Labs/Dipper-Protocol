@@ -128,7 +128,6 @@ func createContracts(b *testing.B, k vm.Keeper, addrs []sdk.AccAddress, ctx sdk.
 						require.Nil(b, err)
 						contractAddrs = append(contractAddrs, contractAddr)
 					}
-
 				}
 			}
 		}
@@ -137,7 +136,7 @@ func createContracts(b *testing.B, k vm.Keeper, addrs []sdk.AccAddress, ctx sdk.
 	return
 }
 
-func mockMemData(baseStr string, length int) string {
+func mockSomeString(baseStr string, length int) string {
 	str := baseStr
 	for len(str) < length {
 		str += baseStr
@@ -149,7 +148,7 @@ func generateContractCallMsgs(b *testing.B, addrs []sdk.AccAddress, contractAddr
 	amount := sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(int64(bond)))
 
 	for i := 0; i < b.N; i++ {
-		data := mockMemData(contractAddrs[i].String(), dataSize)
+		data := mockSomeString(contractAddrs[i].String(), dataSize)
 		argList := []string{contractAddrs[i].String(), data}
 		payload, _, err := vm.GenPayload(contractAbiPath, method, argList)
 		require.Nil(b, err)
@@ -165,7 +164,7 @@ func generateContractCallMsgsRepeatHash(b *testing.B, addrs []sdk.AccAddress, co
 	amount := sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(0))
 
 	for i := 0; i < b.N; i++ {
-		data := mockMemData(contractAddrs[i].String(), dataSize)
+		data := mockSomeString(contractAddrs[i].String(), dataSize)
 		argList := []string{data, fmt.Sprintf("%d", repeatHash)}
 		payload, _, err := vm.GenPayload(contractAbiPath, method, argList)
 		require.Nil(b, err)
@@ -270,7 +269,7 @@ func benchmarkContractCallFuncFactoryRepeatHash(method string, dataSize, repeat 
 	}
 }
 
-func Benchmark_handleMsgContract_Call(b *testing.B) {
+func Benchmark_handleMsgContract_Call_Memory(b *testing.B) {
 	tests := []struct {
 		dataSize int
 		bond     int
@@ -294,7 +293,7 @@ func Benchmark_handleMsgContract_Call(b *testing.B) {
 	}
 }
 
-func Benchmark_handleMsgContract_Call2(b *testing.B) {
+func Benchmark_handleMsgContract_Call_Hashing(b *testing.B) {
 	tests := []struct {
 		dataSize int
 		repeat   int
