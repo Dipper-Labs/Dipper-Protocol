@@ -54,7 +54,7 @@ dipcli query account  $(dipcli keys show alice -a)
 # Smart contract property 
 ## 2.1 deploy contract
 ```
-dipcli vm create --code_file=./contract/demo/demo.bc --from $(dipcli keys show -a alice) --amount=0pdip --gas=1000000
+dipcli vm create --code_file=./contract/demo/demo.bc --abi_file=./contract/demo/demo.abi --from $(dipcli keys show -a alice) --args '' --amount=0pdip --gas=1000000
 ```
 ## 2.2 query txhash
 ```
@@ -66,7 +66,7 @@ dipcli query vm code <contract address>
 ```
 ## 2.4 call contract method <transfer>
 ```
-dipcli vm call --from $(dipcli keys show -a alice) --contract_addr dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms --method transfer --args "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002" --amount 1000000pdip --abi_file ./contract/demo/demo.abi
+dipcli vm call --from $(dipcli keys show -a alice) --contract_addr=dip1jd8jqhnruunhrxh75da02dm7fr29cdkqtq8wmq --abi_file ./contract/demo/demo.abi --method=transfer --args 'dip1dcu73lw9uqkygpde4z4z22f079skta49vxs2r0 10'  --amount 0pdip --gas 2000000
 ```
 ## 2.5 call contract method, such as balanceOf
 ```
@@ -74,7 +74,6 @@ dipcli query account dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms
 ```
 ## 2.6 call contract method, such as query alice money
 ```
-dipcli keys parse $(dipcli keys show -a alice)
-dipcli query vm call $(dipcli keys show -a alice) dip1gtp5xtfnuqpw3dgaxqdk3n8m6d9t4uvwwqt6ms balanceOf "000000000000000000000000DB8822D044FE1C13AA32AF72F27A113E849FC27E" 0pdip ./contract/demo/demo.abi
+dipcli query vm call $(dipcli keys show -a alice) dip1gcwk24al08lul80aejyq409mjgtqfu9uhgwtw4 balanceOf ./contract/demo/demo.abi --args "dip16g54d2akrlln48j5p7gcv4nucfzdn2zsxe54j4" --amount 0pdip
 ```
 
