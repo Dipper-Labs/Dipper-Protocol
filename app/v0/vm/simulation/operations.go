@@ -44,7 +44,7 @@ func SimulateMsgContractCreate(ak types.AccountKeeper, k keeper.Keeper) simtypes
 
 		a := baseapp.DereferenceBaseApp(app)
 		if a == nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCreate, "app invalid"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "app invalid"), nil, nil
 		}
 
 		acc, _ := simtypes.RandomAcc(r, accs)
@@ -52,19 +52,19 @@ func SimulateMsgContractCreate(ak types.AccountKeeper, k keeper.Keeper) simtypes
 
 		code, err := hex.DecodeString(codeStr)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCreate, "wrong contract code"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "wrong contract code"), nil, err
 		}
 
 		abiObj, err := abi.JSON(strings.NewReader(abiStr))
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCreate, "wrong contract abi"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "wrong contract abi"), nil, err
 		}
 
 		args := []interface{}{big.NewInt(10)}
 
 		payload, err := abiObj.Constructor.Inputs.PackValues(args)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCreate, "gen payload failed"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "gen payload failed"), nil, err
 		}
 
 		code = append(code, payload...)
@@ -98,7 +98,7 @@ func SimulateMsgContractCall(ak types.AccountKeeper, k keeper.Keeper) simtypes.O
 
 		a := baseapp.DereferenceBaseApp(app)
 		if a == nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCall, "app invalid"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "app invalid"), nil, nil
 		}
 
 		acc, _ := simtypes.RandomAcc(r, accs)
@@ -106,12 +106,12 @@ func SimulateMsgContractCall(ak types.AccountKeeper, k keeper.Keeper) simtypes.O
 
 		abiObj, err := abi.JSON(strings.NewReader(abiStr))
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCall, "wrong contract abi"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "wrong contract abi"), nil, err
 		}
 
 		m, ok := abiObj.Methods["doTransfer"]
 		if !ok {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCall, "method not exist in abi"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "method not exist in abi"), nil, err
 		}
 
 		var Address [20]byte
@@ -121,13 +121,13 @@ func SimulateMsgContractCall(ak types.AccountKeeper, k keeper.Keeper) simtypes.O
 		payload := m.ID
 		argsBin, err := m.Inputs.PackValues(args)
 		if err != nil {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCall, "gen payload failed"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "gen payload failed"), nil, err
 		}
 		payload = append(payload, argsBin...)
 
 		contractAddrs := k.GetAllHostContractAddresses(ctx)
 		if len(contractAddrs) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContractCall, "no contract"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgContract, "no contract"), nil, nil
 		}
 
 		contractIndex := r.Intn(len(contractAddrs))
