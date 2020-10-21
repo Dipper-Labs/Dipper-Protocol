@@ -121,7 +121,7 @@ func createContracts(b *testing.B, k vm.Keeper, addrs []sdk.AccAddress, ctx sdk.
 		require.Nil(b, err)
 
 		for _, event := range r.Events {
-			if event.Type == vm.EventTypeNewContract {
+			if event.Type == vm.EventTypeContractCreated {
 				for _, attr := range event.Attributes {
 					if string(attr.GetKey()) == vm.AttributeKeyAddress {
 						contractAddr, err := sdk.AccAddressFromBech32(string(attr.GetValue()))

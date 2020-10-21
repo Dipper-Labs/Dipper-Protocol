@@ -1,7 +1,8 @@
 package types
 
 const (
-	EventTypeNewContract = "new_contract"
+	EventTypeContractCreated = "contract_created"
+	EventTypeContractCalled  = "contract_called"
 
 	AttributeKeyAddress    = "address"
 	AttributeValueCategory = "vm"

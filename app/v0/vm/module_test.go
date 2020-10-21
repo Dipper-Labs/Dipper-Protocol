@@ -42,7 +42,7 @@ func (st *VMTestSuite) reset() {
 // nolint
 func getContractAddr(events sdk.Events) (addr sdk.AccAddress, err error) {
 	for _, e := range events {
-		if e.Type == types.EventTypeNewContract {
+		if e.Type == types.EventTypeContractCreated {
 			for _, attr := range e.Attributes {
 				if string(attr.Key) == types.AttributeKeyAddress {
 					addr, err = sdk.AccAddressFromBech32(string(attr.Value))

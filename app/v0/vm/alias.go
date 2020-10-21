@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	ModuleName           = types.ModuleName
-	StoreKey             = types.StoreKey
-	RouterKey            = types.RouterKey
-	QuerierRoute         = types.QuerierRoute
-	DefaultParamspace    = keeper.DefaultParamspace
-	EventTypeNewContract = types.EventTypeNewContract
-	AttributeKeyAddress  = types.AttributeKeyAddress
+	ModuleName               = types.ModuleName
+	StoreKey                 = types.StoreKey
+	RouterKey                = types.RouterKey
+	QuerierRoute             = types.QuerierRoute
+	DefaultParamspace        = keeper.DefaultParamspace
+	EventTypeContractCreated = types.EventTypeContractCreated
+	AttributeKeyAddress      = types.AttributeKeyAddress
 )
 
 type (

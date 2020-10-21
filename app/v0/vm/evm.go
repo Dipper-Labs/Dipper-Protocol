@@ -222,11 +222,11 @@ func (evm *EVM) Call(caller ContractRef, addr sdk.AccAddress, input []byte, gas 
 	if evm.depth > evm.vmConfig.MaxCallCreateDepth {
 		return nil, gas, ErrDepth
 	}
+
 	if !evm.Context.CanTransfer(caller.Address(), value) {
 		return nil, gas, ErrInsufficientBalance
 	}
 
-	// increase contract account nonce
 	callerCodeHash := evm.StateDB.GetCodeHash(caller.Address())
 	if callerCodeHash != (sdk.Hash{}) {
 		nonce := evm.StateDB.GetNonce(caller.Address())
@@ -237,19 +237,23 @@ func (evm *EVM) Call(caller ContractRef, addr sdk.AccAddress, input []byte, gas 
 		to       = AccountRef(addr)
 		snapshot = evm.StateDB.Snapshot()
 	)
+
 	if !evm.StateDB.Exist(addr) {
 		precompiles := PrecompiledContracts
 
 		if precompiles[addr.String()] == nil && value.Sign() == 0 {
-			// Calling a non existing account, don't do anything, but ping the tracer
+
 			if evm.vmConfig.Debug && evm.depth == 0 {
 				evm.vmConfig.Tracer.CaptureStart(caller.Address(), addr, false, input, gas, value)
 				evm.vmConfig.Tracer.CaptureEnd(ret, 0, 0, nil)
 			}
+
 			return nil, gas, nil
 		}
+
 		evm.StateDB.CreateAccount(addr)
 	}
+
 	evm.Transfer(caller.Address(), to.Address(), value)
 
 	contract := NewContract(caller, to, value, gas)
@@ -263,6 +267,7 @@ func (evm *EVM) Call(caller ContractRef, addr sdk.AccAddress, input []byte, gas 
 			evm.vmConfig.Tracer.CaptureEnd(ret, gas-contract.Gas, time.Since(start), err)
 		}()
 	}
+
 	ret, err = run(evm, contract, input, false)
 
 	if err != nil {
@@ -271,6 +276,11 @@ func (evm *EVM) Call(caller ContractRef, addr sdk.AccAddress, input []byte, gas 
 			contract.UseGas(contract.Gas)
 		}
 	}
+
+	if err == nil {
+		evm.StateDB.ContractCalledEvent(addr)
+	}
+
 	return ret, contract.Gas, err
 }
 
@@ -279,16 +289,14 @@ func (evm *EVM) CallCode(caller ContractRef, addr sdk.AccAddress, input []byte, 
 		return nil, gas, nil
 	}
 
-	// Fail if we're trying to execute above the call depth limit
 	if evm.depth > evm.vmConfig.MaxCallCreateDepth {
 		return nil, gas, ErrDepth
 	}
-	// Fail if we're trying to transfer more than the available balance
+
 	if !evm.CanTransfer(caller.Address(), value) {
 		return nil, gas, ErrInsufficientBalance
 	}
 
-	// increase contract account nonce
 	callerCodeHash := evm.StateDB.GetCodeHash(caller.Address())
 	if callerCodeHash != (sdk.Hash{}) {
 		nonce := evm.StateDB.GetNonce(caller.Address())
@@ -296,9 +304,10 @@ func (evm *EVM) CallCode(caller ContractRef, addr sdk.AccAddress, input []byte, 
 	}
 
 	var (
-		snapshot = evm.StateDB.Snapshot()
 		to       = AccountRef(caller.Address())
+		snapshot = evm.StateDB.Snapshot()
 	)
+
 	// Initialise a new contract and set the code that is to be used by the EVM.
 	// The contract is a scoped environment for this execution context only.
 	contract := NewContract(caller, to, value, gas)
@@ -311,6 +320,11 @@ func (evm *EVM) CallCode(caller ContractRef, addr sdk.AccAddress, input []byte, 
 			contract.UseGas(contract.Gas)
 		}
 	}
+
+	if err == nil {
+		evm.StateDB.ContractCalledEvent(to.Address())
+	}
+
 	return ret, contract.Gas, err
 }
 
@@ -318,12 +332,11 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr sdk.AccAddress, input []by
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
-	// check create/call depth limit
+
 	if evm.depth > evm.vmConfig.MaxCallCreateDepth {
 		return nil, gas, ErrDepth
 	}
 
-	// increase contract account nonce
 	callerCodeHash := evm.StateDB.GetCodeHash(caller.Address())
 	if callerCodeHash != (sdk.Hash{}) {
 		nonce := evm.StateDB.GetNonce(caller.Address())
@@ -331,8 +344,8 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr sdk.AccAddress, input []by
 	}
 
 	var (
-		snapshot = evm.StateDB.Snapshot()
 		to       = AccountRef(caller.Address())
+		snapshot = evm.StateDB.Snapshot()
 	)
 
 	contract := NewContract(caller, to, nil, gas).AsDelegate()
@@ -346,6 +359,10 @@ func (evm *EVM) DelegateCall(caller ContractRef, addr sdk.AccAddress, input []by
 		}
 	}
 
+	if err == nil {
+		evm.StateDB.ContractCalledEvent(to.Address())
+	}
+
 	return ret, contract.Gas, err
 }
 
@@ -353,12 +370,11 @@ func (evm *EVM) StaticCall(caller ContractRef, addr sdk.AccAddress, input []byte
 	if evm.vmConfig.NoRecursion && evm.depth > 0 {
 		return nil, gas, nil
 	}
-	// Fail if we're trying to execute above the call depth limit
+
 	if evm.depth > evm.vmConfig.MaxCallCreateDepth {
 		return nil, gas, ErrDepth
 	}
 
-	// increase contract account nonce
 	callerCodeHash := evm.StateDB.GetCodeHash(caller.Address())
 	if callerCodeHash != (sdk.Hash{}) {
 		nonce := evm.StateDB.GetNonce(caller.Address())
@@ -390,5 +406,6 @@ func (evm *EVM) StaticCall(caller ContractRef, addr sdk.AccAddress, input []byte
 			contract.UseGas(contract.Gas)
 		}
 	}
+
 	return ret, contract.Gas, err
 }

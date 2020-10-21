@@ -110,7 +110,18 @@ func (csdb *CommitStateDB) WithContext(ctx sdk.Context) *CommitStateDB {
 func (csdb *CommitStateDB) ContractCreatedEvent(addr sdk.AccAddress) {
 	csdb.ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			EventTypeNewContract,
+			EventTypeContractCreated,
+			sdk.NewAttribute(AttributeKeyAddress, addr.String()),
+		),
+	})
+}
+
+// ContractCalledEvent emit event of contract called
+// nolint
+func (csdb *CommitStateDB) ContractCalledEvent(addr sdk.AccAddress) {
+	csdb.ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			EventTypeContractCalled,
 			sdk.NewAttribute(AttributeKeyAddress, addr.String()),
 		),
 	})
