@@ -51,9 +51,12 @@ func (st StateTransition) TransitionCSDB(ctx sdk.Context, k Keeper) (*big.Int, *
 		BlockNumber: sdk.NewInt(ctx.BlockHeader().Height).BigInt(),
 	}
 
-	gasLimitForVM := uint64(DefaultVMGasLimit)
+	gasLimitForVM := ctx.BlockGasMeter().Limit()
 	if !ctx.Simulate {
-		gasLimitForVM = ctx.GasMeter().Limit() - ctx.GasMeter().GasConsumed()
+		gasLimitForVM = ctx.GasMeter().Limit() - ctx.GasMeter().GasConsumed() - GasReservedForOutOfVm
+		if gasLimitForVM >= ctx.GasMeter().Limit() {
+			return nil, &sdk.Result{Data: nil, GasUsed: ctx.GasMeter().GasConsumed()}, sdk.ErrOutOfGas("")
+		}
 	}
 	evmCtx.GasLimit = gasLimitForVM
 
@@ -97,6 +100,7 @@ func (st StateTransition) TransitionCSDB(ctx sdk.Context, k Keeper) (*big.Int, *
 
 	if vmerr != nil {
 		ctx.EventManager().Clear()
+		ctx.WithGasMeter(curGasMeter).GasMeter().ConsumeGas(vmGasUsed, "VM execution consumption")
 		return nil, &sdk.Result{Data: ret, GasUsed: curGasMeter.GasConsumed() + vmGasUsed}, vmerr
 	}
 

@@ -18,7 +18,7 @@ const (
 	// and the actual run.
 	DefaultGasAdjustment = 1.0
 	DefaultGasLimit      = 200000
-	DefaultGasPrices     = "1000.0pdip"
+	DefaultGasPrices     = "6000000.0pdip"
 	GasFlagAuto          = "auto"
 
 	// BroadcastBlock defines a tx broadcasting mode where the client waits for
