@@ -9,7 +9,7 @@ import (
 
 const (
 	defaultMaxCodeSize     = 1024 * 1024
-	defaultCallCreateDepth = 16
+	defaultCallCreateDepth = 1024
 
 	defaultContractCreationGas = 53000
 	defaultGasPerByte          = 200
