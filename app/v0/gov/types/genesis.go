@@ -35,10 +35,10 @@ func DefaultGenesisState() GenesisState {
 		StartingProposalID: 1,
 		DepositParams: DepositParams{
 			MinDeposit:       sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, minDepositTokens)},
-			MaxDepositPeriod: DefaultPeriod,
+			MaxDepositPeriod: DefaultDepositPeriod,
 		},
 		VotingParams: VotingParams{
-			VotingPeriod: DefaultPeriod,
+			VotingPeriod: DefaultVotingPeriod,
 		},
 		TallyParams: TallyParams{
 			Quorum:    sdk.NewDecWithPrec(334, 3),

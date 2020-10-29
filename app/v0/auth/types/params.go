@@ -15,9 +15,9 @@ const DefaultParamspace = ModuleName
 
 // Default parameter values
 const (
-	DefaultGasPriceThreshold      uint64 = 1000
+	DefaultGasPriceThreshold      uint64 = 6000000
 	DefaultMaxMemoCharacters      uint64 = 256
-	DefaultTxSigLimit             uint64 = 7
+	DefaultTxSigLimit             uint64 = 10
 	DefaultTxSizeCostPerByte      uint64 = 10
 	DefaultSigVerifyCostED25519   uint64 = 590
 	DefaultSigVerifyCostSecp256k1 uint64 = 1000

@@ -13,12 +13,13 @@ import (
 
 // Default period for deposits & voting
 const (
-	DefaultPeriod time.Duration = time.Hour * 24 * 2 // 2 days
+	DefaultDepositPeriod = time.Hour * 24     // 1 days
+	DefaultVotingPeriod  = time.Hour * 24 * 5 // 5 days
 )
 
 // Default governance params
 var (
-	DefaultMinDepositTokens = sdk.TokensFromConsensusPower(10)
+	DefaultMinDepositTokens = sdk.TokensFromConsensusPower(2000)
 	DefaultQuorum           = sdk.NewDecWithPrec(334, 3)
 	DefaultThreshold        = sdk.NewDecWithPrec(5, 1)
 	DefaultVeto             = sdk.NewDecWithPrec(334, 3)
@@ -58,7 +59,7 @@ func NewDepositParams(minDeposit sdk.Coins, maxDepositPeriod time.Duration) Depo
 func DefaultDepositParams() DepositParams {
 	return NewDepositParams(
 		sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, DefaultMinDepositTokens)),
-		DefaultPeriod,
+		DefaultDepositPeriod,
 	)
 }
 
@@ -159,7 +160,7 @@ func NewVotingParams(votingPeriod time.Duration) VotingParams {
 
 // DefaultVotingParams default parameters for voting
 func DefaultVotingParams() VotingParams {
-	return NewVotingParams(DefaultPeriod)
+	return NewVotingParams(DefaultVotingPeriod)
 }
 
 func (vp VotingParams) String() string {
