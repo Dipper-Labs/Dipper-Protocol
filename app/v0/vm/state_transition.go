@@ -11,6 +11,10 @@ import (
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 
+const (
+	DefaultBlockGasLimit = sdk.Gas(100000000)
+)
+
 // StateTransition defines data to transitionDB in vm
 type StateTransition struct {
 	Sender    sdk.AccAddress
@@ -51,7 +55,11 @@ func (st StateTransition) TransitionCSDB(ctx sdk.Context, k Keeper) (*big.Int, *
 		BlockNumber: sdk.NewInt(ctx.BlockHeader().Height).BigInt(),
 	}
 
-	gasLimitForVM := ctx.BlockGasMeter().Limit()
+	gasLimitForVM := DefaultBlockGasLimit
+	if ctx.BlockGasMeter() != nil {
+		gasLimitForVM = ctx.BlockGasMeter().Limit()
+	}
+
 	if !ctx.Simulate {
 		gasLimitForVM = ctx.GasMeter().Limit() - ctx.GasMeter().GasConsumed() - GasReservedForOutOfVm
 		if gasLimitForVM >= ctx.GasMeter().Limit() {
