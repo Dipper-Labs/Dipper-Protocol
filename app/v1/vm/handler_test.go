@@ -11,9 +11,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
-	keep "github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/keeper"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
+	keep "github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/keeper"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 

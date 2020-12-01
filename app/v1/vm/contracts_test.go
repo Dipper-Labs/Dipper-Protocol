@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
 )
 
 // precompiledTest defines the input/output pairs for precompiled contract tests.

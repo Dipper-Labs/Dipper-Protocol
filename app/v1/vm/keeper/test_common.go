@@ -27,7 +27,7 @@ import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/slashing"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/staking"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/supply"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	"github.com/Dipper-Labs/Dipper-Protocol/store"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"

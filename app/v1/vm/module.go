@@ -11,10 +11,10 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/client/cli"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/client/rest"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/simulation"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/client/cli"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/client/rest"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/simulation"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"

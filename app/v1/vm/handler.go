@@ -1,7 +1,7 @@
 package vm
 
 import (
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	sdkerrors "github.com/Dipper-Labs/Dipper-Protocol/types/errors"
 )
@@ -18,6 +18,10 @@ func NewHandler(k Keeper) sdk.Handler {
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
 		}
 	}
+}
+
+func HandleMsgContract(ctx sdk.Context, msg MsgContract, k *Keeper) (*sdk.Result, error) {
+	return handleMsgContract(ctx, msg, *k)
 }
 
 func handleMsgContract(ctx sdk.Context, msg MsgContract, k Keeper) (*sdk.Result, error) {

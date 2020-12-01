@@ -14,7 +14,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common/math"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common/math"
 	"github.com/Dipper-Labs/Dipper-Protocol/hexutil"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )

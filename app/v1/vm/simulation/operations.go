@@ -10,8 +10,8 @@ import (
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app/simapp/helpers"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/simulation"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/keeper"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/keeper"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/baseapp"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"

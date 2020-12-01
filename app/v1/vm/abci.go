@@ -1,7 +1,7 @@
 package vm
 
 import (
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/keeper"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/keeper"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"

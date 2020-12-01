@@ -13,7 +13,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/client"
 	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"

@@ -3,8 +3,8 @@ package vm
 import (
 	"math/big"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common/math"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common/math"
 )
 
 // calcMemSize64 calculates the required memory size, and returns

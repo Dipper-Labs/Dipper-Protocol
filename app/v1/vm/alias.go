@@ -1,10 +1,10 @@
 package vm
 
 import (
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/client/cli"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/keeper"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/client/cli"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/keeper"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 )
 
 const (

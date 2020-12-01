@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto/blake2b"
 	"github.com/ethereum/go-ethereum/crypto/bn256"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common/math"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common/math"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 

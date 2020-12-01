@@ -11,7 +11,7 @@ import (
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/types"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common/math"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common/math"
 	"github.com/Dipper-Labs/Dipper-Protocol/hexutil"
 	"github.com/Dipper-Labs/Dipper-Protocol/store/prefix"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"

@@ -9,7 +9,7 @@ import (
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/client/utils"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/client"
 	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"

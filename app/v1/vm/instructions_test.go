@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/types/time"
 
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/common"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/common"
 )
 
 const (

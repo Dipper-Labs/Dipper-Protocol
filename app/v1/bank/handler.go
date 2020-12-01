@@ -3,6 +3,7 @@ package bank
 import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/bank/internal/keeper"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/bank/internal/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	sdkerrors "github.com/Dipper-Labs/Dipper-Protocol/types/errors"
 )
@@ -33,6 +34,14 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) (*sdk.Re
 
 	if k.BlacklistedAddr(msg.ToAddress) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.ToAddress)
+	}
+
+	if k.IsContractAccount(ctx, msg.ToAddress) {
+		var contractMsg vm.MsgContract
+		contractMsg.From = msg.FromAddress
+		contractMsg.To = msg.ToAddress
+		contractMsg.Amount = sdk.Coin{Denom: sdk.NativeTokenName, Amount: msg.Amount.AmountOf(sdk.NativeTokenName)}
+		vm.HandleMsgContract(ctx, contractMsg, k.GetVMKeeper())
 	}
 
 	err := k.SendCoins(ctx, msg.FromAddress, msg.ToAddress, msg.Amount)

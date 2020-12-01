@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/params"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 )
 

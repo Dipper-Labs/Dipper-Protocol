@@ -9,6 +9,7 @@ import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/exported"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/params"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/bank/internal/types"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	sdkerrors "github.com/Dipper-Labs/Dipper-Protocol/types/errors"
 )
@@ -22,6 +23,9 @@ type Keeper interface {
 
 	DelegateCoins(ctx sdk.Context, delegatorAddr, moduleAccAddr sdk.AccAddress, amt sdk.Coins) error
 	UndelegateCoins(ctx sdk.Context, moduleAccAddr, delegatorAddr sdk.AccAddress, amt sdk.Coins) error
+
+	IsContractAccount(ctx sdk.Context, addr sdk.AccAddress) bool
+	GetVMKeeper() *vm.Keeper
 }
 
 // BaseKeeper manages transfers between accounts. It implements the Keeper interface.
@@ -43,6 +47,15 @@ func NewBaseKeeper(ak types.AccountKeeper,
 		ak:             ak,
 		paramSpace:     ps,
 	}
+}
+
+func (keeper BaseKeeper) IsContractAccount(ctx sdk.Context, addr sdk.AccAddress) bool {
+	account := keeper.ak.GetAccount(ctx, addr)
+	return len(account.GetCodeHash()) > 0
+}
+
+func (keeper BaseKeeper) GetVMKeeper() *vm.Keeper {
+	return keeper.vmKeeper
 }
 
 // DelegateCoins performs delegation by deducting amt coins from an account with
@@ -157,6 +170,7 @@ var _ SendKeeper = (*BaseSendKeeper)(nil)
 type BaseSendKeeper struct {
 	BaseViewKeeper
 
+	vmKeeper   *vm.Keeper
 	ak         types.AccountKeeper
 	paramSpace params.Subspace
 
@@ -174,6 +188,15 @@ func NewBaseSendKeeper(ak types.AccountKeeper,
 		paramSpace:       paramSpace,
 		blacklistedAddrs: blacklistedAddrs,
 	}
+}
+
+func (keeper *BaseSendKeeper) WithVMKeeper(vmKeeper *vm.Keeper) BaseSendKeeper {
+	keeper.vmKeeper = vmKeeper
+	return *keeper
+}
+
+func (keeper *BaseSendKeeper) SetVMKeeper(vmKeeper *vm.Keeper) {
+	keeper.vmKeeper = vmKeeper
 }
 
 // InputOutputCoins handles a list of inputs and outputs
