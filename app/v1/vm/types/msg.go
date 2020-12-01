@@ -44,9 +44,6 @@ func (msg MsgContract) ValidateBasic() error {
 	if msg.Amount.Denom != sdk.NativeTokenName {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "denom must be %s", sdk.NativeTokenName)
 	}
-	if len(msg.Payload) == 0 {
-		return ErrNoPayload
-	}
 
 	return nil
 }
