@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -23,6 +24,7 @@ func VMCmd(cdc *codec.Codec) *cobra.Command {
 	txCmd.AddCommand(
 		ContractCreateCmd(cdc),
 		ContractCallCmd(cdc),
+		ContractFallbackCmd(cdc),
 	)
 	return txCmd
 }
@@ -137,6 +139,56 @@ func ContractCallCmd(cdc *codec.Codec) *cobra.Command {
 	cmd.MarkFlagRequired(flagContractAddr)
 	cmd.MarkFlagRequired(flagMethod)
 	cmd.MarkFlagRequired(flagAbiFile)
+
+	cmd = client.PostCommands(cmd)[0]
+
+	return cmd
+}
+
+func ContractFallbackCmd(cdc *codec.Codec) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "fallback",
+		Short:   "Create and sign a fallback contract tx",
+		Example: `dipcli vm fallback --from=<user key name> --contract_addr=<contract_addr> --amount=<amount>`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			coin := sdk.NewCoin(sdk.NativeTokenName, sdk.NewInt(0))
+			amount := viper.GetString(flagAmount)
+			if len(amount) == 0 {
+				return errors.New("invalid amount")
+			}
+
+			coinInput, err := sdk.ParseCoin(amount)
+			if err != nil {
+				return errors.New(fmt.Sprintf("invalid amount, err:%s", err.Error()))
+			}
+
+			//if coin.Denom != sdk.NativeTokenName {
+			//	return errors.New("must use pdip")
+			//}
+			coin = coinInput
+
+			contractAddr, err := sdk.AccAddressFromBech32(viper.GetString(flagContractAddr))
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgContract(cliCtx.GetFromAddress(), contractAddr, make([]byte, 1), coin)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+
+	cmd.Flags().String(flagContractAddr, "", "contract bech32 addr")
+	cmd.Flags().String(flagAmount, "0pdip", "amount of coins to send (e.g. 1000000pdip)")
+
+	cmd.MarkFlagRequired(flagContractAddr)
+	cmd.MarkFlagRequired(flagAmount)
 
 	cmd = client.PostCommands(cmd)[0]
 
