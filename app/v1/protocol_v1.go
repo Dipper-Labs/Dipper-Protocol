@@ -1,4 +1,4 @@
-package v0
+package v1
 
 import (
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -8,7 +8,6 @@ import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/protocol"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/ante"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/bank"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/crisis"
 	distr "github.com/Dipper-Labs/Dipper-Protocol/app/v0/distribution"
 	distrclient "github.com/Dipper-Labs/Dipper-Protocol/app/v0/distribution/client"
@@ -24,13 +23,14 @@ import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/supply"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/upgrade"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/upgrade/types"
-	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/vm"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/bank"
+	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/types/module"
 )
 
-var _ protocol.Protocol = (*ProtocolV0)(nil)
+var _ protocol.Protocol = (*ProtocolV1)(nil)
 
 // ModuleBasics - The module BasicManager is in charge of setting up basic,
 // non-dependant module elements, such as codec registration
@@ -62,8 +62,8 @@ var maccPerms = map[string][]string{
 	gov.ModuleName:            {supply.Burner},
 }
 
-// ProtocolV0 is the struct of the original protocol
-type ProtocolV0 struct {
+// ProtocolV1 is the struct of the original protocol
+type ProtocolV1 struct {
 	version uint64
 	cdc     *codec.Codec
 	logger  log.Logger
@@ -101,9 +101,9 @@ type ProtocolV0 struct {
 	invCheckPeriod uint
 }
 
-// NewProtocolV0 creates a new instance of ProtocolV0
-func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, deliverTx genutil.DeliverTxfn, invCheckPeriod uint, config *cfg.InstrumentationConfig) *ProtocolV0 {
-	p0 := ProtocolV0{
+// NewProtocolV1 creates a new instance of ProtocolV1
+func NewProtocolV1(version uint64, log log.Logger, pk sdk.ProtocolKeeper, deliverTx genutil.DeliverTxfn, invCheckPeriod uint, config *cfg.InstrumentationConfig) *ProtocolV1 {
+	p1 := ProtocolV1{
 		version:        version,
 		logger:         log,
 		protocolKeeper: pk,
@@ -114,36 +114,36 @@ func NewProtocolV0(version uint64, log log.Logger, pk sdk.ProtocolKeeper, delive
 		invCheckPeriod: invCheckPeriod,
 	}
 
-	return &p0
+	return &p1
 }
 
 // GetVersion gets the version of this protocol
-func (p *ProtocolV0) GetVersion() uint64 {
+func (p *ProtocolV1) GetVersion() uint64 {
 	return p.version
 }
 
 // GetRouter
-func (p *ProtocolV0) GetRouter() sdk.Router {
+func (p *ProtocolV1) GetRouter() sdk.Router {
 	return p.router
 }
 
 // GetQueryRouter
-func (p *ProtocolV0) GetQueryRouter() sdk.QueryRouter {
+func (p *ProtocolV1) GetQueryRouter() sdk.QueryRouter {
 	return p.queryRouter
 }
 
 // GetAnteHandler
-func (p *ProtocolV0) GetAnteHandler() sdk.AnteHandler {
+func (p *ProtocolV1) GetAnteHandler() sdk.AnteHandler {
 	return p.anteHandler
 }
 
 // GetFeeRefundHandler
-func (p *ProtocolV0) GetFeeRefundHandler() sdk.FeeRefundHandler {
+func (p *ProtocolV1) GetFeeRefundHandler() sdk.FeeRefundHandler {
 	return p.feeRefundHandler
 }
 
 // LoadContext updates the context for the app after the upgrade of protocol
-func (p *ProtocolV0) LoadContext() {
+func (p *ProtocolV1) LoadContext() {
 	p.configCodec()
 	p.configKeepers()
 	p.configModuleManager()
@@ -153,30 +153,30 @@ func (p *ProtocolV0) LoadContext() {
 }
 
 // Init
-func (p *ProtocolV0) Init() {
+func (p *ProtocolV1) Init() {
 }
 
 // GetCodec gets tx codec
-func (p *ProtocolV0) GetCodec() *codec.Codec {
+func (p *ProtocolV1) GetCodec() *codec.Codec {
 	return p.cdc
 }
 
 // GetInitChainer
-func (p *ProtocolV0) GetInitChainer() sdk.InitChainer {
+func (p *ProtocolV1) GetInitChainer() sdk.InitChainer {
 	return p.InitChainer
 }
 
 // GetBeginBlocker
-func (p *ProtocolV0) GetBeginBlocker() sdk.BeginBlocker {
+func (p *ProtocolV1) GetBeginBlocker() sdk.BeginBlocker {
 	return p.BeginBlocker
 }
 
 // GetEndBlocker
-func (p *ProtocolV0) GetEndBlocker() sdk.EndBlocker {
+func (p *ProtocolV1) GetEndBlocker() sdk.EndBlocker {
 	return p.EndBlocker
 }
 
-func (p *ProtocolV0) configCodec() {
+func (p *ProtocolV1) configCodec() {
 	p.cdc = MakeCodec()
 }
 
@@ -202,7 +202,7 @@ func ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-func (p *ProtocolV0) configKeepers() {
+func (p *ProtocolV1) configKeepers() {
 	p.paramsKeeper = params.NewKeeper(p.cdc, protocol.Keys[params.StoreKey], protocol.TKeys[params.TStoreKey])
 	authSubspace := p.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := p.paramsKeeper.Subspace(bank.DefaultParamspace)
@@ -261,7 +261,7 @@ func (p *ProtocolV0) configKeepers() {
 		p.stakingKeeper)
 }
 
-func (p *ProtocolV0) configModuleManager() {
+func (p *ProtocolV1) configModuleManager() {
 	moduleManager := module.NewManager(
 		genaccounts.NewAppModule(p.accountKeeper),
 		genutil.NewAppModule(p.accountKeeper, p.stakingKeeper, p.deliverTx),
@@ -315,7 +315,7 @@ func (p *ProtocolV0) configModuleManager() {
 	p.moduleManager = moduleManager
 }
 
-func (p *ProtocolV0) configSimulationManager() {
+func (p *ProtocolV1) configSimulationManager() {
 	slashingModule := slashing.NewAppModule(p.slashingKeeper, p.stakingKeeper)
 	slashingModuleP := slashingModule.WithAccountKeeper(p.accountKeeper).WithStakingKeeper(p.stakingKeeper)
 
@@ -343,12 +343,12 @@ func (p *ProtocolV0) configSimulationManager() {
 	p.simManager = simManager
 }
 
-func (p *ProtocolV0) configRouters() {
+func (p *ProtocolV1) configRouters() {
 	p.moduleManager.RegisterRoutes(p.router, p.queryRouter)
 }
 
 // InitChainer initializes application state at genesis as a hook
-func (p *ProtocolV0) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (p *ProtocolV1) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState sdk.GenesisState
 	p.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
 
@@ -356,16 +356,16 @@ func (p *ProtocolV0) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abc
 }
 
 // BeginBlocker set function to BaseApp as a hook
-func (p *ProtocolV0) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (p *ProtocolV1) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return p.moduleManager.BeginBlock(ctx, req)
 }
 
 // EndBlocker sets function to BaseApp as a hook
-func (p *ProtocolV0) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (p *ProtocolV1) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return p.moduleManager.EndBlock(ctx, req)
 }
 
-func (p *ProtocolV0) configFeeHandlers() {
+func (p *ProtocolV1) configFeeHandlers() {
 	p.anteHandler = ante.NewAnteHandler(p.accountKeeper, p.supplyKeeper, ante.DefaultSigVerificationGasConsumer)
 	p.feeRefundHandler = auth.NewFeeRefundHandler(p.accountKeeper, p.supplyKeeper, p.refundKeeper)
 }
@@ -373,26 +373,26 @@ func (p *ProtocolV0) configFeeHandlers() {
 //for test
 
 // SetInitChainer set the initChainer
-func (p *ProtocolV0) SetInitChainer(initChainer sdk.InitChainer) {
+func (p *ProtocolV1) SetInitChainer(initChainer sdk.InitChainer) {
 	p.initChainer = initChainer
 }
 
 // SetRouter allows us to customize the router
-func (p *ProtocolV0) SetRouter(router sdk.Router) {
+func (p *ProtocolV1) SetRouter(router sdk.Router) {
 	p.router = router
 }
 
 // SetQueryRouter allows us to customize the query router
-func (p *ProtocolV0) SetQueryRouter(queryRouter sdk.QueryRouter) {
+func (p *ProtocolV1) SetQueryRouter(queryRouter sdk.QueryRouter) {
 	p.queryRouter = queryRouter
 }
 
 // SetAnteHandler set the anteHandler
-func (p *ProtocolV0) SetAnteHandler(anteHandler sdk.AnteHandler) {
+func (p *ProtocolV1) SetAnteHandler(anteHandler sdk.AnteHandler) {
 	p.anteHandler = anteHandler
 }
 
 // GetSimulationManager - for simulation
-func (p *ProtocolV0) GetSimulationManager() interface{} {
+func (p *ProtocolV1) GetSimulationManager() interface{} {
 	return p.simManager
 }

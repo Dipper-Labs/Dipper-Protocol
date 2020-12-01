@@ -16,6 +16,7 @@ import (
 	"github.com/Dipper-Labs/Dipper-Protocol/app/protocol"
 	v0 "github.com/Dipper-Labs/Dipper-Protocol/app/v0"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
+	v1 "github.com/Dipper-Labs/Dipper-Protocol/app/v1"
 	"github.com/Dipper-Labs/Dipper-Protocol/baseapp"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
@@ -101,6 +102,7 @@ func NewDIPApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 	}
 
 	engine.Add(v0.NewProtocolV0(0, logger, protocolKeeper, app.DeliverTx, invCheckPeriod, nil))
+	engine.Add(v1.NewProtocolV1(1, logger, protocolKeeper, app.DeliverTx, invCheckPeriod, nil))
 
 	loaded, current := engine.LoadCurrentProtocol(app.GetCms().GetKVStore(mainStoreKey))
 	if !loaded {
@@ -115,7 +117,7 @@ func NewDIPApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bo
 }
 
 func MakeLatestCodec() *codec.Codec {
-	return v0.MakeCodec()
+	return v1.MakeCodec()
 }
 
 func (app *DIPApp) LoadHeight(height int64) error {
