@@ -214,32 +214,76 @@ func (p *ProtocolV1) configKeepers() {
 	crisisSubspace := p.paramsKeeper.Subspace(crisis.DefaultParamspace)
 	vmSubspace := p.paramsKeeper.Subspace(vm.DefaultParamspace)
 
-	p.accountKeeper = auth.NewAccountKeeper(p.cdc, protocol.Keys[auth.StoreKey], authSubspace, auth.ProtoBaseAccount)
+	p.accountKeeper = auth.NewAccountKeeper(
+		p.cdc,
+		protocol.Keys[auth.StoreKey],
+		authSubspace,
+		auth.ProtoBaseAccount,
+	)
 	p.refundKeeper = auth.NewRefundKeeper(p.cdc, protocol.Keys[auth.RefundKey])
-	p.bankKeeper = bank.NewBaseKeeper(p.accountKeeper, bankSubspace, ModuleAccountAddrs())
-	p.supplyKeeper = supply.NewKeeper(p.cdc, protocol.Keys[protocol.SupplyStoreKey], p.accountKeeper, p.bankKeeper, maccPerms)
-	stakingKeeper := staking.NewKeeper(
-		p.cdc, protocol.Keys[staking.StoreKey], protocol.TKeys[staking.TStoreKey],
-		p.supplyKeeper, stakingSubspace)
-	p.mintKeeper = mint.NewKeeper(p.cdc, protocol.Keys[mint.StoreKey], mintSubspace, &stakingKeeper, p.supplyKeeper, auth.FeeCollectorName)
-	p.distrKeeper = distr.NewKeeper(p.cdc, protocol.Keys[distr.StoreKey], distrSubspace, &stakingKeeper,
-		p.supplyKeeper, auth.FeeCollectorName, ModuleAccountAddrs())
-	p.slashingKeeper = slashing.NewKeeper(
-		p.cdc, protocol.Keys[slashing.StoreKey], &stakingKeeper, slashingSubspace)
-	p.crisisKeeper = crisis.NewKeeper(crisisSubspace, p.invCheckPeriod, p.supplyKeeper, auth.FeeCollectorName)
-
 	p.vmKeeper = vm.NewKeeper(
 		p.cdc,
 		protocol.Keys[protocol.VMStoreKey],
 		vmSubspace,
 		p.accountKeeper,
 	)
-
+	p.bankKeeper = bank.NewBaseKeeper(
+		p.accountKeeper,
+		&p.vmKeeper,
+		bankSubspace,
+		ModuleAccountAddrs(),
+	)
+	p.supplyKeeper = supply.NewKeeper(
+		p.cdc,
+		protocol.Keys[protocol.SupplyStoreKey],
+		p.accountKeeper,
+		p.bankKeeper,
+		maccPerms,
+	)
+	stakingKeeper := staking.NewKeeper(
+		p.cdc,
+		protocol.Keys[staking.StoreKey],
+		protocol.TKeys[staking.TStoreKey],
+		p.supplyKeeper, stakingSubspace,
+	)
+	p.mintKeeper = mint.NewKeeper(
+		p.cdc,
+		protocol.Keys[mint.StoreKey],
+		mintSubspace,
+		&stakingKeeper,
+		p.supplyKeeper,
+		auth.FeeCollectorName,
+	)
+	p.distrKeeper = distr.NewKeeper(
+		p.cdc,
+		protocol.Keys[distr.StoreKey],
+		distrSubspace,
+		&stakingKeeper,
+		p.supplyKeeper,
+		auth.FeeCollectorName,
+		ModuleAccountAddrs(),
+	)
+	p.slashingKeeper = slashing.NewKeeper(
+		p.cdc,
+		protocol.Keys[slashing.StoreKey],
+		&stakingKeeper,
+		slashingSubspace,
+	)
+	p.crisisKeeper = crisis.NewKeeper(
+		crisisSubspace,
+		p.invCheckPeriod,
+		p.supplyKeeper,
+		auth.FeeCollectorName,
+	)
 	p.guardianKeeper = guardian.NewKeeper(p.cdc, protocol.Keys[protocol.GuardianStoreKey])
-
 	p.govKeeper = gov.NewKeeper(
-		p.cdc, protocol.Keys[gov.StoreKey], govSubspace, p.supplyKeeper,
-		&stakingKeeper, p.guardianKeeper, p.protocolKeeper,
+		p.cdc,
+		protocol.Keys[gov.StoreKey],
+		govSubspace,
+		p.supplyKeeper,
+		&stakingKeeper,
+		p.guardianKeeper,
+		p.protocolKeeper,
 	)
 
 	govRouter := gov.NewRouter()
@@ -258,7 +302,8 @@ func (p *ProtocolV1) configKeepers() {
 		p.cdc,
 		protocol.Keys[protocol.UpgradeStoreKey],
 		p.protocolKeeper,
-		p.stakingKeeper)
+		p.stakingKeeper,
+	)
 }
 
 func (p *ProtocolV1) configModuleManager() {

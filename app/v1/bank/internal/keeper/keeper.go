@@ -25,6 +25,7 @@ type Keeper interface {
 	UndelegateCoins(ctx sdk.Context, moduleAccAddr, delegatorAddr sdk.AccAddress, amt sdk.Coins) error
 
 	IsContractAccount(ctx sdk.Context, addr sdk.AccAddress) bool
+
 	GetVMKeeper() *vm.Keeper
 }
 
@@ -32,12 +33,14 @@ type Keeper interface {
 type BaseKeeper struct {
 	BaseSendKeeper
 
+	vmKeeper   *vm.Keeper
 	ak         types.AccountKeeper
 	paramSpace params.Subspace
 }
 
 // NewBaseKeeper returns a new BaseKeeper
 func NewBaseKeeper(ak types.AccountKeeper,
+	vmKeeper *vm.Keeper,
 	paramSpace params.Subspace,
 	blacklistedAddrs map[string]bool) BaseKeeper {
 
@@ -45,17 +48,18 @@ func NewBaseKeeper(ak types.AccountKeeper,
 	return BaseKeeper{
 		BaseSendKeeper: NewBaseSendKeeper(ak, ps, blacklistedAddrs),
 		ak:             ak,
+		vmKeeper:       vmKeeper,
 		paramSpace:     ps,
 	}
+}
+
+func (keeper BaseKeeper) GetVMKeeper() *vm.Keeper {
+	return keeper.vmKeeper
 }
 
 func (keeper BaseKeeper) IsContractAccount(ctx sdk.Context, addr sdk.AccAddress) bool {
 	account := keeper.ak.GetAccount(ctx, addr)
 	return len(account.GetCodeHash()) > 0
-}
-
-func (keeper BaseKeeper) GetVMKeeper() *vm.Keeper {
-	return keeper.vmKeeper
 }
 
 // DelegateCoins performs delegation by deducting amt coins from an account with
@@ -170,7 +174,6 @@ var _ SendKeeper = (*BaseSendKeeper)(nil)
 type BaseSendKeeper struct {
 	BaseViewKeeper
 
-	vmKeeper   *vm.Keeper
 	ak         types.AccountKeeper
 	paramSpace params.Subspace
 
@@ -188,15 +191,6 @@ func NewBaseSendKeeper(ak types.AccountKeeper,
 		paramSpace:       paramSpace,
 		blacklistedAddrs: blacklistedAddrs,
 	}
-}
-
-func (keeper *BaseSendKeeper) WithVMKeeper(vmKeeper *vm.Keeper) BaseSendKeeper {
-	keeper.vmKeeper = vmKeeper
-	return *keeper
-}
-
-func (keeper *BaseSendKeeper) SetVMKeeper(vmKeeper *vm.Keeper) {
-	keeper.vmKeeper = vmKeeper
 }
 
 // InputOutputCoins handles a list of inputs and outputs

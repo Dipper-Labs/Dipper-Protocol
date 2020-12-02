@@ -41,7 +41,7 @@ func handleMsgSend(ctx sdk.Context, k keeper.Keeper, msg types.MsgSend) (*sdk.Re
 		contractMsg.From = msg.FromAddress
 		contractMsg.To = msg.ToAddress
 		contractMsg.Amount = sdk.Coin{Denom: sdk.NativeTokenName, Amount: msg.Amount.AmountOf(sdk.NativeTokenName)}
-		vm.HandleMsgContract(ctx, contractMsg, k.GetVMKeeper())
+		return vm.HandleMsgContract(ctx, contractMsg, k.GetVMKeeper())
 	}
 
 	err := k.SendCoins(ctx, msg.FromAddress, msg.ToAddress, msg.Amount)
