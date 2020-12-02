@@ -151,6 +151,7 @@ func (app *DIPApp) postEndBlocker(res *abci.ResponseEndBlock) {
 	}
 
 	app.Log(fmt.Sprintf("activate version from %d to %d failed, please upgrade your app", app.Engine.GetCurrentVersion(), appVersion))
+	os.Exit(0)
 }
 
 // ExportAppStateAndValidators exports the state of application for a genesis file
