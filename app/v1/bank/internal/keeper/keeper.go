@@ -59,7 +59,7 @@ func (keeper BaseKeeper) GetVMKeeper() *vm.Keeper {
 
 func (keeper BaseKeeper) IsContractAccount(ctx sdk.Context, addr sdk.AccAddress) bool {
 	account := keeper.ak.GetAccount(ctx, addr)
-	return len(account.GetCodeHash()) > 0
+	return account != nil && len(account.GetCodeHash()) > 0
 }
 
 // DelegateCoins performs delegation by deducting amt coins from an account with
