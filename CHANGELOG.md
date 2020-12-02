@@ -5,6 +5,7 @@
 ## dipcli
 add 'vm fallback command'
 ## dipd
+fix issue #10
 add 'fallback mechanism for vm'
 
 ----
