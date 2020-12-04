@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
@@ -37,26 +36,14 @@ func (q QueryStorageResult) String() string {
 
 // SimulationResult - for Gas Estimate
 type SimulationResult struct {
-	Gas uint64
-	Res string
+	Code   uint8
+	ErrMsg string
+	Gas    uint64
+	Res    string
 }
 
 func (r SimulationResult) String() string {
-	return fmt.Sprintf("Gas = %d\nRes = %s", r.Gas, r.Res)
-}
-
-// VMQueryResult
-type VMQueryResult struct {
-	Gas    uint64
-	Result []interface{}
-}
-
-func (r VMQueryResult) String() string {
-	j, err := json.Marshal(r)
-	if err != nil {
-		return fmt.Sprintf("Gas = %d\nValues = %s", r.Gas, err.Error())
-	}
-	return string(j)
+	return fmt.Sprintf("Code = %d\nErrMsg = %s\nGas = %d\nRes = %s", r.Code, r.ErrMsg, r.Gas, r.Res)
 }
 
 // QueryStateParams - for query vm db state

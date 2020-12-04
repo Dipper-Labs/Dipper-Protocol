@@ -4,14 +4,13 @@ import (
 	"os"
 	"path"
 
-	v0 "github.com/Dipper-Labs/Dipper-Protocol/app/v0"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/Dipper-Labs/Dipper-Protocol/app"
+	v0 "github.com/Dipper-Labs/Dipper-Protocol/app/v0"
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth"
 	authcmd "github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/client/cli"
 	authrest "github.com/Dipper-Labs/Dipper-Protocol/app/v0/auth/client/rest"

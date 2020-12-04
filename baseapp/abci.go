@@ -434,15 +434,11 @@ func handleQueryCustom(app *BaseApp, path []string, req abci.RequestQuery) (res 
 	//
 	// For example, in the path "custom/gov/proposal/test", the gov querier gets
 	// []string{"proposal", "test"} as the path.
-	resBytes, queryErr := querier(ctx, path[2:], req)
-	if queryErr != nil {
-		space, code, log := sdkerrors.ABCIInfo(err, false)
-		return abci.ResponseQuery{
-			Code:      code,
-			Codespace: space,
-			Log:       log,
-			Height:    req.Height,
-		}
+	resBytes, err := querier(ctx, path[2:], req)
+	if err != nil {
+		res := sdkerrors.QueryResult(err)
+		res.Height = req.Height
+		return res
 	}
 
 	return abci.ResponseQuery{

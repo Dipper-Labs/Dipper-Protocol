@@ -99,16 +99,22 @@ func simulateStateTransition(ctx sdk.Context, req abci.RequestQuery, k keeper.Ke
 	var msg types.MsgContract
 	codec.Cdc.UnmarshalJSON(req.Data, &msg)
 
+	simResult := types.SimulationResult{}
 	_, result, err := DoStateTransition(ctx, msg, k, true)
-
-	if err == nil {
-		bRes := types.SimulationResult{Gas: result.GasUsed, Res: hex.EncodeToString(result.Data)}
-		res, err := codec.MarshalJSONIndent(k.Cdc, bRes)
-		if err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-		}
-		return res, nil
+	if err != nil {
+		simResult.Code = 1
+		simResult.ErrMsg = err.Error()
+	} else {
+		simResult.Code = 0
+		simResult.ErrMsg = ""
+		simResult.Gas = result.GasUsed
+		simResult.Res = hex.EncodeToString(result.Data)
 	}
 
-	return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "StateTransition faileds")
+	res, err := codec.MarshalJSONIndent(k.Cdc, simResult)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
 }

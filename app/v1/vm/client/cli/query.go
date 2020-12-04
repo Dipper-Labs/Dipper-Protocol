@@ -11,13 +11,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ethereum/go-ethereum/common"
-
 	"github.com/Dipper-Labs/Dipper-Protocol/app/v1/vm/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/client"
 	"github.com/Dipper-Labs/Dipper-Protocol/client/context"
 	"github.com/Dipper-Labs/Dipper-Protocol/codec"
-	"github.com/Dipper-Labs/Dipper-Protocol/hexutil"
 	sdk "github.com/Dipper-Labs/Dipper-Protocol/types"
 	"github.com/Dipper-Labs/Dipper-Protocol/version"
 )
@@ -340,7 +337,7 @@ $ %s query vm call dip1mfztsv6eq5rhtaz2l6jjp3yup3q80agsqra9qe dip1rk47h83x4nz474
 			}
 
 			argList := viper.GetStringSlice(flagArgs)
-			payload, m, err := GenPayload(args[3], args[2], argList)
+			payload, _, err := GenPayload(args[3], args[2], argList)
 			if err != nil {
 				return err
 			}
@@ -352,39 +349,8 @@ $ %s query vm call dip1mfztsv6eq5rhtaz2l6jjp3yup3q80agsqra9qe dip1rk47h83x4nz474
 			}
 
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/vm/%s", types.QueryCall), data)
-			if err != nil {
-				return err
-			}
-
-			var out types.SimulationResult
-			cdc.MustUnmarshalJSON(res, &out)
-
-			d, err := hexutil.Decode(out.Res)
-			if err != nil {
-				return cliCtx.PrintOutput(out)
-			}
-
-			var result types.VMQueryResult
-			result.Gas = out.Gas
-			result.Result, err = m.Outputs.UnpackValues(d)
-			if err != nil {
-				return err
-			}
-
-			for i := 0; i < len(m.Outputs); i++ {
-				if m.Outputs[i].Type.String() == "address" {
-					var addr sdk.AccAddress
-					if ethAddr, ok := result.Result[i].(common.Address); ok {
-						addr = append(addr[:], ethAddr.Bytes()...)
-						result.Result[i] = addr.String()
-					}
-				}
-			}
-
-			fmt.Println(result)
-
+			fmt.Println(string(res))
 			return nil
-
 		},
 	}
 
